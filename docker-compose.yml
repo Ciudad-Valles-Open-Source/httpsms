@@ -71,7 +71,7 @@ services:
       args:
         GIT_COMMIT: ${GIT_COMMIT:-dev}
     ports:
-      - "${APP_PORT:-8000}:8000"
+      - "${API_PORT:-8000}:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -87,7 +87,8 @@ services:
     environment:
       # ── Core ────────────────────────────────────────────────────────────
       ENV: ${ENV:-local}
-      APP_PORT: ${APP_PORT:-8000}
+      API_PORT: ${API_PORT:-8000}  # Defines external host port. Added here so Coolify detects it.
+      APP_PORT: "8000"             # Internal port where Go listens. Do not change.
       APP_URL: ${APP_URL:-http://localhost:3000}
       APP_NAME: ${APP_NAME:-httpSMS}
       SWAGGER_HOST: ${SWAGGER_HOST:-localhost:8000}
@@ -185,6 +186,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    environment:
+      WEB_PORT: ${WEB_PORT:-3000} # Defines external host port. Added here so Coolify detects it.
 
 volumes:
   postgres_data:
