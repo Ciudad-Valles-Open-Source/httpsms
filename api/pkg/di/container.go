@@ -423,6 +423,9 @@ ALTER TABLE discords ADD CONSTRAINT IF NOT EXISTS uni_discords_server_id CHECK (
 		container.logger.Fatal(stacktrace.Propagatef(err, "cannot migrate %T", &entities.Contact{}))
 	}
 
+	// Seed the system user on first boot (no-op if users already exist)
+	container.SeedSystemUser(db)
+
 	return container.db
 }
 

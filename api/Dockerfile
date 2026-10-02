@@ -1,37 +1,53 @@
-FROM golang AS builder
+# =============================================================================
+# httpSMS API – Dockerfile (Coolify-ready)
+# =============================================================================
+# Multi-stage build: compiles the Go binary with Swagger docs, then runs in a
+# minimal Alpine container. All runtime configuration is via environment
+# variables (set in Coolify's UI or your .env file).
+# =============================================================================
 
-ARG GIT_COMMIT
+# ── Stage 1: Build ───────────────────────────────────────────────────────────
+FROM golang:1.23-alpine AS builder
+
+ARG GIT_COMMIT=dev
 ENV GIT_COMMIT=$GIT_COMMIT
+
+# Install git (needed by swag for parsing)
+RUN apk add --no-cache git
 
 WORKDIR /http-sms
 
-COPY go.mod .
-COPY go.sum .
-
+# Cache dependency downloads
+COPY go.mod go.sum ./
 RUN go mod download
 
+# Copy source
 COPY . .
 
-RUN go get github.com/swaggo/swag/gen@latest
-RUN go get github.com/swaggo/swag/cmd/swag@latest
-RUN go install github.com/swaggo/swag/cmd/swag
-RUN swag init --requiredByDefault --parseDependency --parseInternal
+# Generate Swagger docs
+RUN go install github.com/swaggo/swag/cmd/swag@latest \
+    && swag init --requiredByDefault --parseDependency --parseInternal
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-X main.Version=$GIT_COMMIT" -o /bin/http-sms .
+# Build a statically linked binary
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -ldflags "-s -w -X main.Version=$GIT_COMMIT" \
+    -o /bin/http-sms .
 
-FROM alpine:latest
+# ── Stage 2: Production ─────────────────────────────────────────────────────
+FROM alpine:3.20
 
-RUN apk add --no-cache curl && addgroup -S http-sms && adduser -S http-sms -G http-sms
+RUN apk add --no-cache curl ca-certificates tzdata \
+    && addgroup -S httpsms \
+    && adduser -S httpsms -G httpsms
 
-USER http-sms
-WORKDIR /home/http-sms
+USER httpsms
+WORKDIR /home/httpsms
 
-COPY --from=builder /usr/local/go/lib/time/zoneinfo.zip /zoneinfo.zip
 COPY --from=builder /bin/http-sms ./
 COPY --from=builder /http-sms/root.crt ./
 
-ENV ZONEINFO=/zoneinfo.zip
-
 EXPOSE 8000
 
+# --dotenv=false tells the app to read config from environment variables
+# (not from a .env file), which is exactly what Coolify provides.
 ENTRYPOINT ["./http-sms", "--dotenv=false"]
