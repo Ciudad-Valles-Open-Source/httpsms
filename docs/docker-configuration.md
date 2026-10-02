@@ -33,7 +33,7 @@ This document describes the Docker configuration provided in this repository, ex
 
 The API image uses a two-stage build:
 
-**Stage 1 — Builder (`golang:1.23-alpine`)**
+**Stage 1 — Builder (`golang:1.26-alpine`)**
 
 - Downloads Go module dependencies before copying source code, exploiting Docker's layer cache. Subsequent builds reuse the dependency layer if `go.mod` and `go.sum` have not changed.
 - Installs and runs `swag` to generate the Swagger specification from Go source annotations. The generated output is embedded in the binary.
