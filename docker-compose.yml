@@ -87,7 +87,7 @@ services:
     environment:
       # ── Core ────────────────────────────────────────────────────────────
       ENV: ${ENV:-local}
-      APP_PORT: "8000"
+      APP_PORT: ${APP_PORT:-8000}
       APP_URL: ${APP_URL:-http://localhost:3000}
       APP_NAME: ${APP_NAME:-httpSMS}
       SWAGGER_HOST: ${SWAGGER_HOST:-localhost:8000}
