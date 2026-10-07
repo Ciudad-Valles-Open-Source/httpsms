@@ -1,4 +1,4 @@
-package com.httpsms
+package com.nerus.httpsms
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -25,8 +25,11 @@ class SmsManagerService {
             return "${BuildConfig.APPLICATION_ID}.$ACTION_SMS_DELIVERED"
         }
 
-        fun isDualSIM(context: Context) : Boolean {
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED
+        fun isDualSIM(context: Context): Boolean {
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.READ_PHONE_STATE
+                ) != PackageManager.PERMISSION_GRANTED
             ) {
                 Timber.w("cannot check if dual sim, no permission")
                 return false
@@ -44,13 +47,27 @@ class SmsManagerService {
         return getSmsManager(context).divideMessage(content)
     }
 
-    fun sendMultipartMessage(context: Context, contact: String, parts: ArrayList<String>, sim: String, sendIntents: ArrayList<PendingIntent>, deliveryIntents: ArrayList<PendingIntent>) {
+    fun sendMultipartMessage(
+        context: Context,
+        contact: String,
+        parts: ArrayList<String>,
+        sim: String,
+        sendIntents: ArrayList<PendingIntent>,
+        deliveryIntents: ArrayList<PendingIntent>
+    ) {
         runSmsAction(context, sim) { smsManager ->
             smsManager.sendMultipartTextMessage(contact, null, parts, sendIntents, deliveryIntents)
         }
     }
 
-    fun sendTextMessage(context: Context, contact: String, content: String, sim: String, sentIntent: PendingIntent, deliveryIntent: PendingIntent) {
+    fun sendTextMessage(
+        context: Context,
+        contact: String,
+        content: String,
+        sim: String,
+        sentIntent: PendingIntent,
+        deliveryIntent: PendingIntent
+    ) {
         runSmsAction(context, sim) { smsManager ->
             smsManager.sendTextMessage(contact, null, content, sentIntent, deliveryIntent)
         }
@@ -105,7 +122,7 @@ class SmsManagerService {
             infoList[0].subscriptionId
         } else if (sim == Constants.SIM2 && (infoList?.size ?: 0) > 1) {
             infoList!![1].subscriptionId
-        } else{
+        } else {
             SubscriptionManager.getDefaultSmsSubscriptionId()
         }
 

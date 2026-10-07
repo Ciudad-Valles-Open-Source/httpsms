@@ -1,4 +1,4 @@
-package com.httpsms.validators
+package com.nerus.httpsms.validators
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import timber.log.Timber
@@ -18,6 +18,7 @@ class PhoneNumberValidator {
                 false
             }
         }
+
         fun formatE164(phoneNumber: String, countryCode: String): String {
             return try {
                 val number = phoneNumberUtil.parse(fixNumber(phoneNumber), countryCode)

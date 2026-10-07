@@ -1,4 +1,4 @@
-package com.httpsms
+package com.nerus.httpsms
 
 import android.app.Activity
 import android.content.BroadcastReceiver
@@ -22,17 +22,46 @@ internal class SentReceiver : BroadcastReceiver() {
         cleanupPduFile(context, messageId)
         when (resultCode) {
             Activity.RESULT_OK -> handleMessageSent(context, intent.getStringExtra(Constants.KEY_MESSAGE_ID))
-            SmsManager.RESULT_ERROR_GENERIC_FAILURE -> handleMessageFailed(context, intent.getStringExtra(Constants.KEY_MESSAGE_ID), "GENERIC_FAILURE")
-            SmsManager.RESULT_ERROR_NO_SERVICE -> handleMessageFailed(context, intent.getStringExtra(Constants.KEY_MESSAGE_ID), "NO_SERVICE")
-            SmsManager.RESULT_ERROR_NULL_PDU -> handleMessageFailed(context, intent.getStringExtra(Constants.KEY_MESSAGE_ID), "NULL_PDU")
-            SmsManager.RESULT_ERROR_RADIO_OFF -> handleMessageFailed(context, intent.getStringExtra(Constants.KEY_MESSAGE_ID), "RADIO_OFF")
-            SmsManager.RESULT_ERROR_LIMIT_EXCEEDED -> handleMessageFailed(context, intent.getStringExtra(Constants.KEY_MESSAGE_ID), "LIMIT_EXCEEDED")
-            else -> handleMessageFailed(context, intent.getStringExtra(Constants.KEY_MESSAGE_ID), "UNKNOWN:${resultCode}")
+            SmsManager.RESULT_ERROR_GENERIC_FAILURE -> handleMessageFailed(
+                context,
+                intent.getStringExtra(Constants.KEY_MESSAGE_ID),
+                "GENERIC_FAILURE"
+            )
+
+            SmsManager.RESULT_ERROR_NO_SERVICE -> handleMessageFailed(
+                context,
+                intent.getStringExtra(Constants.KEY_MESSAGE_ID),
+                "NO_SERVICE"
+            )
+
+            SmsManager.RESULT_ERROR_NULL_PDU -> handleMessageFailed(
+                context,
+                intent.getStringExtra(Constants.KEY_MESSAGE_ID),
+                "NULL_PDU"
+            )
+
+            SmsManager.RESULT_ERROR_RADIO_OFF -> handleMessageFailed(
+                context,
+                intent.getStringExtra(Constants.KEY_MESSAGE_ID),
+                "RADIO_OFF"
+            )
+
+            SmsManager.RESULT_ERROR_LIMIT_EXCEEDED -> handleMessageFailed(
+                context,
+                intent.getStringExtra(Constants.KEY_MESSAGE_ID),
+                "LIMIT_EXCEEDED"
+            )
+
+            else -> handleMessageFailed(
+                context,
+                intent.getStringExtra(Constants.KEY_MESSAGE_ID),
+                "UNKNOWN:${resultCode}"
+            )
         }
     }
 
     private fun cleanupPduFile(context: Context, messageId: String?) {
-                if (messageId == null) return
+        if (messageId == null) return
 
         try {
             val baseMessageId = messageId.substringBefore(".")
@@ -106,21 +135,23 @@ internal class SentReceiver : BroadcastReceiver() {
         Timber.d("work enqueued with ID [${work.id}] for [FAILED] message with ID [${messageId}]")
     }
 
-    internal class SentMessageWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
+    internal class SentMessageWorker(appContext: Context, workerParams: WorkerParameters) :
+        Worker(appContext, workerParams) {
         override fun doWork(): Result {
             val messageId = this.inputData.getString(Constants.KEY_MESSAGE_ID)
             val timestamp = this.inputData.getString(Constants.KEY_MESSAGE_TIMESTAMP)
 
             Timber.i("[${timestamp}] sending [SENT] message event with ID [${messageId}]")
 
-            if (HttpSmsApiService.create(applicationContext).sendSentEvent(messageId!!, timestamp!!)){
+            if (HttpSmsApiService.create(applicationContext).sendSentEvent(messageId!!, timestamp!!)) {
                 return Result.success()
             }
             return Result.retry()
         }
     }
 
-    internal class FailedMessageWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
+    internal class FailedMessageWorker(appContext: Context, workerParams: WorkerParameters) :
+        Worker(appContext, workerParams) {
         override fun doWork(): Result {
             val messageId = this.inputData.getString(Constants.KEY_MESSAGE_ID)
             val reason = this.inputData.getString(Constants.KEY_MESSAGE_REASON)
@@ -128,7 +159,7 @@ internal class SentReceiver : BroadcastReceiver() {
 
             Timber.i("[${timestamp}] sending [FAILED] message event with ID [${messageId}] and reason [$reason]")
 
-            if (HttpSmsApiService.create(applicationContext).sendFailedEvent(messageId!!, timestamp!!, reason!!)){
+            if (HttpSmsApiService.create(applicationContext).sendFailedEvent(messageId!!, timestamp!!, reason!!)) {
                 return Result.success()
             }
             return Result.retry()

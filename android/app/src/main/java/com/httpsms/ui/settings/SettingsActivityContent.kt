@@ -1,4 +1,4 @@
-package com.httpsms.ui.settings
+package com.nerus.httpsms.ui.settings
 
 import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -42,8 +42,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
-import com.httpsms.R
-import com.httpsms.ui.theme.LogoGreen
+import com.nerus.httpsms.R
+import com.nerus.httpsms.ui.theme.LogoGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -219,7 +219,9 @@ fun SwitchSetting(
             text = text,
             modifier = Modifier.weight(1f),
             fontSize = 18.sp,
-            color = if (enabled) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+            color = if (enabled) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(
+                alpha = 0.5f
+            )
         )
         Switch(
             checked = checked,

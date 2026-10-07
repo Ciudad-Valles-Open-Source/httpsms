@@ -1,4 +1,4 @@
-package com.httpsms.receivers
+package com.nerus.httpsms.receivers
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
@@ -16,9 +16,9 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.httpsms.Constants
-import com.httpsms.HttpSmsApiService
-import com.httpsms.Settings
+import com.nerus.httpsms.Constants
+import com.nerus.httpsms.HttpSmsApiService
+import com.nerus.httpsms.Settings
 import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneOffset
@@ -72,7 +72,8 @@ class PhoneStateReceiver : BroadcastReceiver() {
             Constants.KEY_MESSAGE_FROM to contact,
             Constants.KEY_MESSAGE_SIM to sim,
             Constants.KEY_MESSAGE_TO to owner,
-            Constants.KEY_MESSAGE_TIMESTAMP to DateTimeFormatter.ofPattern(Constants.TIMESTAMP_PATTERN).format(timestamp).replace("+", "Z")
+            Constants.KEY_MESSAGE_TIMESTAMP to DateTimeFormatter.ofPattern(Constants.TIMESTAMP_PATTERN)
+                .format(timestamp).replace("+", "Z")
         )
 
         val work = OneTimeWorkRequest
@@ -100,9 +101,9 @@ class PhoneStateReceiver : BroadcastReceiver() {
         var sim = Constants.SIM1
         localSubscriptionManager.activeSubscriptionInfoList!!.forEach {
             if (it.subscriptionId == subscriptionId) {
-               if (it.simSlotIndex > 0){
-                   sim = Constants.SIM2
-               }
+                if (it.simSlotIndex > 0) {
+                    sim = Constants.SIM2
+                }
             }
         }
         return sim
@@ -110,7 +111,8 @@ class PhoneStateReceiver : BroadcastReceiver() {
 
     private fun getCallLog(context: Context, phoneNumber: String): Pair<ZonedDateTime, String>? {
         // Specify the columns you want to retrieve from the call log
-        val projection = arrayOf(CallLog.Calls.NUMBER, CallLog.Calls.DATE, CallLog.Calls.TYPE, CallLog.Calls.PHONE_ACCOUNT_ID)
+        val projection =
+            arrayOf(CallLog.Calls.NUMBER, CallLog.Calls.DATE, CallLog.Calls.TYPE, CallLog.Calls.PHONE_ACCOUNT_ID)
 
         // Query the call log content provider
         val cursor = context.contentResolver.query(
@@ -135,7 +137,10 @@ class PhoneStateReceiver : BroadcastReceiver() {
             }
 
             val date = cursor.getLong(cursor.getColumnIndexOrThrow(CallLog.Calls.DATE))
-            val sim = getSlotIndexFromSubscriptionId(context, cursor.getInt(cursor.getColumnIndexOrThrow(CallLog.Calls.PHONE_ACCOUNT_ID)))
+            val sim = getSlotIndexFromSubscriptionId(
+                context,
+                cursor.getInt(cursor.getColumnIndexOrThrow(CallLog.Calls.PHONE_ACCOUNT_ID))
+            )
 
             // Convert date to a readable format (optional)
             val dateString = java.text.DateFormat.getDateTimeInstance().format(date)
@@ -155,16 +160,24 @@ class PhoneStateReceiver : BroadcastReceiver() {
         return null
     }
 
-    internal class MissedCallWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
+    internal class MissedCallWorker(appContext: Context, workerParams: WorkerParameters) :
+        Worker(appContext, workerParams) {
         override fun doWork(): Result {
-            Timber.i("[${this.inputData.getString(Constants.KEY_MESSAGE_SIM)}] forwarding missed call from [${this.inputData.getString(Constants.KEY_MESSAGE_FROM)}] to [${this.inputData.getString(Constants.KEY_MESSAGE_TO)}]")
+            Timber.i(
+                "[${this.inputData.getString(Constants.KEY_MESSAGE_SIM)}] forwarding missed call from [${
+                    this.inputData.getString(
+                        Constants.KEY_MESSAGE_FROM
+                    )
+                }] to [${this.inputData.getString(Constants.KEY_MESSAGE_TO)}]"
+            )
 
             if (HttpSmsApiService.create(applicationContext).sendMissedCallEvent(
                     this.inputData.getString(Constants.KEY_MESSAGE_SIM)!!,
                     this.inputData.getString(Constants.KEY_MESSAGE_FROM)!!,
                     this.inputData.getString(Constants.KEY_MESSAGE_TO)!!,
                     this.inputData.getString(Constants.KEY_MESSAGE_TIMESTAMP)!!,
-                )) {
+                )
+            ) {
                 return Result.success()
             }
 

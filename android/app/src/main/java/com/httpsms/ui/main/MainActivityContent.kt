@@ -1,4 +1,4 @@
-package com.httpsms.ui.main
+package com.nerus.httpsms.ui.main
 
 import android.telephony.PhoneNumberUtils
 import androidx.compose.foundation.Image
@@ -41,9 +41,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.httpsms.R
-import com.httpsms.ui.theme.Blue500
-import com.httpsms.ui.theme.Pink500
+import com.nerus.httpsms.R
+import com.nerus.httpsms.ui.theme.Blue500
+import com.nerus.httpsms.ui.theme.Pink500
 import java.util.Locale
 
 @Composable
@@ -199,7 +199,7 @@ fun MainScreen(
                 fontSize = 18.sp
             )
         }
-        
+
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
@@ -210,10 +210,10 @@ fun PhoneCard(
     isActive: Boolean,
     refreshTime: String
 ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-        ) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(

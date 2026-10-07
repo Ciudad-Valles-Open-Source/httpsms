@@ -1,4 +1,4 @@
-package com.httpsms.ui.main
+package com.nerus.httpsms.ui.main
 
 import android.Manifest
 import android.content.Context
@@ -6,9 +6,9 @@ import android.content.pm.PackageManager
 import android.os.PowerManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.httpsms.Constants
-import com.httpsms.HttpSmsApiService
-import com.httpsms.Settings
+import com.nerus.httpsms.Constants
+import com.nerus.httpsms.HttpSmsApiService
+import com.nerus.httpsms.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,7 +48,7 @@ class MainViewModel : ViewModel() {
         val active1 = Settings.getActiveStatus(context, Constants.SIM1)
         val phone2 = Settings.getSIM2PhoneNumber(context) ?: ""
         val active2 = Settings.getActiveStatus(context, Constants.SIM2)
-        
+
         val timestamp = Settings.getHeartbeatTimestamp(context)
         val lastHeartbeat = if (timestamp == 0L) {
             "--"
@@ -85,7 +85,7 @@ class MainViewModel : ViewModel() {
 
     fun sendHeartbeat(context: Context, onComplete: (String?) -> Unit) {
         _uiState.value = _uiState.value.copy(isHeartbeatLoading = true)
-        
+
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
                 val charging = Settings.isCharging(context)
@@ -95,7 +95,8 @@ class MainViewModel : ViewModel() {
                     if (Settings.getActiveStatus(context, Constants.SIM2)) {
                         phoneNumbers.add(Settings.getSIM2PhoneNumber(context))
                     }
-                    val isStored = HttpSmsApiService.create(context).storeHeartbeat(phoneNumbers.toTypedArray(), charging)
+                    val isStored =
+                        HttpSmsApiService.create(context).storeHeartbeat(phoneNumbers.toTypedArray(), charging)
                     if (!isStored) {
                         "Could not send heartbeat make sure the phone is connected to the internet"
                     } else {
@@ -107,7 +108,7 @@ class MainViewModel : ViewModel() {
                     exception.javaClass.simpleName
                 }
             }
-            
+
             _uiState.value = _uiState.value.copy(isHeartbeatLoading = false)
             updateState(context, _uiState.value.appVersion)
             onComplete(result)

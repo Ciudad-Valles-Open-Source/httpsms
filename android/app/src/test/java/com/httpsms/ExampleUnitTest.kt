@@ -1,4 +1,4 @@
-package com.httpsms
+package com.nerus.httpsms
 
 import org.junit.Test
 

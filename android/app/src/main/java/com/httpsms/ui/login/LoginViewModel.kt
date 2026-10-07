@@ -1,4 +1,4 @@
-package com.httpsms.ui.login
+package com.nerus.httpsms.ui.login
 
 import android.Manifest
 import android.content.Context
@@ -10,11 +10,11 @@ import android.webkit.URLUtil
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.httpsms.Constants
-import com.httpsms.HttpSmsApiService
-import com.httpsms.Settings
-import com.httpsms.SmsManagerService
-import com.httpsms.validators.PhoneNumberValidator
+import com.nerus.httpsms.Constants
+import com.nerus.httpsms.HttpSmsApiService
+import com.nerus.httpsms.Settings
+import com.nerus.httpsms.SmsManagerService
+import com.nerus.httpsms.validators.PhoneNumberValidator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,14 +46,14 @@ class LoginViewModel : ViewModel() {
         val isDualSim = SmsManagerService.isDualSIM(context)
         val phoneNumberSIM1 = Settings.getSIM1PhoneNumber(context)
         val phoneNumberSIM2 = Settings.getSIM2PhoneNumber(context)
-        
+
         _uiState.value = _uiState.value.copy(
             isDualSim = isDualSim,
             phoneNumberSIM1 = phoneNumberSIM1,
             phoneNumberSIM2 = phoneNumberSIM2,
             serverUrl = defaultServerUrl
         )
-        
+
         // Try to auto-detect if fields are empty
         if (phoneNumberSIM1.isEmpty() || (isDualSim && phoneNumberSIM2.isEmpty())) {
             autoDetectPhoneNumbers(context)
@@ -61,13 +61,17 @@ class LoginViewModel : ViewModel() {
     }
 
     fun autoDetectPhoneNumbers(context: Context) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_PHONE_STATE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             Timber.d("READ_PHONE_STATE permission not granted for auto-detecting phone numbers")
             return
         }
 
         val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        
+
         var detectedSIM1 = _uiState.value.phoneNumberSIM1
         var detectedSIM2 = _uiState.value.phoneNumberSIM2
 
@@ -77,11 +81,19 @@ class LoginViewModel : ViewModel() {
             } else {
                 SubscriptionManager.from(context)
             }
-            
-            val activeSubscriptions = try { subscriptionManager.activeSubscriptionInfoList } catch (e: Exception) { null }
-            
+
+            val activeSubscriptions = try {
+                subscriptionManager.activeSubscriptionInfoList
+            } catch (e: Exception) {
+                null
+            }
+
             if (detectedSIM1.isEmpty()) {
-                val line1Number = try { telephonyManager.line1Number } catch (e: Exception) { null }
+                val line1Number = try {
+                    telephonyManager.line1Number
+                } catch (e: Exception) {
+                    null
+                }
                 if (!line1Number.isNullOrEmpty()) {
                     detectedSIM1 = line1Number
                 } else if (activeSubscriptions != null && activeSubscriptions.isNotEmpty()) {
@@ -92,7 +104,7 @@ class LoginViewModel : ViewModel() {
             if (detectedSIM2.isEmpty() && activeSubscriptions != null && activeSubscriptions.size >= 2) {
                 detectedSIM2 = activeSubscriptions[1].number ?: ""
             }
-            
+
             Timber.d("Auto-detected numbers - SIM1: $detectedSIM1, SIM2: $detectedSIM2")
 
         } catch (e: SecurityException) {
@@ -122,9 +134,14 @@ class LoginViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(serverUrl = value, serverUrlError = null)
     }
 
-    fun login(context: Context, countryCode: String, onGooglePlayServicesError: (String) -> Unit, onFcmTokenMissing: () -> Unit) {
+    fun login(
+        context: Context,
+        countryCode: String,
+        onGooglePlayServicesError: (String) -> Unit,
+        onFcmTokenMissing: () -> Unit
+    ) {
         val currentState = _uiState.value
-        
+
         // Validation logic from LoginActivity.onLoginClick
         if (Settings.getFcmToken(context) == null) {
             onFcmTokenMissing()
@@ -156,7 +173,7 @@ class LoginViewModel : ViewModel() {
             }
 
             if (!URLUtil.isValidUrl(serverUrl)) {
-                 _uiState.value = _uiState.value.copy(
+                _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     serverUrlError = "Server URL [$serverUrl] is invalid"
                 )
@@ -175,15 +192,17 @@ class LoginViewModel : ViewModel() {
                 withContext(Dispatchers.IO) {
                     val service = HttpSmsApiService(apiKey, URI(serverUrl))
                     val e164Phone1 = PhoneNumberValidator.formatE164(phone1, countryCode)
-                    val response1 = service.updateFcmToken(e164Phone1, Constants.SIM1, Settings.getFcmToken(context) ?: "")
-                    
+                    val response1 =
+                        service.updateFcmToken(e164Phone1, Constants.SIM1, Settings.getFcmToken(context) ?: "")
+
                     if (response1.second != null || response1.third != null) {
                         return@withContext Pair(response1.second, response1.third)
                     }
 
                     if (currentState.isDualSim) {
                         val e164Phone2 = PhoneNumberValidator.formatE164(phone2, countryCode)
-                        val response2 = service.updateFcmToken(e164Phone2, Constants.SIM2, Settings.getFcmToken(context) ?: "")
+                        val response2 =
+                            service.updateFcmToken(e164Phone2, Constants.SIM2, Settings.getFcmToken(context) ?: "")
                         return@withContext Pair(response2.second, response2.third)
                     }
 

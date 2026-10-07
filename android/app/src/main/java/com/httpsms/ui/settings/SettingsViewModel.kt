@@ -1,9 +1,9 @@
-package com.httpsms.ui.settings
+package com.nerus.httpsms.ui.settings
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.httpsms.Constants
-import com.httpsms.Settings
+import com.nerus.httpsms.Constants
+import com.nerus.httpsms.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 

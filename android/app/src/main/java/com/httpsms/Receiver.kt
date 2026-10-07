@@ -1,4 +1,4 @@
-package com.httpsms
+package com.nerus.httpsms
 
 import android.content.Context
 import android.content.Context.RECEIVER_EXPORTED
@@ -12,7 +12,7 @@ object Receiver {
     private var deliveredReceiver: DeliveredReceiver? = null;
 
     fun register(context: Context) {
-        if(sentReceiver == null) {
+        if (sentReceiver == null) {
             Timber.d("registering [sent] receiver for intent [${SmsManagerService.sentAction()}]")
             sentReceiver = SentReceiver()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -29,7 +29,7 @@ object Receiver {
             }
         }
 
-        if(deliveredReceiver == null) {
+        if (deliveredReceiver == null) {
             Timber.d("registering [delivered] receiver for intent [${SmsManagerService.deliveredAction()}]")
             deliveredReceiver = DeliveredReceiver()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -63,7 +63,7 @@ object Receiver {
             return false
         }
 
-        if(messageId.contains(".")) {
+        if (messageId.contains(".")) {
             Timber.d("message id [${messageId}] is for multipart segment [${messageId.split(".")[1]}]")
             return false
         }

@@ -4,7 +4,7 @@
     <string name="nextRefreshTime">23/06/2022 18:58:30</string>
     <string name="menuIconDescription">Icono de Menú</string>
     <string name="menuIconName">Más</string>
-    <string name="notification_channel_default">com.httpsms.notification.default</string>
+    <string name="notification_channel_default">com.nerus.httpsms.notification.default</string>
     <string name="sign_in_button">Iniciar Sesión con API Key</string>
     <string name="text_area_api_key">API Key</string>
     <string name="img_http_sms_logo">Logo de HTTP Sms</string>

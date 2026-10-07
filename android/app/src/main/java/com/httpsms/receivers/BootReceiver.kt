@@ -1,24 +1,25 @@
-package com.httpsms.receivers
+package com.nerus.httpsms.receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.httpsms.Constants
-import com.httpsms.Settings
-import com.httpsms.services.StickyNotificationService
+import com.nerus.httpsms.Constants
+import com.nerus.httpsms.Settings
+import com.nerus.httpsms.services.StickyNotificationService
 import timber.log.Timber
 
 
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-           startStickyNotification(context)
+            startStickyNotification(context)
         } else {
             Timber.e("invalid intent [${intent.action}]")
         }
     }
+
     private fun startStickyNotification(context: Context) {
-        if(!Settings.getActiveStatus(context, Constants.SIM1) && !Settings.getActiveStatus(context, Constants.SIM2)) {
+        if (!Settings.getActiveStatus(context, Constants.SIM1) && !Settings.getActiveStatus(context, Constants.SIM2)) {
             Timber.d("active status is false, not starting foreground service")
             return
         }

@@ -1,4 +1,4 @@
-package com.httpsms
+package com.nerus.httpsms
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -21,11 +21,11 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.httpsms.services.StickyNotificationService
-import com.httpsms.ui.main.MainScreen
-import com.httpsms.ui.main.MainViewModel
-import com.httpsms.ui.theme.HttpSmsTheme
-import com.httpsms.worker.HeartbeatWorker
+import com.nerus.httpsms.services.StickyNotificationService
+import com.nerus.httpsms.ui.main.MainScreen
+import com.nerus.httpsms.ui.main.MainViewModel
+import com.nerus.httpsms.ui.theme.HttpSmsTheme
+import com.nerus.httpsms.worker.HeartbeatWorker
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -48,7 +48,10 @@ class MainActivity : AppCompatActivity() {
                     viewModel = viewModel,
                     onSettingsClick = { onSettingsClick() },
                     onSmsPermissionClick = {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://httpsms.com/blog/grant-send-and-read-sms-permissions-on-android"))
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://httpsms.com/blog/grant-send-and-read-sms-permissions-on-android")
+                        )
                         startActivity(intent)
                     },
                     onBatteryOptimizationClick = {
@@ -85,25 +88,26 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        Timber.d( "on activity resume")
+        Timber.d("on activity resume")
         redirectToLogin()
         refreshToken(this)
         viewModel.updateState(this, getString(R.string.app_version, BuildConfig.VERSION_NAME))
     }
 
-    private fun requestPermissions(context:Context) {
+    private fun requestPermissions(context: Context) {
         Timber.d("requesting permissions")
-        val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            permissions.entries.forEach {
-                Timber.d("${it.key} = ${it.value}")
-                if (it.key == Manifest.permission.READ_CALL_LOG && !it.value) {
-                    Timber.w("disabling incoming call events since for SIM1 and SIM2")
-                    Settings.setIncomingCallEventsEnabled(context, Constants.SIM1, false)
-                    Settings.setIncomingCallEventsEnabled(context, Constants.SIM2, false)
+        val requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                permissions.entries.forEach {
+                    Timber.d("${it.key} = ${it.value}")
+                    if (it.key == Manifest.permission.READ_CALL_LOG && !it.value) {
+                        Timber.w("disabling incoming call events since for SIM1 and SIM2")
+                        Settings.setIncomingCallEventsEnabled(context, Constants.SIM1, false)
+                        Settings.setIncomingCallEventsEnabled(context, Constants.SIM2, false)
+                    }
                 }
+                viewModel.updateState(context, getString(R.string.app_version, BuildConfig.VERSION_NAME))
             }
-            viewModel.updateState(context, getString(R.string.app_version, BuildConfig.VERSION_NAME))
-        }
 
         var permissions = arrayOf(
             Manifest.permission.SEND_SMS,
@@ -111,11 +115,15 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.READ_SMS
         )
 
-        if(Build.VERSION.SDK_INT >= 33) {
+        if (Build.VERSION.SDK_INT >= 33) {
             permissions += Manifest.permission.POST_NOTIFICATIONS
         }
 
-        if(Settings.isIncomingCallEventsEnabled(context,Constants.SIM1) || Settings.isIncomingCallEventsEnabled(context,Constants.SIM2) ) {
+        if (Settings.isIncomingCallEventsEnabled(context, Constants.SIM1) || Settings.isIncomingCallEventsEnabled(
+                context,
+                Constants.SIM2
+            )
+        ) {
             permissions += Manifest.permission.READ_CALL_LOG
             permissions += Manifest.permission.READ_PHONE_STATE
         }
@@ -147,7 +155,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startStickyNotification(context: Context) {
         Timber.d("starting foreground service")
-        if(!Settings.getActiveStatus(context, Constants.SIM1) && !Settings.getActiveStatus(context, Constants.SIM2)) {
+        if (!Settings.getActiveStatus(context, Constants.SIM1) && !Settings.getActiveStatus(context, Constants.SIM2)) {
             Timber.d("active status is false, not starting foreground service")
             return
         }
@@ -157,12 +165,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshToken(context: Context) {
-        if(!Settings.isLoggedIn(context)) {
+        if (!Settings.isLoggedIn(context)) {
             Timber.w("cannot refresh token because owner is not logged in")
             return
         }
 
-        if(!Settings.hasOwner(context)) {
+        if (!Settings.hasOwner(context)) {
             Timber.w("cannot refresh token because owner does not exist")
             return
         }
@@ -189,9 +197,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendFCMToken(timestamp: Long, context:Context, phoneNumber: String, sim: String) {
+    private fun sendFCMToken(timestamp: Long, context: Context, phoneNumber: String, sim: String) {
         Thread {
-            val response = HttpSmsApiService.create(context).updateFcmToken(phoneNumber, sim,Settings.getFcmToken(context) ?: "")
+            val response =
+                HttpSmsApiService.create(context).updateFcmToken(phoneNumber, sim, Settings.getFcmToken(context) ?: "")
             if (response.first != null) {
                 Settings.setUserID(context, response.first!!.userID)
                 Settings.setFcmTokenLastUpdateTimestampAsync(context, timestamp)
@@ -209,7 +218,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        if(Settings.isDebugLogEnabled(this)) {
+        if (Settings.isDebugLogEnabled(this)) {
             Timber.plant(Timber.DebugTree())
             Timber.plant(LogzTree(this.applicationContext))
         }
@@ -221,7 +230,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(switchActivityIntent)
     }
 
-    private fun redirectToLogin():Boolean {
+    private fun redirectToLogin(): Boolean {
         if (Settings.isLoggedIn(this)) {
             return false
         }

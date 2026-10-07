@@ -1,4 +1,4 @@
-package com.httpsms
+package com.nerus.httpsms
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -24,8 +24,7 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-class ReceivedReceiver: BroadcastReceiver()
-{
+class ReceivedReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
             handleSmsReceived(context, intent)
@@ -87,7 +86,8 @@ class ReceivedReceiver: BroadcastReceiver()
                         content += String(partData, charset(CharacterSets.getMimeName(part.charset)))
                     } else {
                         // Save attachment to a temporary file
-                        val fileName = String(part.name ?: part.contentLocation ?: part.contentId ?: "attachment_$i".toByteArray())
+                        val fileName =
+                            String(part.name ?: part.contentLocation ?: part.contentId ?: "attachment_$i".toByteArray())
                         val tempFile = File(context.cacheDir, "received_mms_${System.currentTimeMillis()}_$i")
                         FileOutputStream(tempFile).use { it.write(partData) }
                         attachmentFiles.add("${tempFile.absolutePath}|${contentType}|${fileName}")
@@ -125,7 +125,14 @@ class ReceivedReceiver: BroadcastReceiver()
         return Pair(sim, owner)
     }
 
-    private fun handleMessageReceived(context: Context, sim: String, from: String, to : String, content: String, attachments: Array<String>? = null) {
+    private fun handleMessageReceived(
+        context: Context,
+        sim: String,
+        from: String,
+        to: String,
+        content: String,
+        attachments: Array<String>? = null
+    ) {
         val timestamp = ZonedDateTime.now(ZoneOffset.UTC)
 
         if (!Settings.isLoggedIn(context)) {
@@ -153,7 +160,8 @@ class ReceivedReceiver: BroadcastReceiver()
             Constants.KEY_MESSAGE_SIM to sim,
             Constants.KEY_MESSAGE_CONTENT to body,
             Constants.KEY_MESSAGE_ENCRYPTED to Settings.encryptReceivedMessages(context),
-            Constants.KEY_MESSAGE_TIMESTAMP to DateTimeFormatter.ofPattern(Constants.TIMESTAMP_PATTERN).format(timestamp).replace("+", "Z"),
+            Constants.KEY_MESSAGE_TIMESTAMP to DateTimeFormatter.ofPattern(Constants.TIMESTAMP_PATTERN)
+                .format(timestamp).replace("+", "Z"),
             Constants.KEY_MESSAGE_ATTACHMENTS to attachments
         )
 
@@ -170,9 +178,16 @@ class ReceivedReceiver: BroadcastReceiver()
         Timber.d("work enqueued with ID [${work.id}] for received message from [${from}] to [${to}]")
     }
 
-    internal class ReceivedSmsWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
+    internal class ReceivedSmsWorker(appContext: Context, workerParams: WorkerParameters) :
+        Worker(appContext, workerParams) {
         override fun doWork(): Result {
-            Timber.i("[${this.inputData.getString(Constants.KEY_MESSAGE_SIM)}] forwarding received message from [${this.inputData.getString(Constants.KEY_MESSAGE_FROM)}] to [${this.inputData.getString(Constants.KEY_MESSAGE_TO)}]")
+            Timber.i(
+                "[${this.inputData.getString(Constants.KEY_MESSAGE_SIM)}] forwarding received message from [${
+                    this.inputData.getString(
+                        Constants.KEY_MESSAGE_FROM
+                    )
+                }] to [${this.inputData.getString(Constants.KEY_MESSAGE_TO)}]"
+            )
 
             val sim = this.inputData.getString(Constants.KEY_MESSAGE_SIM)!!
             val from = this.inputData.getString(Constants.KEY_MESSAGE_FROM)!!

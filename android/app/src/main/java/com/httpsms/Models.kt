@@ -1,9 +1,9 @@
-package com.httpsms
+package com.nerus.httpsms
 
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
 
-data class ResponseMessage (
+data class ResponseMessage(
     val data: Message,
     val message: String,
     val status: String
@@ -12,7 +12,8 @@ data class ResponseMessage (
         fun fromJson(json: String) = Klaxon().parse<ResponseMessage>(json)
     }
 }
-data class ResponsePhone (
+
+data class ResponsePhone(
     val data: Phone,
     val message: String,
     val status: String,
@@ -22,14 +23,14 @@ data class ResponsePhone (
     }
 }
 
-data class Phone (
+data class Phone(
     val id: String,
 
     @Json(name = "user_id")
     val userID: String,
 )
 
-data class Message (
+data class Message(
     val contact: String,
     val content: String,
     val sim: String,

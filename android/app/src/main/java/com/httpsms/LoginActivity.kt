@@ -1,4 +1,4 @@
-package com.httpsms
+package com.nerus.httpsms
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -19,9 +19,9 @@ import androidx.compose.runtime.getValue
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.httpsms.ui.login.LoginScreen
-import com.httpsms.ui.login.LoginViewModel
-import com.httpsms.ui.theme.HttpSmsTheme
+import com.nerus.httpsms.ui.login.LoginScreen
+import com.nerus.httpsms.ui.login.LoginViewModel
+import com.nerus.httpsms.ui.theme.HttpSmsTheme
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import timber.log.Timber
@@ -32,13 +32,13 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         redirectToMain()
-        
+
         viewModel.initialize(this, getString(R.string.default_server_url))
 
         setContent {
             HttpSmsTheme {
                 val uiState by viewModel.uiState.collectAsState()
-                
+
                 LaunchedEffect(uiState.loginSuccess) {
                     if (uiState.loginSuccess) {
                         redirectToMain()
@@ -111,20 +111,21 @@ class LoginActivity : AppCompatActivity() {
             return Settings.getSIM1PhoneNumber(this)
         }
 
-        if (telephonyManager.line1Number != null && telephonyManager.line1Number  != "") {
+        if (telephonyManager.line1Number != null && telephonyManager.line1Number != "") {
             Settings.setSIM1PhoneNumber(context, telephonyManager.line1Number)
         }
 
         return telephonyManager.line1Number
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-        permissions.entries.forEach {
-            Timber.d("${it.key} = ${it.value}")
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.entries.forEach {
+                Timber.d("${it.key} = ${it.value}")
+            }
+            // Try to auto-detect phone numbers after permissions are granted
+            viewModel.autoDetectPhoneNumbers(this)
         }
-        // Try to auto-detect phone numbers after permissions are granted
-        viewModel.autoDetectPhoneNumbers(this)
-    }
 
     private fun requestPermissions() {
         Timber.d("requesting permissions")
@@ -136,7 +137,7 @@ class LoginActivity : AppCompatActivity() {
             Manifest.permission.READ_SMS,
         )
 
-        if(Build.VERSION.SDK_INT >= 33) {
+        if (Build.VERSION.SDK_INT >= 33) {
             permissions += Manifest.permission.POST_NOTIFICATIONS
         }
 
@@ -167,7 +168,7 @@ class LoginActivity : AppCompatActivity() {
         startActivity(switchActivityIntent)
     }
 
-    private fun getCountryCode() : String {
+    private fun getCountryCode(): String {
         val tm = this.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         val code = tm.networkCountryIso.uppercase()
         if (code.isEmpty()) {

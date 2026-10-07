@@ -1,11 +1,11 @@
-package com.httpsms.worker
+package com.nerus.httpsms.worker
 
 import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.httpsms.Constants
-import com.httpsms.HttpSmsApiService
-import com.httpsms.Settings
+import com.nerus.httpsms.Constants
+import com.nerus.httpsms.HttpSmsApiService
+import com.nerus.httpsms.Settings
 import timber.log.Timber
 
 class HeartbeatWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
@@ -29,8 +29,9 @@ class HeartbeatWorker(appContext: Context, workerParams: WorkerParameters) : Wor
             return Result.success()
         }
 
-        try{
-            HttpSmsApiService.create(applicationContext).storeHeartbeat(phoneNumbers.toTypedArray(), Settings.isCharging(applicationContext))
+        try {
+            HttpSmsApiService.create(applicationContext)
+                .storeHeartbeat(phoneNumbers.toTypedArray(), Settings.isCharging(applicationContext))
             Timber.d("finished sending heartbeats to server")
 
             Settings.setHeartbeatTimestampAsync(applicationContext, System.currentTimeMillis())

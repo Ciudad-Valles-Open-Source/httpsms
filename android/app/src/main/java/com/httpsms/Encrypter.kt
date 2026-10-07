@@ -1,4 +1,4 @@
-package com.httpsms
+package com.nerus.httpsms
 
 import timber.log.Timber
 import java.security.MessageDigest
@@ -17,7 +17,11 @@ object Encrypter {
         val cipherBytes = Base64.getDecoder().decode(cipherText)
         Timber.d("iv = ${Base64.getEncoder().encodeToString(cipherBytes.take(IV_SIZE).toByteArray())}")
         Timber.d("cipher = ${Base64.getEncoder().encodeToString(cipherBytes.drop(IV_SIZE).toByteArray())}")
-        cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(hash(key), "AES"), IvParameterSpec(cipherBytes.take(IV_SIZE).toByteArray()))
+        cipher.init(
+            Cipher.DECRYPT_MODE,
+            SecretKeySpec(hash(key), "AES"),
+            IvParameterSpec(cipherBytes.take(IV_SIZE).toByteArray())
+        )
         val plainText = cipher.doFinal(cipherBytes.drop(IV_SIZE).toByteArray())
         return String(plainText)
     }
@@ -25,7 +29,7 @@ object Encrypter {
     fun encrypt(key: String, inputText: String): String {
         val cipher = Cipher.getInstance(ALGORITHM)
         val iv = generateIv()
-        cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(hash(key),"AES"), IvParameterSpec(iv))
+        cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(hash(key), "AES"), IvParameterSpec(iv))
         val cipherBytes = iv + cipher.doFinal(inputText.toByteArray())
         return Base64.getEncoder().encodeToString(cipherBytes)
     }

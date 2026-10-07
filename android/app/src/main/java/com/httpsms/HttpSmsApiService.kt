@@ -1,7 +1,7 @@
-package com.httpsms
+package com.nerus.httpsms
 
 import android.content.Context
-import com.httpsms.Constants.Companion.MAX_MMS_ATTACHMENT_SIZE
+import com.nerus.httpsms.Constants.Companion.MAX_MMS_ATTACHMENT_SIZE
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -127,7 +127,7 @@ class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
         }
 
         response.close()
-        Timber.i("missed call from [${from}] to [${to}] sent successfully with timestamp [${timestamp}]" )
+        Timber.i("missed call from [${from}] to [${to}] sent successfully with timestamp [${timestamp}]")
         return true
     }
 
@@ -154,7 +154,7 @@ class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
         }
 
         response.close()
-        Timber.i( "heartbeat stored successfully for phone numbers [${phoneNumbers.joinToString()}]" )
+        Timber.i("heartbeat stored successfully for phone numbers [${phoneNumbers.joinToString()}]")
         return true
     }
 
@@ -180,7 +180,12 @@ class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
         return bytesCopied
     }
 
-    fun downloadAttachment(context: Context, urlString: String, messageId: String, attachmentIndex: Int): Pair<File?, MediaType?> {
+    fun downloadAttachment(
+        context: Context,
+        urlString: String,
+        messageId: String,
+        attachmentIndex: Int
+    ): Pair<File?, MediaType?> {
         val request = Request.Builder().url(urlString).build()
 
         try {
@@ -242,7 +247,7 @@ class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
         val response = client.newCall(request).execute()
         if (response.code == 404) {
             response.close()
-            Timber.i( "[$event] event sent successfully but message with ID [$messageId] has been deleted" )
+            Timber.i("[$event] event sent successfully but message with ID [$messageId] has been deleted")
             return true
         }
 
@@ -253,7 +258,7 @@ class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
         }
 
         response.close()
-        Timber.i( "[$event] event sent successfully for message with ID [$messageId]" )
+        Timber.i("[$event] event sent successfully for message with ID [$messageId]")
         return true
     }
 
@@ -282,10 +287,14 @@ class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
                     Timber.e("invalid API key [$apiKey]")
                     return Triple(null, "Cannot validate the API key. Check if it is correct and try again.", null)
                 }
-                return Triple(null,null, "Cannot login to the server, Make sure the phone number is in international format e.g +18005550100")
+                return Triple(
+                    null,
+                    null,
+                    "Cannot login to the server, Make sure the phone number is in international format e.g +18005550100"
+                )
             }
 
-            Timber.i("FCM token submitted correctly with API key [$apiKey] and server url [$baseURL]" )
+            Timber.i("FCM token submitted correctly with API key [$apiKey] and server url [$baseURL]")
             val payload = ResponsePhone.fromJson(response.body!!.string())?.data
             response.close()
             return Triple(payload, null, null)

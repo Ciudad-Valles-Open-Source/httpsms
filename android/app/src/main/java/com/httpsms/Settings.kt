@@ -1,4 +1,4 @@
-package com.httpsms
+package com.nerus.httpsms
 
 import android.content.Context
 import android.os.BatteryManager
@@ -28,7 +28,7 @@ object Settings {
     private const val SETTINGS_ENCRYPTION_KEY = "SETTINGS_ENCRYPTION_KEY"
     private const val SETTINGS_ENCRYPT_RECEIVED_MESSAGES = "SETTINGS_ENCRYPT_RECEIVED_MESSAGES"
 
-    fun getPhoneNumber(context:Context, sim: String): String {
+    fun getPhoneNumber(context: Context, sim: String): String {
         if (sim == Constants.SIM2) {
             return getSIM2PhoneNumber(context)
         }
@@ -76,7 +76,7 @@ object Settings {
 
         val timestamp = PreferenceManager
             .getDefaultSharedPreferences(context)
-            .getLong(this.SETTINGS_FCM_TOKEN_UPDATE_TIMESTAMP,0)
+            .getLong(this.SETTINGS_FCM_TOKEN_UPDATE_TIMESTAMP, 0)
 
         Timber.d("SETTINGS_FCM_TOKEN_UPDATE_TIMESTAMP: [$timestamp]")
         return timestamp
@@ -117,7 +117,7 @@ object Settings {
         }
         val activeStatus = PreferenceManager
             .getDefaultSharedPreferences(context)
-            .getBoolean(setting,true)
+            .getBoolean(setting, true)
 
         Timber.d("SETTINGS_${sim}_INCOMING_ACTIVE: [$activeStatus]")
         return activeStatus
@@ -130,7 +130,7 @@ object Settings {
         }
         val activeStatus = PreferenceManager
             .getDefaultSharedPreferences(context)
-            .getBoolean(setting,false)
+            .getBoolean(setting, false)
 
         Timber.d("SETTINGS_${sim}_INCOMING_CALL_ACTIVE: [$activeStatus]")
         return activeStatus
@@ -149,7 +149,7 @@ object Settings {
     }
 
 
-    fun isDebugLogEnabled(context: Context) : Boolean {
+    fun isDebugLogEnabled(context: Context): Boolean {
         Timber.d(Settings::isDebugLogEnabled.name)
 
         return PreferenceManager
@@ -189,7 +189,7 @@ object Settings {
 
         val encryptReceivedMessages = PreferenceManager
             .getDefaultSharedPreferences(context)
-            .getBoolean(this.SETTINGS_ENCRYPT_RECEIVED_MESSAGES,false)
+            .getBoolean(this.SETTINGS_ENCRYPT_RECEIVED_MESSAGES, false)
 
         Timber.d("SETTINGS_ENCRYPT_RECEIVED_MESSAGES: [$encryptReceivedMessages]")
         return encryptReceivedMessages && !getEncryptionKey(context).isNullOrEmpty()
@@ -229,7 +229,7 @@ object Settings {
         }
         var activeStatus = PreferenceManager
             .getDefaultSharedPreferences(context)
-            .getBoolean(setting,true)
+            .getBoolean(setting, true)
 
         if (sim == Constants.SIM2) {
             activeStatus = activeStatus && isDualSIM(context)
@@ -254,25 +254,25 @@ object Settings {
     }
 
     fun isLoggedIn(context: Context): Boolean {
-       return getApiKey(context) != null && hasOwner(context)
+        return getApiKey(context) != null && hasOwner(context)
     }
 
     fun isDualSIM(context: Context): Boolean {
         return getSIM1PhoneNumber(context) != "" && getSIM2PhoneNumber(context) != ""
     }
 
-    private fun getApiKey(context: Context): String?{
+    private fun getApiKey(context: Context): String? {
         Timber.d(Settings::getApiKey.name)
 
         val apiKey = PreferenceManager
             .getDefaultSharedPreferences(context)
-            .getString(this.SETTINGS_API_KEY,null)
+            .getString(this.SETTINGS_API_KEY, null)
 
         Timber.d("SETTINGS_API_KEY: [$apiKey]")
         return apiKey
     }
 
-    fun getApiKeyOrDefault(context:Context): String {
+    fun getApiKeyOrDefault(context: Context): String {
         return getApiKey(context) ?: ""
     }
 
@@ -281,7 +281,7 @@ object Settings {
         return myBatteryManager.isCharging
     }
 
-    fun setUserID(context:Context, userID: String?) {
+    fun setUserID(context: Context, userID: String?) {
         Timber.d(Settings::setUserID.name)
         PreferenceManager.getDefaultSharedPreferences(context)
             .edit()
@@ -290,14 +290,14 @@ object Settings {
     }
 
     // getUserID don't log here as this will create recursion on the LogTail sink
-    fun getUserID(context:Context): String  {
+    fun getUserID(context: Context): String {
         val userID = PreferenceManager
             .getDefaultSharedPreferences(context)
-            .getString(this.SETTINGS_USER_ID,null)
+            .getString(this.SETTINGS_USER_ID, null)
         return userID ?: ""
     }
 
-    fun getServerUrlOrDefault(context:Context): URI {
+    fun getServerUrlOrDefault(context: Context): URI {
         val urlString = getServerUrl(context) ?: "https://api.httpsms.com"
         return URI(urlString)
     }
@@ -307,7 +307,7 @@ object Settings {
 
         val serverUrl = PreferenceManager
             .getDefaultSharedPreferences(context)
-            .getString(this.SETTINGS_SERVER_URL,null)
+            .getString(this.SETTINGS_SERVER_URL, null)
 
         Timber.d("SETTINGS_SERVER_URL: [$serverUrl]")
         return serverUrl
@@ -331,12 +331,12 @@ object Settings {
             .apply()
     }
 
-    fun getFcmToken(context: Context): String?{
+    fun getFcmToken(context: Context): String? {
         Timber.d(Settings::getFcmToken.name)
 
         val activeStatus = PreferenceManager
             .getDefaultSharedPreferences(context)
-            .getString(this.SETTINGS_FCM_TOKEN,null)
+            .getString(this.SETTINGS_FCM_TOKEN, null)
 
         Timber.d("SETTINGS_FCM_TOKEN: [$activeStatus]")
         return activeStatus
@@ -356,7 +356,7 @@ object Settings {
 
         val timestamp = PreferenceManager
             .getDefaultSharedPreferences(context)
-            .getLong(this.SETTINGS_HEARTBEAT_TIMESTAMP,0)
+            .getLong(this.SETTINGS_HEARTBEAT_TIMESTAMP, 0)
 
         Timber.d("SETTINGS_HEARTBEAT_TIMESTAMP: [$timestamp]")
         return timestamp

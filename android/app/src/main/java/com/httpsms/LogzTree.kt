@@ -1,4 +1,4 @@
-package com.httpsms
+package com.nerus.httpsms
 
 import android.content.Context
 import android.os.Build
@@ -14,7 +14,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import io.sentry.Sentry
 
-class LogzTree(val context: Context): Timber.DebugTree() {
+class LogzTree(val context: Context) : Timber.DebugTree() {
     private val client = OkHttpClient()
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
@@ -47,14 +47,14 @@ class LogzTree(val context: Context): Timber.DebugTree() {
             try {
                 val response = client.newCall(request).execute()
                 response.body?.close()
-            } catch(ex: Exception) {
+            } catch (ex: Exception) {
                 Sentry.captureException(ex)
             }
         }.start()
     }
 
     private fun severity(priority: Int): String {
-        return when(priority) {
+        return when (priority) {
             3 -> "DEBUG"
             4 -> "INFO"
             5 -> "WARNING"
@@ -78,5 +78,6 @@ class LogzTree(val context: Context): Timber.DebugTree() {
         @Json(name = "@timestamp")
         val dt: String,
         val userID: String,
-        val throwable: Throwable?)
+        val throwable: Throwable?
+    )
 }

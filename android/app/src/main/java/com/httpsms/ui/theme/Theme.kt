@@ -1,4 +1,4 @@
-package com.httpsms.ui.theme
+package com.nerus.httpsms.ui.theme
 
 import android.app.Activity
 import android.os.Build

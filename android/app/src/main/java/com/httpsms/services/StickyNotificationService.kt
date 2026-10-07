@@ -1,15 +1,15 @@
-package com.httpsms.services
+package com.nerus.httpsms.services
 
 import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.widget.Toast
-import com.httpsms.MainActivity
-import com.httpsms.R
+import com.nerus.httpsms.MainActivity
+import com.nerus.httpsms.R
 import timber.log.Timber
 
-class StickyNotificationService: Service() {
+class StickyNotificationService : Service() {
     override fun onBind(intent: Intent?): IBinder? {
         Timber.d("Some component want to bind with the service [${intent?.action}]")
         return null
@@ -51,12 +51,13 @@ class StickyNotificationService: Service() {
         }
         notificationManager.createNotificationChannel(channel)
 
-        val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let {
-                notificationIntent -> PendingIntent.getActivity(
-            this,
-            0,
-            notificationIntent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
+            PendingIntent.getActivity(
+                this,
+                0,
+                notificationIntent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
         }
 
         val builder: Notification.Builder = Notification.Builder(

@@ -13,7 +13,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.httpsms"
+        applicationId = "com.nerus.httpsms"
         minSdk = 28
         targetSdk = 37
         versionCode = 1
@@ -35,7 +35,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    namespace = "com.httpsms"
+    namespace = "com.nerus.httpsms"
 
     buildFeatures {
         buildConfig = true

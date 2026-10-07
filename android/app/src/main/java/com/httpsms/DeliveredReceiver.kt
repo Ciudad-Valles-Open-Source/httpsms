@@ -1,4 +1,4 @@
-package com.httpsms
+package com.nerus.httpsms
 
 import android.app.Activity
 import android.content.BroadcastReceiver
@@ -79,21 +79,23 @@ internal class DeliveredReceiver : BroadcastReceiver() {
     }
 
 
-    internal class DeliveredMessageWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
+    internal class DeliveredMessageWorker(appContext: Context, workerParams: WorkerParameters) :
+        Worker(appContext, workerParams) {
         override fun doWork(): Result {
             val messageId = this.inputData.getString(Constants.KEY_MESSAGE_ID)
             val timestamp = this.inputData.getString(Constants.KEY_MESSAGE_TIMESTAMP)
 
             Timber.i("[${timestamp}] sending [DELIVERED] message event with ID [${messageId}]")
 
-            if (HttpSmsApiService.create(applicationContext).sendDeliveredEvent(messageId!!, timestamp!!)){
+            if (HttpSmsApiService.create(applicationContext).sendDeliveredEvent(messageId!!, timestamp!!)) {
                 return Result.success()
             }
             return Result.retry()
         }
     }
 
-    internal class FailedMessageWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
+    internal class FailedMessageWorker(appContext: Context, workerParams: WorkerParameters) :
+        Worker(appContext, workerParams) {
         override fun doWork(): Result {
             val messageId = this.inputData.getString(Constants.KEY_MESSAGE_ID)
             val reason = this.inputData.getString(Constants.KEY_MESSAGE_REASON)
@@ -101,7 +103,7 @@ internal class DeliveredReceiver : BroadcastReceiver() {
 
             Timber.i("[${timestamp}] sending [FAILED] message event with ID [${messageId}] and reason [$reason]")
 
-            if (HttpSmsApiService.create(applicationContext).sendFailedEvent(messageId!!, timestamp!!, reason!!)){
+            if (HttpSmsApiService.create(applicationContext).sendFailedEvent(messageId!!, timestamp!!, reason!!)) {
                 return Result.success()
             }
             return Result.retry()

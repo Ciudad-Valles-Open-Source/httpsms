@@ -1,4 +1,4 @@
-package com.httpsms.ui.login
+package com.nerus.httpsms.ui.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -41,9 +41,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.httpsms.R
-import com.httpsms.ui.theme.Blue500
-import com.httpsms.ui.theme.Pink500
+import com.nerus.httpsms.R
+import com.nerus.httpsms.ui.theme.Blue500
+import com.nerus.httpsms.ui.theme.Pink500
 
 @Composable
 fun LoginScreen(
