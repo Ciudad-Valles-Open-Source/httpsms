@@ -17,7 +17,7 @@ android {
 
     defaultConfig {
         applicationId = "com.nerus.httpsms"
-        minSdk = 28
+        minSdk = 23
         targetSdk = 37
         versionCode = 1
         versionName = gitHash.getOrElse("unknown")

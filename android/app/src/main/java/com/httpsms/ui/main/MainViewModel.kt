@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nerus.httpsms.Constants
 import com.nerus.httpsms.HttpSmsApiService
+import com.nerus.httpsms.BatteryGuide
 import com.nerus.httpsms.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,8 +32,21 @@ data class MainUiState(
     val isSmsPermissionGranted: Boolean = true,
     val isBatteryOptimizationDisabled: Boolean = true,
     val isHeartbeatLoading: Boolean = false,
-    val appVersion: String = ""
+    val appVersion: String = "",
+    val isServerReachable: Boolean? = null,
+    val lastSentTime: String = "--",
+    val lastReceivedTime: String = "--",
+    val showBatteryGuide: Boolean = false,
+    val manufacturer: String = ""
 )
+
+private fun formatTimestamp(timestamp: Long): String {
+    if (timestamp == 0L) {
+        return "--"
+    }
+    val localTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault())
+    return localTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+}
 
 class MainViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(MainUiState())
@@ -44,9 +58,9 @@ class MainViewModel : ViewModel() {
 
     fun updateState(context: Context, appVersion: String) {
         val isDualSim = Settings.isDualSIM(context)
-        val phone1 = Settings.getSIM1PhoneNumber(context) ?: ""
+        val phone1 = Settings.getSIM1PhoneNumber(context)
         val active1 = Settings.getActiveStatus(context, Constants.SIM1)
-        val phone2 = Settings.getSIM2PhoneNumber(context) ?: ""
+        val phone2 = Settings.getSIM2PhoneNumber(context)
         val active2 = Settings.getActiveStatus(context, Constants.SIM2)
 
         val timestamp = Settings.getHeartbeatTimestamp(context)
@@ -60,8 +74,7 @@ class MainViewModel : ViewModel() {
 
         val smsPermissions = arrayOf(
             Manifest.permission.SEND_SMS,
-            Manifest.permission.RECEIVE_SMS,
-            Manifest.permission.READ_SMS
+            Manifest.permission.RECEIVE_SMS
         )
         val allGranted = smsPermissions.all {
             context.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED
@@ -79,8 +92,18 @@ class MainViewModel : ViewModel() {
             lastHeartbeatTime = lastHeartbeat,
             isSmsPermissionGranted = allGranted,
             isBatteryOptimizationDisabled = batteryOptimized,
-            appVersion = appVersion
+            appVersion = appVersion,
+            isServerReachable = Settings.isServerReachable(context),
+            lastSentTime = formatTimestamp(Settings.getLastSentTimestamp(context)),
+            lastReceivedTime = formatTimestamp(Settings.getLastReceivedTimestamp(context)),
+            showBatteryGuide = BatteryGuide.isAggressiveManufacturer() && !Settings.isBatteryGuideDismissed(context),
+            manufacturer = BatteryGuide.manufacturerName()
         )
+    }
+
+    fun dismissBatteryGuide(context: Context) {
+        Settings.setBatteryGuideDismissed(context, true)
+        _uiState.value = _uiState.value.copy(showBatteryGuide = false)
     }
 
     fun sendHeartbeat(context: Context, onComplete: (String?) -> Unit) {

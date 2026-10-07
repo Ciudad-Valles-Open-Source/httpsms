@@ -60,13 +60,15 @@ class MainActivity : AppCompatActivity() {
                         intent.data = Uri.parse("package:$packageName")
                         startActivity(intent)
                     },
+                    onBatteryGuideClick = { BatteryGuide.openSettings(this) },
+                    onBatteryGuideDismiss = { viewModel.dismissBatteryGuide(this) },
                     onHeartbeatClick = {
                         viewModel.sendHeartbeat(this) { error ->
                             if (error != null) {
                                 Timber.w("heartbeat sending failed with [$error]")
                                 Toast.makeText(this, error, Toast.LENGTH_LONG).show()
                             } else {
-                                Toast.makeText(this, "Heartbeat sent successfully", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, getString(R.string.heartbeat_sent), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -111,8 +113,7 @@ class MainActivity : AppCompatActivity() {
 
         var permissions = arrayOf(
             Manifest.permission.SEND_SMS,
-            Manifest.permission.RECEIVE_SMS,
-            Manifest.permission.READ_SMS
+            Manifest.permission.RECEIVE_SMS
         )
 
         if (Build.VERSION.SDK_INT >= 33) {

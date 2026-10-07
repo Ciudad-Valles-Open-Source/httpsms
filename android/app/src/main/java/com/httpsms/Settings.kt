@@ -27,6 +27,12 @@ object Settings {
     private const val SETTINGS_HEARTBEAT_TIMESTAMP = "SETTINGS_HEARTBEAT_TIMESTAMP"
     private const val SETTINGS_ENCRYPTION_KEY = "SETTINGS_ENCRYPTION_KEY"
     private const val SETTINGS_ENCRYPT_RECEIVED_MESSAGES = "SETTINGS_ENCRYPT_RECEIVED_MESSAGES"
+    private const val SETTINGS_THEME_MODE = "SETTINGS_THEME_MODE"
+    private const val SETTINGS_BATTERY_GUIDE_DISMISSED = "SETTINGS_BATTERY_GUIDE_DISMISSED"
+    private const val SETTINGS_SERVER_OK = "SETTINGS_SERVER_OK"
+    private const val SETTINGS_SERVER_CONTACT_TIMESTAMP = "SETTINGS_SERVER_CONTACT_TIMESTAMP"
+    private const val SETTINGS_LAST_SENT_TIMESTAMP = "SETTINGS_LAST_SENT_TIMESTAMP"
+    private const val SETTINGS_LAST_RECEIVED_TIMESTAMP = "SETTINGS_LAST_RECEIVED_TIMESTAMP"
 
     fun getPhoneNumber(context: Context, sim: String): String {
         if (sim == Constants.SIM2) {
@@ -164,6 +170,68 @@ object Settings {
             .edit()
             .putBoolean(this.SETTINGS_DEBUG_LOG_ENABLED, status)
             .apply()
+    }
+
+    /** Returns an [androidx.appcompat.app.AppCompatDelegate] night mode constant. */
+    fun getThemeMode(context: Context): Int {
+        return PreferenceManager
+            .getDefaultSharedPreferences(context)
+            .getInt(this.SETTINGS_THEME_MODE, androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+    }
+
+    fun setThemeMode(context: Context, mode: Int) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+            .edit()
+            .putInt(this.SETTINGS_THEME_MODE, mode)
+            .apply()
+    }
+
+    fun isBatteryGuideDismissed(context: Context): Boolean {
+        return PreferenceManager
+            .getDefaultSharedPreferences(context)
+            .getBoolean(this.SETTINGS_BATTERY_GUIDE_DISMISSED, false)
+    }
+
+    fun setBatteryGuideDismissed(context: Context, dismissed: Boolean) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+            .edit()
+            .putBoolean(this.SETTINGS_BATTERY_GUIDE_DISMISSED, dismissed)
+            .apply()
+    }
+
+    /** Records whether the last request to the server worked, and when. */
+    fun setServerContact(context: Context, ok: Boolean) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+            .edit()
+            .putBoolean(this.SETTINGS_SERVER_OK, ok)
+            .putLong(this.SETTINGS_SERVER_CONTACT_TIMESTAMP, System.currentTimeMillis())
+            .apply()
+    }
+
+    /** Returns null when the app has never talked to the server. */
+    fun isServerReachable(context: Context): Boolean? {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        if (!prefs.contains(this.SETTINGS_SERVER_OK)) {
+            return null
+        }
+        return prefs.getBoolean(this.SETTINGS_SERVER_OK, false)
+    }
+
+    /** [kind] is either "sent" or "received". */
+    fun setMessageActivity(context: Context, kind: String) {
+        val key = if (kind == "sent") this.SETTINGS_LAST_SENT_TIMESTAMP else this.SETTINGS_LAST_RECEIVED_TIMESTAMP
+        PreferenceManager.getDefaultSharedPreferences(context)
+            .edit()
+            .putLong(key, System.currentTimeMillis())
+            .apply()
+    }
+
+    fun getLastSentTimestamp(context: Context): Long {
+        return PreferenceManager.getDefaultSharedPreferences(context).getLong(this.SETTINGS_LAST_SENT_TIMESTAMP, 0)
+    }
+
+    fun getLastReceivedTimestamp(context: Context): Long {
+        return PreferenceManager.getDefaultSharedPreferences(context).getLong(this.SETTINGS_LAST_RECEIVED_TIMESTAMP, 0)
     }
 
     fun setIncomingActiveSIM1(context: Context, status: Boolean) {

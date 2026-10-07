@@ -52,6 +52,8 @@ fun MainScreen(
     onSettingsClick: () -> Unit,
     onSmsPermissionClick: () -> Unit,
     onBatteryOptimizationClick: () -> Unit,
+    onBatteryGuideClick: () -> Unit,
+    onBatteryGuideDismiss: () -> Unit,
     onHeartbeatClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -136,6 +138,68 @@ fun MainScreen(
                         )
                     }
                 }
+            }
+        }
+
+        if (uiState.showBatteryGuide) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Warning: ${uiState.manufacturer} Devices",
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Your device has aggressive background restrictions that may kill this app. Please disable them.",
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        fontSize = 14.sp
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row {
+                        Button(
+                            onClick = onBatteryGuideClick,
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                        ) {
+                            Text("Fix It")
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(
+                            onClick = onBatteryGuideDismiss,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                        ) {
+                            Text("Dismiss")
+                        }
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Connection Status
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("Connection Status", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                val serverStatus = when (uiState.isServerReachable) {
+                    true -> "Online"
+                    false -> "Offline"
+                    null -> "Unknown"
+                }
+                Text("Server Reachability: $serverStatus", fontSize = 14.sp)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("Last Sent: ${uiState.lastSentTime}", fontSize = 14.sp)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("Last Received: ${uiState.lastReceivedTime}", fontSize = 14.sp)
             }
         }
 
