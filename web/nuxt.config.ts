@@ -24,6 +24,9 @@ export default defineNuxtConfig({
   css: ['vuetify/styles'],
 
   i18n: {
+    compilation: {
+      strictMessage: false,
+    },
     locales: [
       { code: 'en', name: 'English', file: 'en.json' },
       { code: 'es', name: 'Español', file: 'es.json' },
