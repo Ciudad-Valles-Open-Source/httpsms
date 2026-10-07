@@ -1,5 +1,7 @@
 # Documentation Index
 
+*[Leer en Español](README_ES.md)*
+
 This directory contains the technical documentation for self-hosting httpSMS.
 
 | Document | Description |

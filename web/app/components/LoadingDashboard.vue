@@ -21,7 +21,7 @@ const { mdAndDown } = useDisplay()
               style="max-width: 32px"
               alt="httpSMS Logo"
             />
-            Loading the httpSMS dashboard
+            {{ $t('components.loadingDashboard.loadingText') }}
           </h2>
           <v-progress-circular
             indeterminate

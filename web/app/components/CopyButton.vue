@@ -2,6 +2,8 @@
 import { useDisplay } from 'vuetify'
 import { mdiContentCopy } from '@mdi/js'
 
+const { t } = useI18n()
+
 const props = withDefaults(
   defineProps<{
     value: string
@@ -28,7 +30,7 @@ async function copy() {
   disabled.value = true
   await navigator.clipboard.writeText(props.value)
   notificationsStore.addNotification({
-    message: props.notificationText,
+    message: props.notificationText === 'Copied' ? t('components.copyButton.copied') : props.notificationText,
     type: 'success',
   })
   setTimeout(() => {
@@ -47,6 +49,6 @@ async function copy() {
     @click="copy"
   >
     <v-icon start :icon="mdiContentCopy" />
-    {{ copyText }}
+    {{ copyText === 'Copy' ? $t('components.copyButton.copy') : copyText }}
   </v-btn>
 </template>

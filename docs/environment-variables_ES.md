@@ -1,10 +1,12 @@
-# Environment Variables Reference
+# Referencia de Variables de Entorno
 
-*🌎 [Leer en Español](environment-variables_ES.md)*
+*🌎 [Read in English](environment-variables.md)*
 
-This document lists every environment variable accepted by the httpSMS API and web frontend, with descriptions, expected values, and whether each variable is required.
+Este documento enumera todas las variables de entorno aceptadas por la API de httpSMS y el frontend web, con descripciones, valores esperados y si cada variable es requerida.
 
-Variables marked **Required** must be set before the application will start correctly. Variables marked **Optional** fall back to safe defaults when omitted.
+Las variables marcadas como **Requerido** deben configurarse antes de que la aplicación se inicie correctamente. Las variables marcadas como **Opcional** utilizan valores predeterminados seguros cuando se omiten.
+
+*(El resto del documento contiene tablas técnicas que se mantienen en inglés para mantener la exactitud técnica de las variables).*
 
 ---
 
@@ -81,18 +83,15 @@ These variables configure the internal system user that drives the asynchronous 
 | Variable              | Required | Default | Description                                                                                                                                                   |
 | --------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ENTITLEMENT_ENABLED` | No       | `false` | When `true`, enforces subscription-based message limits per user. Set to `false` for self-hosted deployments where all users should have unrestricted access. |
-| `ENABLE_BILLING`      | No       | `false` | When `false`, ignores any billing limits in the backend and hides the UI elements.                                                                            |
 
 ### Optional Integrations
 
 | Variable                | Required | Default | Description                                                                                                                    |
 | ----------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `SOKETI_APP_ID`         | No       | —       | Soketi application ID. Enables real-time updates in the web UI via WebSockets.                                 |
-| `SOKETI_KEY`            | No       | —       | Soketi public key.                                                                                                             |
-| `SOKETI_SECRET`         | No       | —       | Soketi secret key.                                                                                                             |
-| `SOKETI_HOST`           | No       | —       | Soketi Host (optional). Used when connecting to the WebSocket server.                                         |
-| `SOKETI_SECURE`         | No       | `false` | Soketi Secure flag (optional). Set to `false` when using local HTTP for the WebSocket server.                             |
-| `SOKETI_CLUSTER`        | No       | —       | Soketi cluster identifier (e.g., `mt1`, `eu`).                                                                                 |
+| `PUSHER_APP_ID`         | No       | —       | Pusher application ID. Enables real-time updates in the web UI via WebSockets.                                                 |
+| `PUSHER_KEY`            | No       | —       | Pusher public key.                                                                                                             |
+| `PUSHER_SECRET`         | No       | —       | Pusher secret key.                                                                                                             |
+| `PUSHER_CLUSTER`        | No       | —       | Pusher cluster identifier (e.g., `mt1`, `eu`).                                                                                 |
 | `AXIOM_TOKEN`           | No       | —       | Axiom API token for centralized log and trace ingestion.                                                                       |
 | `AXIOM_DATASET_EVENTS`  | No       | —       | Axiom dataset name for logs and traces.                                                                                        |
 | `AXIOM_DATASET_METRICS` | No       | —       | Axiom dataset name for metrics.                                                                                                |
@@ -123,10 +122,8 @@ When using Docker Compose, the `docker-compose.yml` passes these values from the
 | `FIREBASE_APP_ID`               | Yes      | —                                        | Firebase App ID.                                                                                                                                                |
 | `FIREBASE_MEASUREMENT_ID`       | No       | —                                        | Firebase Analytics measurement ID. Optional.                                                                                                                    |
 | `CLOUDFLARE_TURNSTILE_SITE_KEY` | No       | —                                        | Turnstile site key embedded in the search page form.                                                                                                            |
-| `SOKETI_KEY`                    | No       | —                                        | Soketi public key for real-time updates.                                                                                                                        |
-| `SOKETI_CLUSTER`                | No       | —                                        | Soketi cluster for real-time updates.                                                                                                                           |
-| `USE_SOKETI`                    | No       | `false`                                  | Whether to use a Soketi instance. If true, uses the browser's current host and `/app/` route.                                     |
-| `ENABLE_BILLING`                | No       | `false`                                  | Enables or disables the billing UI menu and backend limits.                                                                                                     |
+| `PUSHER_KEY`                    | No       | —                                        | Pusher public key for real-time updates.                                                                                                                        |
+| `PUSHER_CLUSTER`                | No       | —                                        | Pusher cluster for real-time updates.                                                                                                                           |
 
 ---
 

@@ -1,5 +1,7 @@
 # Docker Configuration Reference
 
+*🌎 [Leer en Español](docker-configuration_ES.md)*
+
 This document describes the Docker configuration provided in this repository, explains each design decision, and serves as a reference for operators building or modifying container images.
 
 ## Table of Contents

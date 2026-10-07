@@ -31,13 +31,13 @@ definePageMeta({
   middleware: ['redirect-to-threads'],
 })
 
+const { t } = useI18n()
+
 useSeoMeta({
-  title: 'Convert your Android phone into an SMS gateway - httpSMS',
-  description:
-    'Turn your Android phone into an SMS gateway and send or receive text messages with a simple HTTP API. Get started free — no SMS provider or short code needed.',
-  ogTitle: 'Convert your Android phone into an SMS gateway',
-  ogDescription:
-    'Send and receive SMS messages worldwide through your own Android phone using a simple HTTP API. No SMS provider, short code, or monthly minimum required.',
+  title: () => t('pages.index.metaTitle'),
+  description: () => t('pages.index.metaDescription'),
+  ogTitle: () => t('pages.index.metaOgTitle'),
+  ogDescription: () => t('pages.index.metaOgDescription'),
   ogImage: 'https://httpsms.com/header.png',
   twitterCard: 'summary_large_image',
 })
@@ -85,17 +85,14 @@ const planYearlyMonthlyPrice = computed(
               'mt-n8': smAndDown,
             }"
           >
-            Convert your Android phone into an SMS gateway.
+            {{ $t('pages.index.heroTitle') }}
           </h1>
-          <h2 class="text-medium-emphasis text-headline-small mt-8 mb-8">
-            <span class="gradient-underline">Save money</span> by using your
-            phone to send and receive SMS messages via a simple programmable API
-            with end-to-end encryption.
+          <h2 class="text-medium-emphasis text-headline-small mt-8 mb-8" v-html="$t('pages.index.heroSubtitle')">
           </h2>
           <div :class="{ 'text-center': mdAndDown }">
             <VBtn color="primary" size="large" class="mt-4 mb-4" to="/login">
               <VIcon v-if="lgAndUp" start :icon="mdiSend" />
-              Get Started
+              {{ $t('pages.index.getStartedBtn') }}
             </VBtn>
             <VBtn
               size="large"
@@ -104,18 +101,15 @@ const planYearlyMonthlyPrice = computed(
               href="https://sandbox.httpsms.com"
             >
               <VIcon v-if="lgAndUp" start :icon="mdiCreation" color="#ffe500" />
-              Live Demo
+              {{ $t('pages.index.liveDemoBtn') }}
             </VBtn>
           </div>
-          <p class="text-body-medium mt-2">
-            ⚡Trusted by <b>23,273+</b> users who send/receive more than
-            <b>500,000</b> messages per month.
-          </p>
+          <p class="text-body-medium mt-2" v-html="$t('pages.index.trustedBy')"></p>
           <div class="mt-4" :class="{ 'text-center': mdAndDown }">
             <VIcon color="success" :icon="mdiCheckCircle" />
-            Free to use
+            {{ $t('pages.index.freeToUse') }}
             <VIcon class="ml-4" color="success" :icon="mdiCheckCircle" />
-            100% Open Source
+            {{ $t('pages.index.openSourceBadge') }}
           </div>
           <div v-if="xl" class="mt-4">
             <a href="https://www.uneed.best/tool/httpsmscom">
@@ -171,36 +165,20 @@ const planYearlyMonthlyPrice = computed(
                 class="text-display-medium mb-1"
                 :class="{ 'mt-n8': mdAndUp }"
               >
-                Bulk SMS
+                {{ $t('pages.index.bulkSmsTitle') }}
                 <VChip class="ma-2" color="pink" label>
                   <VIcon start :icon="mdiLabel" />
-                  No code
+                  {{ $t('pages.index.noCodeBadge') }}
                 </VChip>
               </h3>
-              <h5 class="text-title-large font-weight-light my-2">
-                Fill in our bulk SMS
-                <a
-                  class="text-decoration-none"
-                  download
-                  href="/templates/httpsms-bulk.csv"
-                  >CSV template</a
-                >
-                or our
-                <a
-                  class="text-decoration-none"
-                  download
-                  href="/templates/httpsms-bulk.xlsx"
-                  >excel template</a
-                >
-                and upload it on httpSMS to send SMS messages to up to 1,000
-                recipients at once without writing any code.
+              <h5 class="text-title-large font-weight-light my-2" v-html="$t('pages.index.bulkSmsDesc')">
               </h5>
               <VBtn
                 to="/blog/how-to-send-sms-messages-from-excel"
                 color="primary"
               >
                 <VIcon start :icon="mdiMicrosoftExcel" />
-                Integration Guide
+                {{ $t('pages.index.integrationGuideBtn') }}
               </VBtn>
             </div>
           </VCol>
@@ -218,24 +196,20 @@ const planYearlyMonthlyPrice = computed(
           <VCol cols="12" md="6" class="d-flex align-center" order-lg="1">
             <div>
               <h3 class="text-display-medium mb-1">
-                Integrations
+                {{ $t('pages.index.integrationsTitle') }}
                 <VChip class="ma-2" color="pink" label>
                   <VIcon start :icon="mdiLabel" />
-                  No code
+                  {{ $t('pages.index.noCodeBadge') }}
                 </VChip>
               </h3>
               <h5 class="text-title-large font-weight-light my-2">
-                Connect your workflow with thousands of other apps with the
-                power of Zapier. For example you can setup an automation to send
-                personalized SMS messages each time someone makes an order from
-                your shopify store or each time a new row is added to a Google
-                spreadsheet.
+                {{ $t('pages.index.integrationsDesc') }}
               </h5>
               <VBtn
                 to="/blog/send-sms-when-new-row-is-added-to-google-sheets-using-zapier"
                 color="primary"
               >
-                Zapier Integration Guide
+                {{ $t('pages.index.zapierIntegrationGuideBtn') }}
               </VBtn>
             </div>
           </VCol>
@@ -253,12 +227,9 @@ const planYearlyMonthlyPrice = computed(
         <VRow class="mb-16 mt-16">
           <VCol cols="12" md="6" class="d-flex align-center" order-lg="2">
             <div>
-              <h3 class="text-display-medium mb-1">Webhooks</h3>
+              <h3 class="text-display-medium mb-1">{{ $t('pages.index.webhooksTitle') }}</h3>
               <h5 class="text-title-large font-weight-light my-2">
-                If you want to build advanced integrations, we support callback
-                URLs. The httpSMS platform can forward SMS messages received on
-                your Android phone to your server using a callback URL which you
-                provide.
+                {{ $t('pages.index.webhooksDesc') }}
               </h5>
               <VBtn
                 target="_blank"
@@ -266,7 +237,7 @@ const planYearlyMonthlyPrice = computed(
                 color="primary"
               >
                 <VIcon start :icon="mdiWebhook" />
-                Documentation
+                {{ $t('pages.index.documentationBtn') }}
               </VBtn>
             </div>
           </VCol>
@@ -279,19 +250,16 @@ const planYearlyMonthlyPrice = computed(
         <VRow class="mb-16 mt-16">
           <VCol cols="12" md="6" class="d-flex align-center" order-lg="1">
             <div>
-              <h3 class="text-display-medium mb-1">Control Sending</h3>
+              <h3 class="text-display-medium mb-1">{{ $t('pages.index.controlSendingTitle') }}</h3>
               <h5 class="text-title-large font-weight-light my-2">
-                Send SMS messages without going over your mobile carrier
-                limitations. If you set a rate e.g 3 messages per minute, we
-                will queue up your messages and send them at a rate of 1 message
-                per 20 seconds.
+                {{ $t('pages.index.controlSendingDesc') }}
               </h5>
               <VBtn
                 href="https://docs.httpsms.com/features/control-sms-send-rate"
                 color="primary"
               >
                 <VIcon start :icon="mdiArrowRightThin" />
-                Documentation
+                {{ $t('pages.index.documentationBtn') }}
               </VBtn>
             </div>
           </VCol>
@@ -304,10 +272,9 @@ const planYearlyMonthlyPrice = computed(
         <VRow class="mb-16 mt-16">
           <VCol cols="12" md="6" class="d-flex align-center" order-lg="2">
             <div>
-              <h3 class="text-display-medium mb-1">Monitoring</h3>
+              <h3 class="text-display-medium mb-1">{{ $t('pages.index.monitoringTitle') }}</h3>
               <h5 class="text-title-large font-weight-light my-2">
-                If your android phone goes offline for some reason and it can't
-                send SMS messages, we will send you a notification immediately.
+                {{ $t('pages.index.monitoringDesc') }}
               </h5>
             </div>
           </VCol>
@@ -320,11 +287,9 @@ const planYearlyMonthlyPrice = computed(
         <VRow class="mt-16 mb-16">
           <VCol cols="12" md="6" class="d-flex align-center" order-lg="1">
             <div>
-              <h3 class="text-display-medium mb-1">Open Source</h3>
+              <h3 class="text-display-medium mb-1">{{ $t('pages.index.openSourceTitle') }}</h3>
               <h5 class="text-title-large mb-3 font-weight-light my-2">
-                httpSMS is transparent and fully open source. The source code is
-                available on GitHub. Feel free to fork it, verify it or submit a
-                pull request.
+                {{ $t('pages.index.openSourceDesc') }}
               </h5>
               <a
                 class="text-decoration-none"
@@ -351,24 +316,15 @@ const planYearlyMonthlyPrice = computed(
         <VRow class="mt-16">
           <VCol cols="12" md="6" class="d-flex align-center" order-lg="2">
             <div>
-              <h3 class="text-display-medium mb-1">Encryption 🔐</h3>
-              <h5 class="text-title-large mb-3 font-weight-light my-2">
-                Take control of your privacy with our end-to-end encrypted SMS
-                feature. Safeguard your messages from prying eyes, ensuring
-                absolute confidentiality using the military grade
-                <a
-                  class="text-decoration-none"
-                  href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard"
-                  >AES-256 encryption</a
-                >
-                algorithm.
+              <h3 class="text-display-medium mb-1">{{ $t('pages.index.encryptionTitle') }}</h3>
+              <h5 class="text-title-large mb-3 font-weight-light my-2" v-html="$t('pages.index.encryptionDesc')">
               </h5>
               <VBtn
                 to="/blog/end-to-end-encryption-to-sms-messages"
                 color="primary"
               >
                 <VIcon start :icon="mdiLockOutline" />
-                Setup end-to-end encryption
+                {{ $t('pages.index.setupEncryptionBtn') }}
               </VBtn>
             </div>
           </VCol>
@@ -385,18 +341,16 @@ const planYearlyMonthlyPrice = computed(
         <VRow class="mt-16">
           <VCol cols="12" md="6" class="d-flex align-center">
             <div>
-              <h3 class="text-display-medium mb-1">Multiple Phones</h3>
+              <h3 class="text-display-medium mb-1">{{ $t('pages.index.multiplePhonesTitle') }}</h3>
               <h5 class="text-title-large mb-3 font-weight-light my-2">
-                Setup the httpSMS gateway Android app on multiple phones
-                independently and securely without sharing data under one
-                account by creating unique phone API keys.
+                {{ $t('pages.index.multiplePhonesDesc') }}
               </h5>
               <VBtn
                 href="https://docs.httpsms.com/features/phone-api-keys"
                 color="primary"
               >
                 <VIcon start :icon="mdiCellphoneKey" />
-                Documentation
+                {{ $t('pages.index.documentationBtn') }}
               </VBtn>
             </div>
           </VCol>
@@ -413,18 +367,16 @@ const planYearlyMonthlyPrice = computed(
         <VRow class="mt-16">
           <VCol cols="12" md="6" class="d-flex align-center" order-lg="2">
             <div>
-              <h3 class="text-display-medium mb-1">Schedule Text Messages</h3>
+              <h3 class="text-display-medium mb-1">{{ $t('pages.index.scheduleTextMessagesTitle') }}</h3>
               <h5 class="text-headline-small my-2 font-weight-light">
-                Control when your SMS will reach your recipients, allowing you
-                to perfectly time promotions, critical alerts etc by scheduling
-                your messages in advance.
+                {{ $t('pages.index.scheduleTextMessagesDesc') }}
               </h5>
               <VBtn
                 href="https://docs.httpsms.com/features/scheduling-sms-messages"
                 color="primary"
               >
                 <VIcon start :icon="mdiClockOutline" />
-                Documentation
+                {{ $t('pages.index.documentationBtn') }}
               </VBtn>
             </div>
           </VCol>
@@ -443,7 +395,7 @@ const planYearlyMonthlyPrice = computed(
     <VContainer class="pb-16">
       <VRow>
         <VCol>
-          <h2 class="text-display-large text-center mb-0">Get Started</h2>
+          <h2 class="text-display-large text-center mb-0">{{ $t('pages.index.getStartedSectionTitle') }}</h2>
         </VCol>
       </VRow>
       <VRow>
@@ -457,40 +409,23 @@ const planYearlyMonthlyPrice = computed(
               >
                 <VTimelineItem dot-color="primary" :icon="mdiTallyMark1">
                   <VCard variant="elevated">
-                    <VCardTitle class="text-headline-medium">Step 1</VCardTitle>
-                    <VCardText class="text-body-large">
-                      <NuxtLink
-                        class="font-weight-bold text-decoration-none"
-                        to="/login"
-                      >
-                        Create an account
-                      </NuxtLink>
-                      on httpsms.com and obtain your API key on the settings
-                      page.
+                    <VCardTitle class="text-headline-medium">{{ $t('pages.index.step1Title') }}</VCardTitle>
+                    <VCardText class="text-body-large" v-html="$t('pages.index.step1Desc')">
                     </VCardText>
                   </VCard>
                 </VTimelineItem>
                 <VTimelineItem dot-color="primary" :icon="mdiTallyMark2">
                   <VCard variant="elevated">
-                    <VCardTitle class="text-headline-medium">Step 2</VCardTitle>
-                    <VCardText class="text-body-large">
-                      <a
-                        download
-                        class="font-weight-bold text-decoration-none"
-                        :href="config.public.appDownloadUrl"
-                        >Download</a
-                      >
-                      and install the companion android application on your
-                      phone and sign in using your API Key.
+                    <VCardTitle class="text-headline-medium">{{ $t('pages.index.step2Title') }}</VCardTitle>
+                    <VCardText class="text-body-large" v-html="$t('pages.index.step2Desc').replace('{url}', config.public.appDownloadUrl)">
                     </VCardText>
                   </VCard>
                 </VTimelineItem>
                 <VTimelineItem dot-color="primary" :icon="mdiTallyMark3">
                   <VCard variant="elevated">
-                    <VCardTitle class="text-headline-medium">Step 3</VCardTitle>
+                    <VCardTitle class="text-headline-medium">{{ $t('pages.index.step3Title') }}</VCardTitle>
                     <VCardText class="text-body-large">
-                      Start sending and receiving SMS messages using our rich
-                      HTTP API. You can find the documentation on
+                      {{ $t('pages.index.step3Desc') }}
                       <a
                         class="text-decoration-none"
                         :href="config.public.appDocumentationUrl"
@@ -716,19 +651,16 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
               style="text-decoration-color: #329ef4"
               class="text-center text-display-large mb-4 text-decoration-underline dark:text-white"
             >
-              Pricing
+              {{ $t('pages.index.pricingTitle') }}
             </h2>
-            <h4 class="text-center text-headline-small text-medium-emphasis">
-              Most of the httpSMS features are completely
-              <span class="text-primary">free</span> but if you want a little
-              extra, you can go pro
+            <h4 class="text-center text-headline-small text-medium-emphasis" v-html="$t('pages.index.pricingDesc')">
             </h4>
             <div class="d-flex justify-center mt-4 align-center">
               <p
                 class="text-headline-small mr-3 mt-3"
                 :class="{ 'text-medium-emphasis': yearlyPricing }"
               >
-                Monthly
+                {{ $t('pages.index.monthlyLabel') }}
               </p>
               <VSwitch
                 v-model="yearlyPricing"
@@ -740,10 +672,10 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                 class="text-headline-small ml-3 mt-3"
                 :class="{ 'text-medium-emphasis': !yearlyPricing }"
               >
-                Yearly
+                {{ $t('pages.index.yearlyLabel') }}
                 <VChip color="primary" size="small">
                   <VIcon start :icon="mdiGift" size="small" />
-                  2 months free
+                  {{ $t('pages.index.twoMonthsFreeBadge') }}
                 </VChip>
               </p>
             </div>
@@ -774,21 +706,20 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
           <VCol cols="12" lg="4">
             <VCard elevation="4" color="#121212">
               <VCardText>
-                <h1 class="text-center text-display-medium mt-0 mb-4">Free</h1>
+                <h1 class="text-center text-display-medium mt-0 mb-4">{{ $t('pages.index.freePlanTitle') }}</h1>
                 <p
                   class="text-body-large text-center mt-0 text-medium-emphasis"
                 >
-                  Try sending and receiving SMS on your hobby websites and
-                  experiments.
+                  {{ $t('pages.index.freePlanDesc') }}
                 </p>
                 <p class="text-center">
-                  <span class="text-display-small">$0</span>
+                  <span class="text-display-small">{{ $t('pages.index.freePlanCost') }}</span>
                 </p>
                 <p class="text-center mt-n3 text-medium-emphasis">
-                  No credit card required
+                  {{ $t('pages.index.noCreditCard') }}
                 </p>
                 <VBtn block to="/login" variant="tonal" size="large"
-                  >Get Started</VBtn
+                  >{{ $t('pages.index.getStartedBtn') }}</VBtn
                 >
                 <p class="mt-6 text-md-body-large text-title-medium">
                   <VIcon
@@ -836,13 +767,12 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                 <h1
                   class="text-center text-display-medium mt-0 mb-4 text-primary"
                 >
-                  Pro
+                  {{ $t('pages.index.proPlanTitle') }}
                 </h1>
                 <p
                   class="text-body-large text-center mt-0 text-medium-emphasis"
                 >
-                  Send and receive more SMS messages like a pro with advanced
-                  features.
+                  {{ $t('pages.index.proPlanDesc') }}
                 </p>
                 <p v-if="!yearlyPricing" class="text-center">
                   <span class="text-display-small">$10</span>/month
@@ -853,14 +783,13 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                 <p
                   v-if="!yearlyPricing"
                   class="text-center mt-n3 text-medium-emphasis"
+                  v-html="$t('pages.index.orPerYear').replace('{price}', '100')"
                 >
-                  or <b>$100</b> per year
                 </p>
-                <p v-else class="text-center mt-n3 text-medium-emphasis">
-                  or <b>$8.33</b> per month
+                <p v-else class="text-center mt-n3 text-medium-emphasis" v-html="$t('pages.index.orPerMonth').replace('{price}', '8.33')">
                 </p>
                 <VBtn block color="primary" to="/login" size="large"
-                  >Try For Free</VBtn
+                  >{{ $t('pages.index.tryForFreeBtn') }}</VBtn
                 >
                 <p class="mt-6 text-md-body-large text-title-medium">
                   <VIcon
@@ -869,7 +798,7 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                     start
                     :icon="mdiCheckCircle"
                   />
-                  Send or receive up to <b>5,000</b> SMS/month
+                  <span v-html="$t('pages.index.proPlanFeature1')"></span>
                 </p>
                 <p class="text-md-body-large text-title-medium mt-n3">
                   <VIcon
@@ -878,7 +807,7 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                     start
                     :icon="mdiCheckCircle"
                   />
-                  Offline notifications for your phone
+                  {{ $t('pages.index.offlineNotifications') }}
                 </p>
                 <p class="text-md-body-large text-title-medium mt-n3">
                   <VIcon
@@ -887,7 +816,7 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                     start
                     :icon="mdiCheckCircle"
                   />
-                  Forward received messages via webhook
+                  {{ $t('pages.index.forwardMessagesWebhook') }}
                 </p>
                 <p class="text-md-body-large text-title-medium mt-n3">
                   <VIcon
@@ -896,7 +825,7 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                     start
                     :icon="mdiCheckCircle"
                   />
-                  Priority support
+                  {{ $t('pages.index.prioritySupport') }}
                 </p>
               </VCardText>
             </VCard>
@@ -906,13 +835,12 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
             <VCard elevation="4" color="#121212">
               <VCardText>
                 <h1 class="text-center text-display-medium mt-0 mb-4">
-                  {{ pricingLabels[pricing] }} Plan
+                  {{ $t('pages.index.customPlanTitle').replace('{plan}', pricingLabels[pricing]) }}
                 </h1>
                 <p
                   class="text-body-large text-center mt-0 text-medium-emphasis"
                 >
-                  Send and receive up to {{ planMessages }} SMS messages like a
-                  power user.
+                  {{ $t('pages.index.customPlanDesc').replace('{messages}', planMessages) }}
                 </p>
                 <p v-if="!yearlyPricing" class="text-center">
                   <span class="text-display-small">${{ planMonthlyPrice }}</span
@@ -925,14 +853,13 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                 <p
                   v-if="!yearlyPricing"
                   class="text-center mt-n3 text-medium-emphasis"
+                  v-html="$t('pages.index.orPerYear').replace('{price}', planYearlyPrice)"
                 >
-                  or <b>${{ planYearlyPrice }}</b> per year
                 </p>
-                <p v-else class="text-center mt-n3 text-medium-emphasis">
-                  or <b>${{ planYearlyMonthlyPrice }}</b> per month
+                <p v-else class="text-center mt-n3 text-medium-emphasis" v-html="$t('pages.index.orPerMonth').replace('{price}', planYearlyMonthlyPrice)">
                 </p>
                 <VBtn block variant="tonal" to="/login" size="large"
-                  >Try For Free</VBtn
+                  >{{ $t('pages.index.tryForFreeBtn') }}</VBtn
                 >
                 <p class="mt-6 text-md-body-large text-title-medium">
                   <VIcon
@@ -941,8 +868,7 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                     start
                     :icon="mdiCheckCircle"
                   />
-                  Send or receive up to
-                  <b>{{ pricingLabels[pricing] }}</b> SMS/month
+                  <span v-html="$t('pages.index.customPlanFeature1').replace('{messages}', pricingLabels[pricing])"></span>
                 </p>
                 <p class="text-md-body-large text-title-medium mt-n3">
                   <VIcon
@@ -951,7 +877,7 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                     start
                     :icon="mdiCheckCircle"
                   />
-                  Offline notifications for your phone
+                  {{ $t('pages.index.offlineNotifications') }}
                 </p>
                 <p class="text-md-body-large text-title-medium mt-n3">
                   <VIcon
@@ -960,7 +886,7 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                     start
                     :icon="mdiCheckCircle"
                   />
-                  Forward received messages via webhook
+                  {{ $t('pages.index.forwardMessagesWebhook') }}
                 </p>
                 <p class="text-md-body-large text-title-medium mt-n3">
                   <VIcon
@@ -969,7 +895,7 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                     start
                     :icon="mdiCheckCircle"
                   />
-                  Priority support
+                  {{ $t('pages.index.prioritySupport') }}
                 </p>
               </VCardText>
             </VCard>
@@ -983,13 +909,7 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
               :prominent="mdAndUp"
               variant="tonal"
             >
-              Feel free to <a href="mailto:arnold@httpsms.com">contact us</a> if
-              you need a bigger plan, or if you want us to install the httpSMS
-              API on your dedicated server. If you would still like to support
-              us, please donate via
-              <a href="https://github.com/sponsors/NdoleStudio"
-                >GitHub Sponsors</a
-              >💖
+              <span v-html="$t('pages.index.contactSupportAlert')"></span>
             </VAlert>
           </VCol>
         </VRow>
@@ -1029,12 +949,7 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                   />
                 </div>
               </div>
-              <p class="text-title-large font-weight-light mt-0">
-                httpSMS is free platform which transforms your phone into an sms
-                server! It has no hard limit also. It is an
-                <b>innovative</b> idea, I have not seen such tech before. If you
-                have an <b>sms active pack</b> in your phone then good to go
-                with httpSMS.
+              <p class="text-title-large font-weight-light mt-0" v-html="$t('pages.index.testimonial1')">
               </p>
             </VCardText>
           </VCard>
@@ -1064,11 +979,7 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                   <v-img width="64" src="/img/logos/uneed.svg" />
                 </div>
               </div>
-              <p class="text-title-large font-weight-light mt-0">
-                "<b>Outstanding product</b>. Literally have been using this for
-                years since we don't have an sms gateways that can handle http
-                requests costing less than <b>50 cent per sms</b> in my Country.
-                Love the product and the support! Great work Arnold!"
+              <p class="text-title-large font-weight-light mt-0" v-html="$t('pages.index.testimonial2')">
               </p>
             </VCardText>
           </VCard>
@@ -1083,12 +994,9 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
           <h2
             class="text-md-display-large mb-4 text-center text-display-medium"
           >
-            Frequently Asked Questions
+            {{ $t('pages.index.faqTitle') }}
           </h2>
-          <p class="text-center text-title-large mt-4 text-medium-emphasis">
-            If you still cannot find the answer to your question,
-            <a href="mailto:arnold@httpsms.com">send us an email</a> or ask in
-            our <a href="https://discord.gg/kGk8HVqeEZ">Discord</a> channel.
+          <p class="text-center text-title-large mt-4 text-medium-emphasis" v-html="$t('pages.index.faqDesc')">
           </p>
         </VCol>
       </VRow>
@@ -1099,16 +1007,14 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
               <VExpansionPanelTitle
                 class="text-title-large text-md-headline-small"
               >
-                Can I install the app on my iPhone?
+                {{ $t('pages.index.faq1Question') }}
                 <template #actions>
                   <VIcon :icon="faqPanel === 0 ? mdiMinus : mdiPlus" />
                 </template>
               </VExpansionPanelTitle>
               <VExpansionPanelText>
                 <p class="mt-4">
-                  The httpSMS application works only on Android phones at the
-                  moment since Apple doesn't allow you to install a custom SMS
-                  messaging app.
+                  {{ $t('pages.index.faq1Answer') }}
                 </p>
               </VExpansionPanelText>
             </VExpansionPanel>
@@ -1116,16 +1022,14 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
               <VExpansionPanelTitle
                 class="text-title-large text-md-headline-small"
               >
-                What's the minimum supported Android version?
+                {{ $t('pages.index.faq2Question') }}
                 <template #actions>
                   <VIcon :icon="faqPanel === 1 ? mdiMinus : mdiPlus" />
                 </template>
               </VExpansionPanelTitle>
               <VExpansionPanelText>
                 <p class="mt-4">
-                  The httpSMS Android app works from Android 9 (Pie) and above.
-                  So you can install the application on your old Android phone
-                  which you don't use anymore.
+                  {{ $t('pages.index.faq2Answer') }}
                 </p>
               </VExpansionPanelText>
             </VExpansionPanel>
@@ -1133,18 +1037,13 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
               <VExpansionPanelTitle
                 class="text-title-large text-md-headline-small"
               >
-                Can I send unlimited number of messages per month?
+                {{ $t('pages.index.faq3Question') }}
                 <template #actions>
                   <VIcon :icon="faqPanel === 2 ? mdiMinus : mdiPlus" />
                 </template>
               </VExpansionPanelTitle>
               <VExpansionPanelText>
-                <p class="mt-4">
-                  We do have packages that allow up to 200,000 SMS messages per
-                  month but you can
-                  <a href="mailto:arnold@httpsms.com">send us an email</a> if
-                  you will like to send more messages so we create a custom plan
-                  just for you.
+                <p class="mt-4" v-html="$t('pages.index.faq3Answer')">
                 </p>
               </VExpansionPanelText>
             </VExpansionPanel>
@@ -1152,17 +1051,14 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
               <VExpansionPanelTitle
                 class="text-title-large text-md-headline-small"
               >
-                Can I change the sender of the SMS message?
+                {{ $t('pages.index.faq4Question') }}
                 <template #actions>
                   <VIcon :icon="faqPanel === 3 ? mdiMinus : mdiPlus" />
                 </template>
               </VExpansionPanelTitle>
               <VExpansionPanelText>
                 <p class="mt-4">
-                  No you cannot. When you send an SMS message using the httpSMS
-                  app it uses your SIM card to send the message so the recipient
-                  will see your phone number as the sender of the SMS. You
-                  cannot use your brand name as the sender ID.
+                  {{ $t('pages.index.faq4Answer') }}
                 </p>
               </VExpansionPanelText>
             </VExpansionPanel>

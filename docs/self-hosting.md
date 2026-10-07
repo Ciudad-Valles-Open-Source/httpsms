@@ -1,5 +1,7 @@
 # Self-Hosting httpSMS
 
+*🌎 [Leer en Español](self-hosting_ES.md)*
+
 This document covers everything required to run httpSMS on your own infrastructure. The application is distributed as a set of Docker images and can be deployed on any container platform that supports Docker Compose or individual Dockerfiles.
 
 ## Table of Contents

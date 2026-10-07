@@ -24,7 +24,7 @@ definePageMeta({
 })
 
 useHead({
-  title: 'Usage & Billing - httpSMS',
+  title: computed(() => $t('pages.billing.title')),
 })
 
 const config = useRuntimeConfig()
@@ -274,7 +274,7 @@ onMounted(async () => {
         <VBtn icon to="/threads">
           <VIcon :icon="mdiArrowLeft" />
         </VBtn>
-        <VToolbarTitle>Account Usage</VToolbarTitle>
+        <VToolbarTitle>{{ $t('pages.billing.accountUsage') }}</VToolbarTitle>
         <VProgressLinear
           color="primary"
           :active="loading"
@@ -287,7 +287,7 @@ onMounted(async () => {
         <VRow>
           <VCol cols="12" md="9" offset-md="1" xl="8" offset-xl="2">
             <!-- Current Plan -->
-            <h4 class="text-headline-large mb-3 mt-0">Current Plan</h4>
+            <h4 class="text-headline-large mb-3 mt-0">{{ $t('pages.billing.currentPlan') }}</h4>
             <VRow v-if="authStore.user">
               <VCol md="6">
                 <VAlert type="info" :icon="false" variant="tonal" prominent>
@@ -296,8 +296,7 @@ onMounted(async () => {
                       class="text-title-large mt-0 mb-0 font-weight-bold text-uppercase"
                     >
                       <span v-if="isOnFreePlan">{{ plan.name }}</span>
-                      <span v-else-if="subscriptionIsCancelled">
-                        <span class="text-warning">{{ plan.name }}</span> → Free
+                      <span v-else-if="subscriptionIsCancelled" v-html="$t('pages.billing.downgradedFree').replace('{date}', new Date(authStore.user.subscription_ends_at!).toLocaleDateString())">
                       </span>
                       <span v-else>{{ plan.name }}</span>
                     </h1>
@@ -308,34 +307,19 @@ onMounted(async () => {
                         !subscriptionIsCancelled
                       "
                       class="text-medium-emphasis mt-1"
+                      v-html="$t('pages.billing.nextBill').replace('{price}', String(plan.price)).replace('{date}', new Date(authStore.user.subscription_renews_at!).toLocaleDateString())"
                     >
-                      Your next bill is for <b>${{ plan.price }}</b> on
-                      <b>{{
-                        new Date(
-                          authStore.user.subscription_renews_at!,
-                        ).toLocaleDateString()
-                      }}</b>
                     </p>
-                    <p v-if="isOnLifetimePlan" class="text-medium-emphasis">
-                      You are on the life time plan which costs
-                      <b>${{ plan.price }}</b>
+                    <p v-if="isOnLifetimePlan" class="text-medium-emphasis" v-html="$t('pages.billing.lifetimePlanDesc').replace('{price}', String(plan.price))">
                     </p>
                     <p
                       v-else-if="subscriptionIsCancelled"
                       class="text-medium-emphasis"
+                      v-html="$t('pages.billing.downgradedFree').replace('{date}', new Date(authStore.user.subscription_ends_at!).toLocaleDateString())"
                     >
-                      You will be downgraded to the <b>FREE</b> plan on
-                      <b>{{
-                        new Date(
-                          authStore.user.subscription_ends_at!,
-                        ).toLocaleDateString()
-                      }}</b>
                     </p>
                     <p v-else class="text-medium-emphasis mt-1">
-                      {{ formatDecimal(totalMessages) }}/{{
-                        formatDecimal(plan.messagesPerMonth)
-                      }}
-                      messages
+                      {{ $t('pages.billing.messagesRatio').replace('{used}', formatDecimal(totalMessages)).replace('{total}', formatDecimal(plan.messagesPerMonth)) }}
                     </p>
                   </div>
                   <div class="d-flex mb-1 mt-1">
@@ -349,14 +333,14 @@ onMounted(async () => {
                       :loading="loading"
                       @click="updateDetails"
                     >
-                      Update Plan
+                      {{ $t('pages.billing.updatePlan') }}
                     </VBtn>
                     <VBtn
                       v-else-if="!isOnLifetimePlan"
                       color="primary"
                       :href="checkoutURL"
                     >
-                      Upgrade Plan
+                      {{ $t('pages.billing.upgradePlan') }}
                     </VBtn>
                     <VSpacer />
                     <VDialog
@@ -375,22 +359,15 @@ onMounted(async () => {
                           color="error"
                           variant="text"
                         >
-                          Cancel Plan
+                          {{ $t('pages.billing.cancelPlan') }}
                         </VBtn>
                       </template>
                       <VCard>
                         <VCardText class="pt-4">
                           <h2 class="text-headline-medium mt-0 mb-2">
-                            Are you sure you want to cancel your subscription?
+                            {{ $t('pages.billing.cancelConfirmTitle') }}
                           </h2>
-                          <p class="text-medium-emphasis">
-                            You will be downgraded to the free plan at the end
-                            of the current billing period on
-                            <b>{{
-                              new Date(
-                                authStore.user.subscription_renews_at!,
-                              ).toLocaleDateString()
-                            }}</b>
+                          <p class="text-medium-emphasis" v-html="$t('pages.billing.cancelConfirmDesc').replace('{date}', new Date(authStore.user.subscription_renews_at!).toLocaleDateString())">
                           </p>
                         </VCardText>
                         <VCardActions class="mt-n6 px-6 pb-6">
@@ -399,7 +376,7 @@ onMounted(async () => {
                             variant="flat"
                             @click="dialog = false"
                           >
-                            Keep Subscription
+                            {{ $t('pages.billing.keepSubscription') }}
                           </VBtn>
                           <VSpacer />
                           <VBtn
@@ -409,7 +386,7 @@ onMounted(async () => {
                             color="error"
                             @click="cancelPlan"
                           >
-                            Cancel Plan
+                            {{ $t('pages.billing.cancelPlan') }}
                           </VBtn>
                         </VCardActions>
                       </VCard>
@@ -421,7 +398,7 @@ onMounted(async () => {
 
             <!-- Upgrade Plan (only for free users) -->
             <template v-if="isOnFreePlan">
-              <h2 class="text-headline-large mt-4 mb-2">Upgrade Plan</h2>
+              <h2 class="text-headline-large mt-4 mb-2">{{ $t('pages.billing.upgradePlanTitle') }}</h2>
               <VRow>
                 <VCol cols="12" md="6">
                   <VCard :href="checkoutURL" link>
@@ -431,14 +408,14 @@ onMounted(async () => {
                           <h1
                             class="text-title-large font-weight-bold text-uppercase mt-3"
                           >
-                            Pro Plan
+                            {{ $t('pages.billing.proPlanTitle') }}
                           </h1>
                           <p class="text-medium-emphasis">
-                            Send and receive 5,000 to 20,000 messages per month
+                            {{ $t('pages.billing.proPlanFeatures') }}
                           </p>
                         </VCol>
                         <VCol class="flex-grow-0 flex-shrink-0 text-center">
-                          <span class="text-headline-medium">$10</span>/month
+                          <span class="text-headline-medium">$10</span>{{ $t('pages.billing.perMonth') }}
                         </VCol>
                       </VRow>
                     </VCardText>
@@ -452,15 +429,14 @@ onMounted(async () => {
                           <h1
                             class="text-title-large font-weight-bold text-uppercase mt-3"
                           >
-                            Enterprise Plan
+                            {{ $t('pages.billing.enterprisePlanTitle') }}
                           </h1>
                           <p class="text-medium-emphasis">
-                            Send and receive 50,000 to 200,000 messages per
-                            month
+                            {{ $t('pages.billing.enterprisePlanFeatures') }}
                           </p>
                         </VCol>
                         <VCol class="flex-grow-0 flex-shrink-0 text-center">
-                          <span class="text-headline-medium">$89</span>/month
+                          <span class="text-headline-medium">$89</span>{{ $t('pages.billing.perMonth') }}
                         </VCol>
                       </VRow>
                     </VCardText>
@@ -470,16 +446,15 @@ onMounted(async () => {
             </template>
 
             <!-- Overview -->
-            <h4 class="text-headline-large mb-3 mt-8">Overview</h4>
+            <h4 class="text-headline-large mb-3 mt-8">{{ $t('pages.billing.overview') }}</h4>
             <p class="text-medium-emphasis">
-              This is the summary of the sent messages and received messages
-              from
+              {{ $t('pages.billing.overviewDesc') }}
               <v-code v-if="billingStore.billingUsage" class="font-weight-bold">
                 <BillingDateOrdinal
                   :value="billingStore.billingUsage.start_timestamp"
                 />
               </v-code>
-              to
+              {{ $t('pages.billing.overviewDescTo') }}
               <v-code v-if="billingStore.billingUsage" class="font-weight-bold">
                 <BillingDateOrdinal
                   :value="billingStore.billingUsage.end_timestamp"
@@ -497,7 +472,7 @@ onMounted(async () => {
                   <h2 class="text-headline-large my-0">
                     {{ formatDecimal(billingStore.billingUsage.sent_messages) }}
                   </h2>
-                  <p class="text-medium-emphasis mt-n1">Messages Sent</p>
+                  <p class="text-medium-emphasis mt-n1">{{ $t('pages.billing.messagesSent') }}</p>
                 </VAlert>
               </VCol>
               <VCol cols="12" md="6">
@@ -512,7 +487,7 @@ onMounted(async () => {
                       formatDecimal(billingStore.billingUsage.received_messages)
                     }}
                   </h2>
-                  <p class="text-medium-emphasis mt-n1">Messages Received</p>
+                  <p class="text-medium-emphasis mt-n1">{{ $t('pages.billing.messagesReceived') }}</p>
                 </VAlert>
               </VCol>
             </VRow>
@@ -520,17 +495,9 @@ onMounted(async () => {
             <!-- Subscription Payments -->
             <template v-if="authStore.user?.subscription_id != null">
               <h4 class="text-headline-large mb-3 mt-8">
-                Subscription Payments
+                {{ $t('pages.billing.subscriptionPayments') }}
               </h4>
-              <p class="text-medium-emphasis">
-                This is a list of your last 10 subscription payments made using
-                our payment provider
-                <a
-                  class="text-decoration-none"
-                  href="https://www.lemonsqueezy.com"
-                >
-                  Lemon Squeezy</a
-                >.
+              <p class="text-medium-emphasis" v-html="$t('pages.billing.subscriptionPaymentsDesc')">
               </p>
               <VProgressCircular
                 v-if="payments == null && loadingSubscriptionPayments"
@@ -542,11 +509,11 @@ onMounted(async () => {
               <VTable v-if="payments">
                 <thead>
                   <tr class="text-uppercase">
-                    <th v-if="lgAndUp" class="text-left">ID</th>
-                    <th class="text-left">Timestamp</th>
-                    <th class="text-left">Status</th>
-                    <th v-if="lgAndUp" class="text-left">Tax</th>
-                    <th class="text-left">Total</th>
+                    <th v-if="lgAndUp" class="text-left">{{ $t('pages.billing.thId') }}</th>
+                    <th class="text-left">{{ $t('pages.billing.thTimestamp') }}</th>
+                    <th class="text-left">{{ $t('pages.billing.thStatus') }}</th>
+                    <th v-if="lgAndUp" class="text-left">{{ $t('pages.billing.thTax') }}</th>
+                    <th class="text-left">{{ $t('pages.billing.thTotal') }}</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -586,7 +553,7 @@ onMounted(async () => {
                         @click="showInvoiceDialog(payment)"
                       >
                         <VIcon start :icon="mdiInvoice" />
-                        Invoice
+                        {{ $t('pages.billing.btnInvoice') }}
                       </VBtn>
                     </td>
                   </tr>
@@ -595,23 +562,22 @@ onMounted(async () => {
             </template>
 
             <!-- Usage History -->
-            <h4 class="text-headline-large mb-3 mt-8">Usage History</h4>
+            <h4 class="text-headline-large mb-3 mt-8">{{ $t('pages.billing.usageHistory') }}</h4>
             <p class="text-medium-emphasis">
-              Summary of all the sent and received messages in the past 12
-              billing periods
+              {{ $t('pages.billing.usageHistoryDesc') }}
             </p>
             <VTable density="comfortable">
               <thead>
                 <tr class="text-uppercase text-medium-emphasis">
-                  <th class="text-left">Start Date</th>
-                  <th class="text-left">End Date</th>
+                  <th class="text-left">{{ $t('pages.billing.thStartDate') }}</th>
+                  <th class="text-left">{{ $t('pages.billing.thEndDate') }}</th>
                   <th class="text-left">
-                    Sent
-                    <span v-if="lgAndUp">Messages</span>
+                    {{ $t('pages.billing.thSent') }}
+                    <span v-if="lgAndUp">{{ $t('pages.billing.thMessages') }}</span>
                   </th>
                   <th class="text-left">
-                    Received
-                    <span v-if="lgAndUp">Messages</span>
+                    {{ $t('pages.billing.thReceived') }}
+                    <span v-if="lgAndUp">{{ $t('pages.billing.thMessages') }}</span>
                   </th>
                 </tr>
               </thead>
@@ -644,11 +610,8 @@ onMounted(async () => {
       opacity="0.9"
     >
       <VCard>
-        <VCardTitle class="text-headline-large">Generate Invoice</VCardTitle>
-        <VCardSubtitle class="mt-n1">
-          Create an invoice for your
-          <b>{{ selectedPayment?.attributes.total_formatted }}</b> payment on
-          {{ formatTimestamp(selectedPayment?.attributes.created_at ?? '') }}
+        <VCardTitle class="text-headline-large">{{ $t('pages.billing.invoiceDialogTitle') }}</VCardTitle>
+        <VCardSubtitle class="mt-n1" v-html="$t('pages.billing.invoiceDialogDesc').replace('{amount}', selectedPayment?.attributes.total_formatted || '').replace('{date}', formatTimestamp(selectedPayment?.attributes.created_at ?? ''))">
         </VCardSubtitle>
         <VCardText class="pb-0">
           <VContainer>
@@ -661,8 +624,8 @@ onMounted(async () => {
                   :disabled="loading"
                   :error="errorMessages.has('name')"
                   :error-messages="errorMessages.get('name')"
-                  label="Name"
-                  placeholder="e.g Acme Corporation"
+                  :label="$t('pages.billing.formNameLabel')"
+                  :placeholder="$t('pages.billing.formNamePlaceholder')"
                   persistent-placeholder
                   variant="outlined"
                 />
@@ -675,8 +638,8 @@ onMounted(async () => {
                   :disabled="loading"
                   :error="errorMessages.has('address')"
                   :error-messages="errorMessages.get('address')"
-                  label="Address"
-                  placeholder="e.g 221B Baker Street"
+                  :label="$t('pages.billing.formAddressLabel')"
+                  :placeholder="$t('pages.billing.formAddressPlaceholder')"
                   persistent-placeholder
                   variant="outlined"
                 />
@@ -690,8 +653,8 @@ onMounted(async () => {
                   :disabled="loading"
                   :error="errorMessages.has('city')"
                   :error-messages="errorMessages.get('city')"
-                  label="City"
-                  placeholder="e.g Los Angeles"
+                  :label="$t('pages.billing.formCityLabel')"
+                  :placeholder="$t('pages.billing.formCityPlaceholder')"
                   persistent-placeholder
                   variant="outlined"
                 />
@@ -705,8 +668,8 @@ onMounted(async () => {
                   :disabled="loading"
                   :error="errorMessages.has('state')"
                   :error-messages="errorMessages.get('state')"
-                  label="State"
-                  placeholder="e.g CA"
+                  :label="$t('pages.billing.formStateLabel')"
+                  :placeholder="$t('pages.billing.formStatePlaceholder')"
                   persistent-placeholder
                   variant="outlined"
                 />
@@ -719,8 +682,8 @@ onMounted(async () => {
                   :error="errorMessages.has('state')"
                   :error-messages="errorMessages.get('state')"
                   :items="invoiceStateOptions"
-                  label="State"
-                  placeholder="e.g CA"
+                  :label="$t('pages.billing.formStateLabel')"
+                  :placeholder="$t('pages.billing.formStatePlaceholder')"
                   persistent-placeholder
                   variant="outlined"
                 />
@@ -735,8 +698,8 @@ onMounted(async () => {
                   :disabled="loading"
                   :error="errorMessages.has('zip_code')"
                   :error-messages="errorMessages.get('zip_code')"
-                  label="Zip Code"
-                  placeholder="e.g 46001"
+                  :label="$t('pages.billing.formZipCodeLabel')"
+                  :placeholder="$t('pages.billing.formZipCodePlaceholder')"
                   persistent-placeholder
                   variant="outlined"
                 />
@@ -750,8 +713,8 @@ onMounted(async () => {
                   :error="errorMessages.has('country')"
                   :error-messages="errorMessages.get('country')"
                   :items="countries"
-                  label="Country"
-                  placeholder="e.g United States"
+                  :label="$t('pages.billing.formCountryLabel')"
+                  :placeholder="$t('pages.billing.formCountryPlaceholder')"
                   persistent-placeholder
                   variant="outlined"
                 />
@@ -767,8 +730,8 @@ onMounted(async () => {
                   :error="errorMessages.has('notes')"
                   :error-messages="errorMessages.get('notes')"
                   rows="3"
-                  label="Notes (optional)"
-                  placeholder="e.g Thanks for doing business with us!"
+                  :label="$t('pages.billing.formNotesLabel')"
+                  :placeholder="$t('pages.billing.formNotesPlaceholder')"
                   persistent-placeholder
                   variant="outlined"
                 />
@@ -784,7 +747,7 @@ onMounted(async () => {
             @click="generateInvoice"
           >
             <VIcon start :icon="mdiDownloadOutline" />
-            Download Invoice
+            {{ $t('pages.billing.btnDownloadInvoice') }}
           </VBtn>
           <VSpacer />
           <VBtn
@@ -792,7 +755,7 @@ onMounted(async () => {
             variant="text"
             @click="subscriptionInvoiceDialog = false"
           >
-            Close
+            {{ $t('pages.billing.btnClose') }}
           </VBtn>
         </VCardActions>
       </VCard>

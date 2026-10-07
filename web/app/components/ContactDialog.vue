@@ -13,6 +13,8 @@ import { useContactsStore, type ContactInput } from '~/stores/contacts'
 import { toApiError } from '~/utils/api-error'
 import { ErrorMessages } from '~/utils/errors'
 
+const { t } = useI18n()
+
 interface PropertyRow {
   key: string
   value: string
@@ -55,7 +57,7 @@ const form = ref<ContactForm>(emptyForm())
 const formErrors = ref(new ErrorMessages())
 
 const dialogTitle = computed(() =>
-  props.contact ? 'Edit Contact' : 'Add Contact',
+  props.contact ? t('components.contactDialog.editContact') : t('components.contactDialog.addContact'),
 )
 
 function phoneNumberRow(value = ''): PhoneNumberRow {
@@ -156,13 +158,13 @@ function buildPayload(): ContactInput {
 function validateForm(): boolean {
   const bag = new ErrorMessages()
   if (form.value.name.trim() === '') {
-    bag.add('name', 'The name is required.')
+    bag.add('name', t('components.contactDialog.nameRequired'))
   }
   const hasPhone = form.value.phoneNumbers.some(
     ({ value }) => value.trim().length > 0,
   )
   if (!hasPhone) {
-    bag.add('phone_numbers', 'At least one phone number is required.')
+    bag.add('phone_numbers', t('components.contactDialog.phoneRequired'))
   }
   formErrors.value = bag
   return bag.size() === 0
@@ -233,7 +235,7 @@ watch(
           variant="text"
           color="warning"
           size="small"
-          aria-label="Close dialog"
+          :aria-label="$t('components.contactDialog.ariaCloseDialog')"
           @click="closeDialog"
         />
       </VCardTitle>
@@ -255,11 +257,11 @@ watch(
 
         <VTextField
           v-model="form.name"
-          label="Name"
+          :label="$t('components.contactDialog.name')"
           variant="outlined"
           density="comfortable"
           persistent-placeholder
-          placeholder="e.g John Doe"
+          :placeholder="$t('components.contactDialog.namePlaceholder')"
           :prepend-inner-icon="mdiAccount"
           :error="formErrors.has('name')"
           :error-messages="formErrors.get('name')"
@@ -267,7 +269,7 @@ watch(
         />
 
         <div class="d-flex align-center mt-2 mb-1">
-          <span class="text-subtitle-2">Phone Numbers</span>
+          <span class="text-subtitle-2">{{ $t('components.contactDialog.phoneNumbers') }}</span>
           <VSpacer />
           <VBtn
             variant="text"
@@ -276,7 +278,7 @@ watch(
             :prepend-icon="mdiPlus"
             @click="addPhoneNumber"
           >
-            Add
+            {{ $t('components.contactDialog.add') }}
           </VBtn>
         </div>
         <div
@@ -288,9 +290,9 @@ watch(
             <v-phone-input
               v-model="phone.value"
               v-model:country="phone.country"
-              :label="`Phone number ${index + 1}`"
-              country-label="Country"
-              placeholder="Phone number e.g 18005550199"
+              :label="`${$t('components.contactDialog.phoneNumber')} ${index + 1}`"
+              :country-label="$t('components.contactDialog.country')"
+              :placeholder="$t('components.contactDialog.phonePlaceholder')"
               variant="outlined"
               density="comfortable"
               color="primary"
@@ -307,14 +309,14 @@ watch(
               variant="text"
               size="small"
               class="mt-1"
-              aria-label="Remove phone number"
+              :aria-label="$t('components.contactDialog.ariaRemovePhone')"
               @click="removePhoneNumber(index)"
             />
           </div>
         </div>
 
         <div class="d-flex align-center mt-2 mb-1">
-          <span class="text-subtitle-2">Email Addresses</span>
+          <span class="text-subtitle-2">{{ $t('components.contactDialog.emailAddresses') }}</span>
           <VSpacer />
           <VBtn
             variant="text"
@@ -323,7 +325,7 @@ watch(
             :prepend-icon="mdiPlus"
             @click="addEmail"
           >
-            Add
+            {{ $t('components.contactDialog.add') }}
           </VBtn>
         </div>
         <div
@@ -333,8 +335,8 @@ watch(
         >
           <VTextField
             v-model="form.emails[index]"
-            :label="`Email ${index + 1}`"
-            placeholder="e.g alice@example.com"
+            :label="`${$t('components.contactDialog.email')} ${index + 1}`"
+            :placeholder="$t('components.contactDialog.emailPlaceholder')"
             variant="outlined"
             autocomplete="email"
             type="email"
@@ -347,13 +349,13 @@ watch(
             variant="text"
             size="small"
             class="mt-1"
-            aria-label="Remove email"
+            :aria-label="$t('components.contactDialog.ariaRemoveEmail')"
             @click="removeEmail(index)"
           />
         </div>
 
         <div class="d-flex align-center mt-2 mb-1">
-          <span class="text-subtitle-2">Properties</span>
+          <span class="text-subtitle-2">{{ $t('components.contactDialog.properties') }}</span>
           <VSpacer />
           <VBtn
             variant="text"
@@ -362,7 +364,7 @@ watch(
             :prepend-icon="mdiPlus"
             @click="addProperty"
           >
-            Add
+            {{ $t('components.contactDialog.add') }}
           </VBtn>
         </div>
         <div
@@ -372,13 +374,13 @@ watch(
         >
           <VTextField
             v-model="property.key"
-            label="Key"
+            :label="$t('components.contactDialog.key')"
             variant="outlined"
             density="comfortable"
           />
           <VTextField
             v-model="property.value"
-            label="Value"
+            :label="$t('components.contactDialog.value')"
             variant="outlined"
             density="comfortable"
           />
@@ -387,7 +389,7 @@ watch(
             variant="text"
             size="small"
             class="mt-1"
-            aria-label="Remove property"
+            :aria-label="$t('components.contactDialog.ariaRemoveProperty')"
             @click="removeProperty(index)"
           />
         </div>
@@ -401,10 +403,10 @@ watch(
           :prepend-icon="mdiContentSaveCheck"
           @click="submitForm"
         >
-          Save Contact
+          {{ $t('components.contactDialog.saveContact') }}
         </VBtn>
         <VSpacer />
-        <VBtn color="warning" variant="text" @click="closeDialog">Close</VBtn>
+        <VBtn color="warning" variant="text" @click="closeDialog">{{ $t('components.contactDialog.close') }}</VBtn>
       </VCardActions>
     </VCard>
   </VDialog>

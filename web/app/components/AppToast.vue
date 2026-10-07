@@ -37,7 +37,7 @@ const notificationActive = computed({
         variant="text"
         @click="notificationsStore.disableNotification()"
       >
-        <span class="font-weight-bold">Close</span>
+        <span class="font-weight-bold">{{ $t('components.appToast.close') }}</span>
       </v-btn>
     </template>
   </v-snackbar>

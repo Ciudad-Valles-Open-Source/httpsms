@@ -31,7 +31,7 @@ class StickyNotificationService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         Timber.d("The service has been destroyed")
-        Toast.makeText(this, "Service destroyed", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.service_destroyed), Toast.LENGTH_SHORT).show()
     }
 
 

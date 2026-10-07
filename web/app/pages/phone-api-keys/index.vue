@@ -12,7 +12,7 @@ definePageMeta({
 })
 
 useHead({
-  title: 'Phone API Keys - httpSMS',
+  title: computed(() => $t('pages.phoneApiKeys.title')),
 })
 
 const config = useRuntimeConfig()
@@ -23,6 +23,7 @@ const phonesStore = usePhonesStore()
 const notificationsStore = useNotificationsStore()
 const { formatTimestamp, formatPhoneNumber } = useFilters()
 const { useApi } = useApiComposable()
+const { t } = useI18n()
 
 const loading = ref(true)
 const phoneApiKeys = ref<EntitiesPhoneAPIKey[]>([])
@@ -60,7 +61,7 @@ async function loadPhoneApiKeys() {
     phoneApiKeys.value = response.data ?? []
   } catch (error: unknown) {
     notificationsStore.addNotification({
-      message: getApiErrorMessage(error, 'Failed to load Phone API Keys'),
+      message: getApiErrorMessage(error, t('pages.phoneApiKeys.errorMessageLoad')),
       type: 'error',
     })
   } finally {
@@ -78,7 +79,7 @@ async function createPhoneApiKey() {
       body: { name: formPhoneApiKeyName.value },
     })
     notificationsStore.addNotification({
-      message: 'Phone API Key created successfully',
+      message: t('pages.phoneApiKeys.successMessageCreate'),
       type: 'success',
     })
     formPhoneApiKeyName.value = ''
@@ -88,7 +89,7 @@ async function createPhoneApiKey() {
     errorMessages.value = parseErrors(error)
     if (errorMessages.value.size() === 0) {
       notificationsStore.addNotification({
-        message: getApiErrorMessage(error, 'Failed to create Phone API Key'),
+        message: getApiErrorMessage(error, t('pages.phoneApiKeys.errorMessageCreate')),
         type: 'error',
       })
     }
@@ -109,7 +110,7 @@ function generateQrCode(text: string) {
     (err: Error | null | undefined) => {
       if (err) {
         notificationsStore.addNotification({
-          message: 'Failed to generate phone API key QR code',
+          message: t('pages.phoneApiKeys.errorMessageQr'),
           type: 'error',
         })
       }
@@ -150,14 +151,14 @@ async function deleteApiKey() {
       method: 'DELETE',
     })
     notificationsStore.addNotification({
-      message: 'The phone API key has been deleted successfully',
+      message: t('pages.phoneApiKeys.successMessageDelete'),
       type: 'success',
     })
     deleteApiKeyDialog.value = false
     await loadPhoneApiKeys()
   } catch (error: unknown) {
     notificationsStore.addNotification({
-      message: getApiErrorMessage(error, 'Failed to delete Phone API Key'),
+      message: getApiErrorMessage(error, t('pages.phoneApiKeys.errorMessageDelete')),
       type: 'error',
     })
     loading.value = false
@@ -173,7 +174,7 @@ async function removePhoneFromPhoneKey() {
   )?.id
   if (!phoneId) {
     notificationsStore.addNotification({
-      message: 'Could not find the phone to remove from the API key',
+      message: t('pages.phoneApiKeys.errorMessageFindPhone'),
       type: 'error',
     })
     return
@@ -186,7 +187,7 @@ async function removePhoneFromPhoneKey() {
       { method: 'DELETE' },
     )
     notificationsStore.addNotification({
-      message: 'The phone has been removed from the phone API key successfully',
+      message: t('pages.phoneApiKeys.successMessageRemovePhone'),
       type: 'success',
     })
     removePhoneFromApiKeyDialog.value = false
@@ -195,7 +196,7 @@ async function removePhoneFromPhoneKey() {
     notificationsStore.addNotification({
       message: getApiErrorMessage(
         error,
-        'Failed to remove the phone from the Phone API Key',
+        t('pages.phoneApiKeys.errorMessageRemovePhone'),
       ),
       type: 'error',
     })
@@ -208,10 +209,21 @@ onMounted(async () => {
   await phonesStore.loadPhones()
   await loadPhoneApiKeys()
 
-  const pusherKey = config.public.pusherKey as string
-  const pusherCluster = config.public.pusherCluster as string
+  const pusherKey = config.public.soketiKey as string
+  const pusherCluster = config.public.soketiCluster as string
   if (pusherKey && authStore.user?.id) {
-    const pusher = new Pusher(pusherKey, { cluster: pusherCluster })
+    const pusherOptions = config.public.useSoketi ? {
+      wsHost: window.location.hostname,
+      wsPort: window.location.port ? Number(window.location.port) : (window.location.protocol === 'https:' ? 443 : 80),
+      wssPort: window.location.port ? Number(window.location.port) : (window.location.protocol === 'https:' ? 443 : 80),
+      forceTLS: window.location.protocol === 'https:',
+      disableStats: true,
+      enabledTransports: ['ws', 'wss'],
+      cluster: ''
+    } : {
+      cluster: pusherCluster,
+    }
+    const pusher = new Pusher(pusherKey, pusherOptions)
     webhookChannel = pusher.subscribe(authStore.user.id)
     webhookChannel.bind('phone.updated', () => {
       if (!loading.value) {
@@ -235,7 +247,7 @@ onBeforeUnmount(() => {
         <VBtn icon to="/threads">
           <VIcon :icon="mdiArrowLeft" />
         </VBtn>
-        <VToolbarTitle>Phone API Keys</VToolbarTitle>
+        <VToolbarTitle>{{ $t('pages.phoneApiKeys.titlePhoneApiKeys') }}</VToolbarTitle>
         <VProgressLinear
           color="primary"
           :active="loading"
@@ -257,7 +269,7 @@ onBeforeUnmount(() => {
                 indeterminate
               />
               <h5 class="text-md-display-small text-title-large my-0">
-                Phone API Keys
+                {{ $t('pages.phoneApiKeys.titlePhoneApiKeys') }}
               </h5>
               <VBtn
                 color="primary"
@@ -265,7 +277,7 @@ onBeforeUnmount(() => {
                 @click="showCreateApiKeyDialog = true"
               >
                 <VIcon start :icon="mdiPlus" />
-                Create API Key
+                {{ $t('pages.phoneApiKeys.btnCreateApiKey') }}
               </VBtn>
               <VSpacer />
               <VBtn
@@ -275,35 +287,18 @@ onBeforeUnmount(() => {
                 variant="tonal"
                 class="mt-1"
               >
-                Documentation
+                {{ $t('pages.phoneApiKeys.btnDocumentation') }}
               </VBtn>
             </div>
-            <p class="text-medium-emphasis">
-              If you have multiple phones, you can create unique phone API keys
-              for your different Android phones. These API keys can only be used
-              on the specific mobile phone when it calls the httpSMS server for
-              specific actions like sending heartbeats, registering received
-              messages, delivery reports etc. If you want to interact with the
-              full
-              <a
-                class="text-decoration-none hover:text-decoration-underline"
-                target="_blank"
-                href="https://api.httpsms.com"
-                >httpSMS API</a
-              >, use the API key under your account settings page instead
-              <NuxtLink
-                class="text-decoration-none hover:text-decoration-underline"
-                to="/settings"
-                >https://httpsms.com/settings</NuxtLink
-              >.
+            <p class="text-medium-emphasis" v-html="$t('pages.phoneApiKeys.description')">
             </p>
             <VTable class="mb-4 api-key-table" density="comfortable">
               <thead>
                 <tr class="text-uppercase text-medium-emphasis">
-                  <th class="text-left">Name</th>
-                  <th class="text-left">Created At</th>
-                  <th class="text-left">Phone Numbers</th>
-                  <th class="text-left">Actions</th>
+                  <th class="text-left">{{ $t('pages.phoneApiKeys.thName') }}</th>
+                  <th class="text-left">{{ $t('pages.phoneApiKeys.thCreatedAt') }}</th>
+                  <th class="text-left">{{ $t('pages.phoneApiKeys.thPhoneNumbers') }}</th>
+                  <th class="text-left">{{ $t('pages.phoneApiKeys.thActions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -329,7 +324,7 @@ onBeforeUnmount(() => {
                             )
                           "
                         >
-                          Remove
+                          {{ $t('pages.phoneApiKeys.btnRemove') }}
                         </VBtn>
                       </li>
                     </ul>
@@ -342,7 +337,7 @@ onBeforeUnmount(() => {
                       :disabled="loading"
                       @click="showPhoneApiKey(phoneApiKey)"
                     >
-                      <VIcon start :icon="mdiEye" /> View
+                      <VIcon start :icon="mdiEye" /> {{ $t('pages.phoneApiKeys.btnView') }}
                     </VBtn>
                     <VBtn
                       class="ml-2"
@@ -351,7 +346,7 @@ onBeforeUnmount(() => {
                       :disabled="loading"
                       @click="showDeletePhoneApiKeyDialog(phoneApiKey)"
                     >
-                      <VIcon start :icon="mdiDelete" /> Delete
+                      <VIcon start :icon="mdiDelete" /> {{ $t('pages.phoneApiKeys.btnDelete') }}
                     </VBtn>
                   </td>
                 </tr>
@@ -364,20 +359,19 @@ onBeforeUnmount(() => {
 
     <VDialog v-model="showCreateApiKeyDialog" max-width="600" opacity="0.9">
       <VCard>
-        <VCardTitle>Create Phone API Key</VCardTitle>
+        <VCardTitle>{{ $t('pages.phoneApiKeys.dialogCreateTitle') }}</VCardTitle>
         <VCardSubtitle class="mt-2" style="white-space: normal">
-          After creating the API key you can use it to login to the httpSMS
-          Android app on your phone
+          {{ $t('pages.phoneApiKeys.dialogCreateSubtitle') }}
         </VCardSubtitle>
         <VCardText>
           <VForm @submit.prevent="createPhoneApiKey">
             <VTextField
               v-model="formPhoneApiKeyName"
               variant="outlined"
-              label="Name"
+              :label="$t('pages.phoneApiKeys.formNameLabel')"
               class="mt-4"
               persistent-placeholder
-              placeholder="Enter a name for your phone API key"
+              :placeholder="$t('pages.phoneApiKeys.formNamePlaceholder')"
               name="api-key"
               :disabled="loading"
               :error="errorMessages.has('name')"
@@ -391,7 +385,7 @@ onBeforeUnmount(() => {
             :loading="loading"
             @click="createPhoneApiKey"
           >
-            Create<span v-if="lgAndUp" class="mx-1">Phone API</span>Key
+            {{ $t('pages.phoneApiKeys.btnCreate') }}<span v-if="lgAndUp" class="mx-1">{{ $t('pages.phoneApiKeys.phoneApiText') }}</span>{{ $t('pages.phoneApiKeys.keyText') }}
           </loading-button>
           <VSpacer />
           <VBtn
@@ -399,7 +393,7 @@ onBeforeUnmount(() => {
             color="warning"
             @click="showCreateApiKeyDialog = false"
           >
-            Close
+            {{ $t('pages.phoneApiKeys.btnClose') }}
           </VBtn>
         </VCardActions>
       </VCard>
@@ -407,16 +401,8 @@ onBeforeUnmount(() => {
 
     <VDialog v-model="showPhoneApiKeyQrCode" max-width="600" opacity="0.9">
       <VCard>
-        <VCardTitle>Phone API Key QR Code</VCardTitle>
-        <VCardSubtitle class="mt-2" style="white-space: normal">
-          Scan this QR code with the
-          <a
-            class="text-decoration-none hover:text-decoration-underline"
-            target="_blank"
-            :href="appStore.appData.appDownloadUrl"
-            >httpSMS app</a
-          >
-          on your Android phone to login.
+        <VCardTitle>{{ $t('pages.phoneApiKeys.dialogQrTitle') }}</VCardTitle>
+        <VCardSubtitle class="mt-2" style="white-space: normal" v-html="$t('pages.phoneApiKeys.dialogQrSubtitle')">
         </VCardSubtitle>
         <VCardText class="text-center">
           <VTextField
@@ -431,8 +417,8 @@ onBeforeUnmount(() => {
           <CopyButton
             :value="activePhoneApiKey?.api_key ?? ''"
             color="primary"
-            copy-text="Copy API key"
-            notification-text="Phone API Key copied successfully"
+            :copy-text="$t('pages.phoneApiKeys.copyApiKey')"
+            :notification-text="$t('pages.phoneApiKeys.copySuccess')"
           />
           <VSpacer />
           <VBtn
@@ -440,7 +426,7 @@ onBeforeUnmount(() => {
             variant="text"
             @click="showPhoneApiKeyQrCode = false"
           >
-            Close
+            {{ $t('pages.phoneApiKeys.btnClose') }}
           </VBtn>
         </VCardActions>
       </VCard>
@@ -449,11 +435,9 @@ onBeforeUnmount(() => {
     <VDialog v-model="deleteApiKeyDialog" max-width="600" opacity="0.9">
       <VCard>
         <VCardTitle class="text-h5 text-break">
-          Are you sure you want to delete the phone API Key?
+          {{ $t('pages.phoneApiKeys.dialogDeleteTitle') }}
         </VCardTitle>
-        <VCardText class="text-medium-emphasis">
-          You will have to logout and login again on the <b>httpSMS</b> Android
-          app on all of the phones which are currently using this API key.
+        <VCardText class="text-medium-emphasis" v-html="$t('pages.phoneApiKeys.dialogDeleteSubtitle')">
         </VCardText>
         <VCardActions class="pb-2 mt-n2">
           <VBtn
@@ -463,14 +447,14 @@ onBeforeUnmount(() => {
             @click="deleteApiKey"
           >
             <VIcon start :icon="mdiDelete" />
-            Delete API Key
+            {{ $t('pages.phoneApiKeys.btnDeleteApiKey') }}
           </VBtn>
           <VSpacer />
           <VBtn
             variant="text"
             color="warning"
             @click="deleteApiKeyDialog = false"
-            >Close</VBtn
+            >{{ $t('pages.phoneApiKeys.btnClose') }}</VBtn
           >
         </VCardActions>
       </VCard>
@@ -483,15 +467,9 @@ onBeforeUnmount(() => {
     >
       <VCard>
         <VCardTitle class="text-h5 text-break">
-          Are you sure you want to remove this phone number from the Phone API
-          Key?
+          {{ $t('pages.phoneApiKeys.dialogRemoveTitle') }}
         </VCardTitle>
-        <VCardText>
-          This will remove the
-          <code>{{ formatPhoneNumber(activePhoneNumber) }}</code> from your
-          phone API key. You will have to logout and login again on the
-          <b>httpSMS</b> Android app on the phone which is currently using this
-          API key.
+        <VCardText v-html="$t('pages.phoneApiKeys.dialogRemoveSubtitle').replace('{phoneNumber}', formatPhoneNumber(activePhoneNumber))">
         </VCardText>
         <VCardActions class="pb-4">
           <VBtn
@@ -500,7 +478,7 @@ onBeforeUnmount(() => {
             @click="removePhoneFromPhoneKey"
           >
             <VIcon start :icon="mdiDelete" />
-            Remove Phone from key
+            {{ $t('pages.phoneApiKeys.btnRemovePhoneFromKey') }}
           </VBtn>
           <VSpacer />
           <VBtn
@@ -508,7 +486,7 @@ onBeforeUnmount(() => {
             color="warning"
             @click="removePhoneFromApiKeyDialog = false"
           >
-            Close
+            {{ $t('pages.phoneApiKeys.btnClose') }}
           </VBtn>
         </VCardActions>
       </VCard>

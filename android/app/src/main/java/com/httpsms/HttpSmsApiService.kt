@@ -19,7 +19,11 @@ import java.util.logging.Level
 import java.util.logging.Logger.getLogger
 
 
-class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
+class HttpSmsApiService(
+    private val apiKey: String,
+    private val baseURL: URI,
+    private val appContext: Context? = null
+) {
     private val apiKeyHeader = "x-api-key"
     private val clientVersionHeader = "X-Client-Version"
     private val jsonMediaType = "application/json; charset=utf-8".toMediaType()
@@ -33,9 +37,18 @@ class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
         fun create(context: Context): HttpSmsApiService {
             return HttpSmsApiService(
                 Settings.getApiKeyOrDefault(context),
-                Settings.getServerUrlOrDefault(context)
+                Settings.getServerUrlOrDefault(context),
+                context.applicationContext
             )
         }
+    }
+
+    private fun recordContact(ok: Boolean) {
+        appContext?.let { Settings.setServerContact(it, ok) }
+    }
+
+    private fun recordActivity(kind: String) {
+        appContext?.let { Settings.setMessageActivity(it, kind) }
     }
 
     fun getOutstandingMessage(messageID: String): Message? {
@@ -47,7 +60,7 @@ class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
 
         val response = client.newCall(request).execute()
         if (response.isSuccessful) {
-            val payload = ResponseMessage.fromJson(response.body!!.string())?.data
+            val payload = ResponseMessage.fromJson(response.body.string())?.data
             if (payload == null) {
                 response.close()
                 Timber.e("cannot decode payload [${response.body}]")
@@ -88,16 +101,19 @@ class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
             client.newCall(request).execute()
         } catch (e: Exception) {
             Timber.e(e, "Exception while sending received message request")
+            recordContact(false)
             return false
         }
 
         if (!response.isSuccessful) {
-            Timber.e("error response [${response.body?.string()}] with code [${response.code}] while receiving message")
+            Timber.e("error response [${response.body.string()}] with code [${response.code}] while receiving message")
             response.close()
             return response.code in 400..499
         }
 
         response.close()
+        recordContact(true)
+        recordActivity("received")
         Timber.i("received message stored successfully")
         return true
     }
@@ -121,7 +137,7 @@ class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
 
         val response = client.newCall(request).execute()
         if (!response.isSuccessful) {
-            Timber.e("error response [${response.body?.string()}] with code [${response.code}] while sending missed call event [${body}]")
+            Timber.e("error response [${response.body.string()}] with code [${response.code}] while sending missed call event [${body}]")
             response.close()
             return response.code in 400..499
         }
@@ -146,14 +162,21 @@ class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
             .header(clientVersionHeader, BuildConfig.VERSION_NAME)
             .build()
 
-        val response = client.newCall(request).execute()
+        val response = try {
+            client.newCall(request).execute()
+        } catch (e: Exception) {
+            recordContact(false)
+            throw e
+        }
         if (!response.isSuccessful) {
-            Timber.e("error response [${response.body?.string()}] with code [${response.code}] while sending heartbeat [$body] for phone numbers [${phoneNumbers.joinToString()}]")
+            Timber.e("error response [${response.body.string()}] with code [${response.code}] while sending heartbeat [$body] for phone numbers [${phoneNumbers.joinToString()}]")
             response.close()
+            recordContact(false)
             return false
         }
 
         response.close()
+        recordContact(true)
         Timber.i("heartbeat stored successfully for phone numbers [${phoneNumbers.joinToString()}]")
         return true
     }
@@ -258,6 +281,10 @@ class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
         }
 
         response.close()
+        recordContact(true)
+        if (event == "SENT") {
+            recordActivity("sent")
+        }
         Timber.i("[$event] event sent successfully for message with ID [$messageId]")
         return true
     }
@@ -281,7 +308,7 @@ class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
         try {
             val response = client.newCall(request).execute()
             if (!response.isSuccessful) {
-                Timber.e("error response [${response.body?.string()}] with code [${response.code}] while updating FCM token [$fcmToken] with apiKey [$apiKey]")
+                Timber.e("error response [${response.body.string()}] with code [${response.code}] while updating FCM token [$fcmToken] with apiKey [$apiKey]")
                 response.close()
                 if (response.code == 401) {
                     Timber.e("invalid API key [$apiKey]")
@@ -295,7 +322,7 @@ class HttpSmsApiService(private val apiKey: String, private val baseURL: URI) {
             }
 
             Timber.i("FCM token submitted correctly with API key [$apiKey] and server url [$baseURL]")
-            val payload = ResponsePhone.fromJson(response.body!!.string())?.data
+            val payload = ResponsePhone.fromJson(response.body.string())?.data
             response.close()
             return Triple(payload, null, null)
         } catch (ex: Exception) {

@@ -1,5 +1,7 @@
 # Deployment Platforms
 
+*🌎 [Leer en Español](deployment-platforms_ES.md)*
+
 This document provides platform-specific instructions for deploying httpSMS on common container orchestration platforms. All platforms use the same Docker images and the same set of environment variables described in [environment-variables.md](./environment-variables.md).
 
 ## Table of Contents

@@ -62,7 +62,7 @@ class LoginActivity : AppCompatActivity() {
                                 onFcmTokenMissing = {
                                     Toast.makeText(
                                         this@LoginActivity,
-                                        "Cannot find FCM token. Make sure you have Google Play Services installed",
+                                        getString(R.string.fcm_token_missing),
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
@@ -77,15 +77,15 @@ class LoginActivity : AppCompatActivity() {
     private val barcodeLauncher = registerForActivityResult(ScanContract()) { result ->
         if (result.contents != null) {
             viewModel.onApiKeyChange(result.contents)
-            Toast.makeText(this, "Scanned: ${result.contents}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.scanned_qr, result.contents), Toast.LENGTH_LONG).show()
         } else {
-            Toast.makeText(this, "Scan cancelled", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.scan_cancelled), Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun startQrCodeScan() {
         val options = ScanOptions()
-        options.setPrompt("Scan a QR code")
+        options.setPrompt(getString(R.string.scan_qr_prompt))
         options.setBeepEnabled(true)
         options.setOrientationLocked(false)
         options.setCameraId(0)
@@ -104,7 +104,7 @@ class LoginActivity : AppCompatActivity() {
         val telephonyManager = this.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         if (ActivityCompat.checkSelfPermission(
                 this,
-                Manifest.permission.READ_SMS
+                Manifest.permission.READ_PHONE_STATE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             Timber.e("cannot get owner because permissions are not granted")
@@ -134,8 +134,11 @@ class LoginActivity : AppCompatActivity() {
             Manifest.permission.SEND_SMS,
             Manifest.permission.RECEIVE_SMS,
             Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.READ_SMS,
         )
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            permissions += Manifest.permission.READ_PHONE_NUMBERS
+        }
 
         if (Build.VERSION.SDK_INT >= 33) {
             permissions += Manifest.permission.POST_NOTIFICATIONS

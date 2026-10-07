@@ -38,6 +38,6 @@ function goBack() {
     @click="goBack"
   >
     <v-icon :icon="mdiArrowLeft" start />
-    Go Back
+    {{ $t('components.backButton.goBack') }}
   </v-btn>
 </template>

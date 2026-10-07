@@ -13,7 +13,7 @@ definePageMeta({
 })
 
 useHead({
-  title: 'Heartbeats - httpSMS',
+  title: computed(() => $t('pages.heartbeats.title')),
 })
 
 const route = useRoute()
@@ -21,6 +21,7 @@ const { mdAndDown, mdAndUp, lgAndUp } = useVDisplay()
 const authStore = useAuthStore()
 const phonesStore = usePhonesStore()
 const { formatPhoneNumber, formatTimestamp } = useFilters()
+const { t } = useI18n()
 
 const loading = ref(true)
 const heartbeats = ref<EntitiesHeartbeat[]>([])
@@ -33,12 +34,12 @@ interface HeartbeatTableItem {
   interval: number
 }
 
-const dataTableHeaders = [
-  { title: 'HEARTBEAT ID', key: 'id', sortable: false },
-  { title: 'PHONE NUMBER', key: 'owner', sortable: false },
-  { title: 'RECEIVED AT', key: 'timestamp' },
-  { title: 'TIME INTERVAL', key: 'interval' },
-] as const
+const dataTableHeaders = computed(() => [
+  { title: t('pages.heartbeats.thId'), key: 'id', sortable: false },
+  { title: t('pages.heartbeats.thPhone'), key: 'owner', sortable: false },
+  { title: t('pages.heartbeats.thReceived'), key: 'timestamp' },
+  { title: t('pages.heartbeats.thInterval'), key: 'interval' },
+] as const)
 
 function getDiff(a: string, b: string): number {
   return new Date(a).getTime() - new Date(b).getTime()
@@ -161,7 +162,7 @@ onMounted(async () => {
           <VIcon :icon="mdiArrowLeft" />
         </VBtn>
         <VToolbarTitle>
-          Heartbeats
+          {{ $t('pages.heartbeats.titleHeartbeats') }}
           <VIcon size="12" class="mx-2" color="primary" :icon="mdiCircle" />
           <span v-if="phonesStore.owner">{{
             formatPhoneNumber(phonesStore.owner)
@@ -171,22 +172,10 @@ onMounted(async () => {
       <VContainer>
         <VRow>
           <VCol cols="12" class="mt-n4">
-            <p>
-              Every 15 minutes, the httpSMS app on your Android phone sends a
-              heartbeat event to the httpsms API to show that it is alive. The
-              reason for this is because the Android operating system sometimes
-              kills an application to save battery
-              <a
-                href="https://dontkillmyapp.com"
-                class="text-decoration-none hover:text-decoration-underline"
-                target="_blank"
-                >https://dontkillmyapp.com</a
-              >.
+            <p v-html="$t('pages.heartbeats.desc1')">
             </p>
             <p>
-              If httpSMS doesn't get any heartbeat event in a 1-hour interval,
-              you will get an email notification about it so you can check if
-              there is an issue with your Android phone.
+              {{ $t('pages.heartbeats.desc2') }}
             </p>
           </VCol>
           <VCol v-if="mdAndUp" cols="12" class="px-0">
@@ -198,8 +187,7 @@ onMounted(async () => {
           </VCol>
           <VCol cols="12">
             <p>
-              The table below shows the last 100 heartbeat events received from
-              the httpSMS app on your Android phone.
+              {{ $t('pages.heartbeats.tableDesc') }}
             </p>
             <VProgressLinear
               v-if="loading"

@@ -33,4 +33,10 @@
     <string name="enable_debug_logs">Habilitar registros de depuración</string>
     <string name="enable_incoming_call_events_sim1">Habilitar eventos de llamadas perdidas SIM1</string>
     <string name="enable_sim2_incoming_call_events">Habilitar eventos de llamadas perdidas SIM2</string>
+    <string name="fcm_token_missing">No se pudo encontrar el token FCM. Asegúrate de tener los Servicios de Google Play instalados</string>
+    <string name="scanned_qr">Escaneado: %s</string>
+    <string name="scan_cancelled">Escaneo cancelado</string>
+    <string name="scan_qr_prompt">Escanea un código QR</string>
+    <string name="heartbeat_sent">Latido enviado con éxito</string>
+    <string name="service_destroyed">Servicio destruido</string>
 </resources>

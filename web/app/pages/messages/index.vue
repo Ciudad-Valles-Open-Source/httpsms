@@ -13,7 +13,7 @@ definePageMeta({
 })
 
 useHead({
-  title: 'New Message - httpSMS',
+  title: computed(() => $t('pages.messages.title')),
 })
 
 const router = useRouter()
@@ -22,6 +22,7 @@ const notificationsStore = useNotificationsStore()
 const phonesStore = usePhonesStore()
 const { useApi } = useApiComposable()
 const { formatPhoneNumber } = useFilters()
+const { t } = useI18n()
 
 const sending = ref(false)
 const formPhoneNumber = ref('')
@@ -67,7 +68,7 @@ async function sendMessage() {
       },
     })
     notificationsStore.addNotification({
-      message: 'Message sent successfully!',
+      message: t('pages.messages.successMessageSent'),
       type: 'success',
     })
     await router.push('/threads')
@@ -93,7 +94,7 @@ async function sendMessage() {
       errors.value = newErrors
     } else {
       notificationsStore.addNotification({
-        message: getApiErrorMessage(err, 'Failed to send message'),
+        message: getApiErrorMessage(err, t('pages.messages.defaultErrorSending')),
         type: 'error',
       })
     }
@@ -121,7 +122,7 @@ onMounted(async () => {
           <VIcon :icon="mdiArrowLeft" />
         </VBtn>
         <VToolbarTitle>
-          New Message
+          {{ $t('pages.messages.titleNewMessage') }}
           <template v-if="phonesStore.owner && mdAndUp">
             <VIcon size="12" class="mx-2" color="primary" :icon="mdiCircle" />
             {{ formatPhoneNumber(phonesStore.owner) }}
@@ -131,11 +132,7 @@ onMounted(async () => {
       <VContainer>
         <VRow>
           <VCol cols="12" md="8" offset-md="2" xl="6" offset-xl="3">
-            <p class="mb-8 mt-0">
-              Enter the recipient's phone number and your message below, and
-              we'll deliver a real SMS it through your connected Android phone.
-              You can also text a short code like
-              <v-code>24273</v-code> without entering a full phone number.
+            <p class="mb-8 mt-0" v-html="$t('pages.messages.description')">
             </p>
             <form>
               <v-phone-input
@@ -148,9 +145,9 @@ onMounted(async () => {
                 color="primary"
                 density="compact"
                 persistent-placeholder
-                placeholder="Recipient phone number e.g 18005550199"
-                label="Phone Number"
-                country-label="Country"
+                :placeholder="$t('pages.messages.phonePlaceholder')"
+                :label="$t('pages.messages.phoneLabel')"
+                :country-label="$t('pages.messages.phoneCountryLabel')"
               />
               <VTextarea
                 v-model="formContent"
@@ -161,8 +158,8 @@ onMounted(async () => {
                 density="compact"
                 color="primary"
                 persistent-placeholder
-                placeholder="Enter your message here"
-                label="Content"
+                :placeholder="$t('pages.messages.contentPlaceholder')"
+                :label="$t('pages.messages.contentLabel')"
               />
               <loading-button
                 :disabled="sending"
@@ -171,7 +168,7 @@ onMounted(async () => {
                 :icon="mdiSend"
                 @click="sendMessage"
               >
-                Send Message
+                {{ $t('pages.messages.btnSendMessage') }}
               </loading-button>
             </form>
           </VCol>

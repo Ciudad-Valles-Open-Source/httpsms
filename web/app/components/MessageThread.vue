@@ -9,6 +9,8 @@ import {
 } from '@mdi/js'
 import type { EntitiesMessageThread } from '~~/shared/types/api'
 
+const { t } = useI18n()
+
 const threadsStore = useThreadsStore()
 const phonesStore = usePhonesStore()
 const appStore = useAppStore()
@@ -41,7 +43,7 @@ function unreadBadge(
 function onInstallApp() {
   notificationsStore.addNotification({
     type: 'info',
-    message: 'Downloading the httpSMS Android App',
+    message: t('components.messageThread.downloadingApp'),
   })
 }
 
@@ -72,7 +74,7 @@ function threadAvatarInitial(thread: EntitiesMessageThread): string {
       v-if="!threadsStore.loadingThreads && threadsStore.archivedThreads"
       class="bg-warning py-1 text-center text-uppercase text-title-medium"
     >
-      Archived Messages
+      {{ $t('components.messageThread.archivedMessages') }}
     </div>
     <div
       v-if="
@@ -83,7 +85,7 @@ function threadAvatarInitial(thread: EntitiesMessageThread): string {
       class="text-center mt-6"
     >
       <p v-if="phonesStore.owner" class="text-medium-emphasis text-center">
-        Start sending messages
+        {{ $t('components.messageThread.startSendingMessages') }}
       </p>
       <v-btn
         v-if="phonesStore.owner && phonesStore.phones.length !== 0"
@@ -91,7 +93,7 @@ function threadAvatarInitial(thread: EntitiesMessageThread): string {
         :to="{ name: 'messages' }"
       >
         <v-icon :icon="mdiPlus" start />
-        New Message
+        {{ $t('components.messageThread.newMessage') }}
       </v-btn>
     </div>
     <div
@@ -99,15 +101,14 @@ function threadAvatarInitial(thread: EntitiesMessageThread): string {
       class="px-4 text-center"
     >
       <p>
-        Install the mobile app on your Android phone to start sending messages.
-        You can also
+        {{ $t('components.messageThread.installAppPrompt') }}
         <a
           href="https://discord.gg/kGk8HVqeEZ"
           target="_blank"
           class="text-decoration-none hover:text-decoration-underline"
-          >message us on Discord</a
+          >{{ $t('components.messageThread.messageDiscord') }}</a
         >
-        to help set things up.
+        {{ $t('components.messageThread.setupHelp') }}
       </p>
       <v-btn
         color="primary"
@@ -115,7 +116,7 @@ function threadAvatarInitial(thread: EntitiesMessageThread): string {
         @click="onInstallApp"
       >
         <v-icon :icon="mdiDownload" start />
-        Download App
+        {{ $t('components.messageThread.downloadApp') }}
       </v-btn>
     </div>
     <v-list
@@ -201,7 +202,7 @@ function threadAvatarInitial(thread: EntitiesMessageThread): string {
                   />
                 </div>
               </template>
-              <span>{{ thread.status }}</span>
+              <span>{{ $t(`components.messageThread.status.${thread.status}`) }}</span>
             </VTooltip>
           </div>
         </template>

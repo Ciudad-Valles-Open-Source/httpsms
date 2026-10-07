@@ -41,6 +41,7 @@ const authStore = useAuthStore()
 const phonesStore = usePhonesStore()
 const threadsStore = useThreadsStore()
 const messagesStore = useMessagesStore()
+const { t } = useI18n()
 const { currentThread } = storeToRefs(threadsStore)
 
 const formMessage = ref('')
@@ -60,7 +61,7 @@ const formMessageRules = [
   (v: string) =>
     v === '' ||
     (v && v.length <= 320) ||
-    'Message must be less than 320 characters',
+    t('threads.id.message_length_error'),
 ]
 
 let webhookChannel: Channel | null = null
@@ -241,7 +242,7 @@ async function deleteMessage(message: EntitiesMessage) {
 async function copyMessageId(message: EntitiesMessage) {
   await navigator.clipboard.writeText(message.id)
   notificationsStore.addNotification({
-    message: 'Message ID copied to clipboard',
+    message: t('threads.id.message_id_copied'),
     type: 'success',
   })
   setTimeout(() => {
@@ -278,9 +279,18 @@ async function sendMessage(event: KeyboardEvent | Event) {
 onMounted(async () => {
   await loadData()
 
-  const pusher = new Pusher(config.public.pusherKey as string, {
-    cluster: config.public.pusherCluster as string,
-  })
+  const pusherOptions = config.public.useSoketi ? {
+    wsHost: window.location.hostname,
+    wsPort: window.location.port ? Number(window.location.port) : (window.location.protocol === 'https:' ? 443 : 80),
+    wssPort: window.location.port ? Number(window.location.port) : (window.location.protocol === 'https:' ? 443 : 80),
+    forceTLS: window.location.protocol === 'https:',
+    disableStats: true,
+    enabledTransports: ['ws', 'wss'],
+    cluster: ''
+  } : {
+    cluster: config.public.soketiCluster as string,
+  }
+  const pusher = new Pusher(config.public.soketiKey as string, pusherOptions)
 
   webhookChannel = pusher.subscribe(authStore.user!.id)
   webhookChannel.bind('message.phone.sent', () => {
@@ -349,7 +359,7 @@ onBeforeUnmount(() => {
               <template #prepend>
                 <VIcon :icon="mdiSquareEditOutline" />
               </template>
-              <VListItemTitle>Edit Contact</VListItemTitle>
+              <VListItemTitle>{{ $t('threads.id.edit_contact') }}</VListItemTitle>
             </VListItem>
             <VListItem
               v-else-if="contactIsPhoneNumber"
@@ -358,7 +368,7 @@ onBeforeUnmount(() => {
               <template #prepend>
                 <VIcon :icon="mdiAccountPlus" />
               </template>
-              <VListItemTitle>Add Contact</VListItemTitle>
+              <VListItemTitle>{{ $t('threads.id.add_contact') }}</VListItemTitle>
             </VListItem>
             <VListItem
               v-if="currentThread && !currentThread.is_archived"
@@ -367,7 +377,7 @@ onBeforeUnmount(() => {
               <template #prepend>
                 <VIcon :icon="mdiPackageDown" />
               </template>
-              <VListItemTitle>Archive</VListItemTitle>
+              <VListItemTitle>{{ $t('threads.id.archive') }}</VListItemTitle>
             </VListItem>
             <VListItem
               v-if="currentThread && currentThread.is_archived"
@@ -376,7 +386,7 @@ onBeforeUnmount(() => {
               <template #prepend>
                 <VIcon :icon="mdiPackageUp" />
               </template>
-              <VListItemTitle>Unarchive</VListItemTitle>
+              <VListItemTitle>{{ $t('threads.id.unarchive') }}</VListItemTitle>
             </VListItem>
             <VListItem
               v-if="currentThread"
@@ -385,7 +395,7 @@ onBeforeUnmount(() => {
               <template #prepend>
                 <VIcon :icon="mdiDelete" color="error" />
               </template>
-              <VListItemTitle>Delete Thread</VListItemTitle>
+              <VListItemTitle>{{ $t('threads.id.delete_thread') }}</VListItemTitle>
             </VListItem>
           </VList>
         </VMenu>
@@ -454,7 +464,7 @@ onBeforeUnmount(() => {
                       ><VIcon size="small" :icon="mdiRefresh"
                     /></template>
                     <VListItemTitle class="text-body-medium"
-                      >Resend Message</VListItemTitle
+                      >{{ $t('threads.id.resend_message') }}</VListItemTitle
                     >
                   </VListItem>
                   <VListItem @click.prevent="copyMessageId(message)">
@@ -462,7 +472,7 @@ onBeforeUnmount(() => {
                       ><VIcon size="small" :icon="mdiContentCopy"
                     /></template>
                     <VListItemTitle class="text-body-medium"
-                      >Copy Message ID</VListItemTitle
+                      >{{ $t('threads.id.copy_message_id') }}</VListItemTitle
                     >
                   </VListItem>
                   <VListItem @click.prevent="deleteMessage(message)">
@@ -470,7 +480,7 @@ onBeforeUnmount(() => {
                       ><VIcon size="small" :icon="mdiDelete" color="error"
                     /></template>
                     <VListItemTitle class="text-body-medium"
-                      >Delete Message</VListItemTitle
+                      >{{ $t('threads.id.delete_message') }}</VListItemTitle
                     >
                   </VListItem>
                 </VList>
@@ -491,7 +501,7 @@ onBeforeUnmount(() => {
                       message.content
                     }}</span>
                     <span v-else class="text-medium-emphasis"
-                      >Missed phone call</span
+                      >{{ $t('threads.id.missed_phone_call') }}</span
                     >
                   </VCardText>
                 </VCard>
@@ -578,7 +588,7 @@ onBeforeUnmount(() => {
                       ><VIcon size="small" :icon="mdiRefresh"
                     /></template>
                     <VListItemTitle class="text-body-medium"
-                      >Resend Message</VListItemTitle
+                      >{{ $t('threads.id.resend_message') }}</VListItemTitle
                     >
                   </VListItem>
                   <VListItem @click.prevent="copyMessageId(message)">
@@ -586,7 +596,7 @@ onBeforeUnmount(() => {
                       ><VIcon size="small" :icon="mdiContentCopy"
                     /></template>
                     <VListItemTitle class="text-body-medium"
-                      >Copy Message ID</VListItemTitle
+                      >{{ $t('threads.id.copy_message_id') }}</VListItemTitle
                     >
                   </VListItem>
                   <VListItem @click.prevent="deleteMessage(message)">
@@ -594,7 +604,7 @@ onBeforeUnmount(() => {
                       ><VIcon size="small" :icon="mdiDelete" color="error"
                     /></template>
                     <VListItemTitle class="text-body-medium"
-                      >Delete Message</VListItemTitle
+                      >{{ $t('threads.id.delete_message') }}</VListItemTitle
                     >
                   </VListItem>
                 </VList>
@@ -612,8 +622,8 @@ onBeforeUnmount(() => {
                 :rules="formMessageRules"
                 :placeholder="
                   contactIsPhoneNumber
-                    ? 'Type your message here'
-                    : 'You cannot send messages to ' + contact
+                    ? $t('threads.id.type_message_here')
+                    : $t('threads.id.cannot_send_messages', { contact })
                 "
                 rounded
                 @keydown.enter="sendMessage"

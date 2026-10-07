@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -1393,11 +1394,12 @@ func (container *Container) LemonsqueezyClient() (client *lemonsqueezy.Client) {
 func (container *Container) PusherClient() (client *pusher.Client) {
 	container.logger.Debug(fmt.Sprintf("creating %T", client))
 	return &pusher.Client{
-		AppID:   os.Getenv("PUSHER_APP_ID"),
-		Key:     os.Getenv("PUSHER_KEY"),
-		Secret:  os.Getenv("PUSHER_SECRET"),
-		Cluster: os.Getenv("PUSHER_CLUSTER"),
-		Secure:  true,
+		AppID:   os.Getenv("SOKETI_APP_ID"),
+		Key:     os.Getenv("SOKETI_KEY"),
+		Secret:  os.Getenv("SOKETI_SECRET"),
+		Cluster: os.Getenv("SOKETI_CLUSTER"),
+		Host:    os.Getenv("SOKETI_HOST"),
+		Secure:  os.Getenv("SOKETI_SECURE") != "false",
 	}
 }
 
@@ -1816,16 +1818,43 @@ func (container *Container) RegisterEventRoutes() {
 // RegisterSwaggerRoutes registers routes for swagger
 func (container *Container) RegisterSwaggerRoutes() {
 	container.logger.Debug(fmt.Sprintf("registering %T routes", swagger.HandlerDefault))
-	container.App().Get("/*", swagger.New(swagger.Config{
-		Title: docs.SwaggerInfo.Title,
-		CustomScript: `
+
+	// Selector de idioma flotante (EN / ES) compartido por ambas versiones.
+	languageSwitcher := `
+		document.addEventListener("DOMContentLoaded", function(event) {
+			var box = document.createElement("div");
+			box.style.cssText = "position:fixed;top:10px;right:10px;z-index:9999;font:600 13px sans-serif;background:#fff;border:1px solid #ccc;border-radius:6px;padding:6px 10px;box-shadow:0 2px 6px rgba(0,0,0,.15)";
+			var inEs = window.location.pathname.indexOf("/es") === 0;
+			box.innerHTML = inEs
+				? '<a href="/">English</a> | <b>Español</b>'
+				: '<b>English</b> | <a href="/es/">Español</a>';
+			document.body.appendChild(box);
+		});`
+
+	baseScript := `
 		document.addEventListener("DOMContentLoaded", function(event) {
 			document.body.style.margin = '0';
 			var links = document.querySelectorAll("link[rel~='icon']");
 			links.forEach(function (link) {
 				link.href = 'https://httpsms.com/favicon.ico';
 			});
-		});`,
+		});` + languageSwitcher
+
+	// Especificación OpenAPI en español (debe registrarse antes de /es/*)
+	container.App().Get("/es/doc.json", func(c fiber.Ctx) error {
+		c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
+		return c.SendString(docs.SpanishDoc())
+	})
+
+	container.App().Get("/es/*", swagger.New(swagger.Config{
+		Title:        docs.SwaggerInfo.Title + " (ES)",
+		URL:          "/es/doc.json",
+		CustomScript: template.JS(baseScript),
+	}))
+
+	container.App().Get("/*", swagger.New(swagger.Config{
+		Title:        docs.SwaggerInfo.Title,
+		CustomScript: template.JS(baseScript),
 	}))
 }
 

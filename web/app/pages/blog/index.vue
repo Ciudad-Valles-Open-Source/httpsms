@@ -5,13 +5,13 @@ definePageMeta({
   layout: 'website',
 })
 
+const { t } = useI18n()
+
 useSeoMeta({
-  title: 'httpSMS Blog - SMS automation guides & tutorials',
-  description:
-    'Guides and tutorials for sending and receiving SMS with your Android phone — bulk messaging, webhooks, end-to-end encryption, Zapier, Excel, and Python.',
-  ogTitle: 'httpSMS Blog - SMS automation guides & tutorials',
-  ogDescription:
-    'Learn how to send and receive SMS from your Android phone: bulk messaging, webhooks, encryption, Zapier, Excel, and Python tutorials.',
+  title: computed(() => t('blog.meta_title')),
+  description: computed(() => t('blog.meta_description')),
+  ogTitle: computed(() => t('blog.meta_ogTitle')),
+  ogDescription: computed(() => t('blog.meta_ogDescription')),
   ogImage: 'https://httpsms.com/header.png',
   twitterCard: 'summary_large_image',
 })
@@ -113,12 +113,12 @@ const sortedArticles = computed(() =>
         <VRow>
           <VCol cols="12">
             <h1 class="text-display-large mb-2" :class="{ 'mt-0': smAndDown }">
-              Blog
+              {{ $t('blog.title') }}
             </h1>
             <h2
               class="text-medium-emphasis mt-2 mb-n4 text-title-large font-weight-light"
             >
-              Learn more about httpSMS through our blog!
+              {{ $t('blog.description') }}
             </h2>
           </VCol>
         </VRow>

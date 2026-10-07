@@ -10,7 +10,7 @@ definePageMeta({
 })
 
 useHead({
-  title: 'Send Bulk Messages - httpSMS',
+  title: computed(() => $t('pages.bulkMessages.title')),
 })
 
 const router = useRouter()
@@ -18,6 +18,7 @@ const { mdAndUp } = useVDisplay()
 const authStore = useAuthStore()
 const notificationsStore = useNotificationsStore()
 const { formatTimestamp } = useFilters()
+const { t } = useI18n()
 const { useApi } = useApiComposable()
 
 const formFile = ref<File | null>(null)
@@ -59,7 +60,7 @@ async function fetchBulkOrders() {
     bulkOrders.value = response.data ?? []
   } catch {
     notificationsStore.addNotification({
-      message: 'Error while fetching bulk messages history',
+      message: t('pages.bulkMessages.errorMessageHistory'),
       type: 'error',
     })
   } finally {
@@ -81,7 +82,7 @@ async function sendBulkMessages() {
       body: formData,
     })
     notificationsStore.addNotification({
-      message: response?.message ?? 'Bulk messages sent successfully',
+      message: response?.message ?? t('pages.bulkMessages.successMessageSent'),
       type: 'success',
     })
     loading.value = false
@@ -89,12 +90,12 @@ async function sendBulkMessages() {
     fetchBulkOrders()
   } catch (error: unknown) {
     errorTitle.value = capitalize(
-      toApiError(error).data?.message ?? 'Error while sending bulk messages',
+      toApiError(error).data?.message ?? t('pages.bulkMessages.defaultErrorSending'),
     )
     errorMessages.value = parseErrors(error)
     notificationsStore.addNotification({
       message:
-        toApiError(error).data?.message ?? 'Errors while sending bulk messages',
+        toApiError(error).data?.message ?? t('pages.bulkMessages.defaultErrorsSending'),
       type: 'error',
     })
     loading.value = false
@@ -116,7 +117,7 @@ onMounted(async () => {
           <VIcon :icon="mdiArrowLeft" />
         </VBtn>
         <VToolbarTitle>
-          <div class="py-16">Bulk Messages</div>
+          <div class="py-16">{{ $t('pages.bulkMessages.bulkMessages') }}</div>
         </VToolbarTitle>
         <VProgressLinear
           :active="loading"
@@ -129,32 +130,8 @@ onMounted(async () => {
       <VContainer>
         <VRow>
           <VCol cols="12" md="10" offset-md="1" xxl="8" offset-xxl="2">
-            <h5 class="text-headline-large mb-3 mt-3">Bulk Messages</h5>
-            <p>
-              Fill in our bulk SMS
-              <a
-                class="text-decoration-none hover:text-decoration-underline"
-                download
-                href="/templates/httpsms-bulk.csv"
-                >CSV template</a
-              >
-              or our
-              <a
-                class="text-decoration-none hover:text-decoration-underline"
-                download
-                href="/templates/httpsms-bulk.xlsx"
-                >Excel template</a
-              >
-              and upload it here to send your SMS messages to multiple
-              recipients at once. You can also configure
-              <NuxtLink
-                class="text-decoration-none hover:text-decoration-underline"
-                to="/settings/#send-schedules"
-                >send schedules</NuxtLink
-              >
-              on your phone to make sure messages are sent out at specific times
-              of the day e.g
-              <span class="text-medium-emphasis">Mon - Fri 9am - 5pm.</span>
+            <h5 class="text-headline-large mb-3 mt-3">{{ $t('pages.bulkMessages.bulkMessages') }}</h5>
+            <p v-html="$t('pages.bulkMessages.description')">
             </p>
             <VAlert v-if="errorTitle" variant="tonal" type="warning" prominent>
               <h6 class="text-title-large font-weight-bold">
@@ -172,7 +149,7 @@ onMounted(async () => {
             <form>
               <VFileInput
                 v-model="formFile"
-                label="File"
+                :label="$t('pages.bulkMessages.fileLabel')"
                 color="primary"
                 accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 :error-messages="errorMessages.get('document')"
@@ -189,7 +166,7 @@ onMounted(async () => {
                   :icon="mdiSendCheck"
                   @click="sendBulkMessages"
                 >
-                  Send Bulk Messages
+                  {{ $t('pages.bulkMessages.btnSendBulk') }}
                 </loading-button>
                 <VSpacer />
                 <VBtn
@@ -198,7 +175,7 @@ onMounted(async () => {
                   color="info"
                   href="mailto:arnold@httpsms.com?subject=I'm having trouble with the bulk messages"
                 >
-                  I Need Help
+                  {{ $t('pages.bulkMessages.btnNeedHelp') }}
                 </VBtn>
               </div>
             </form>
@@ -206,11 +183,9 @@ onMounted(async () => {
         </VRow>
         <VRow class="mt-8">
           <VCol cols="12" md="10" offset-md="1" xxl="8" offset-xxl="2">
-            <h4 class="text-headline-large mb-3">Bulk Message History</h4>
+            <h4 class="text-headline-large mb-3">{{ $t('pages.bulkMessages.historyTitle') }}</h4>
             <p class="text-medium-emphasis">
-              Your 10 most recent bulk SMS uploads are shown below, including a
-              delivery status breakdown for each batch. Click on a row to see
-              individual messages on the search page.
+              {{ $t('pages.bulkMessages.historyDesc') }}
             </p>
             <VProgressLinear
               v-if="loadingHistory"
@@ -221,15 +196,15 @@ onMounted(async () => {
             <VTable v-else density="comfortable">
               <thead>
                 <tr class="text-uppercase text-medium-emphasis">
-                  <th class="text-left">Name</th>
-                  <th class="text-center">Created At</th>
-                  <th class="text-center">Total</th>
-                  <th class="text-center">Pending</th>
-                  <th class="text-center">Scheduled</th>
-                  <th class="text-center">Sent</th>
-                  <th class="text-center">Delivered</th>
-                  <th class="text-center">Failed</th>
-                  <th class="text-center">Expired</th>
+                  <th class="text-left">{{ $t('pages.bulkMessages.thName') }}</th>
+                  <th class="text-center">{{ $t('pages.bulkMessages.thCreatedAt') }}</th>
+                  <th class="text-center">{{ $t('pages.bulkMessages.thTotal') }}</th>
+                  <th class="text-center">{{ $t('pages.bulkMessages.thPending') }}</th>
+                  <th class="text-center">{{ $t('pages.bulkMessages.thScheduled') }}</th>
+                  <th class="text-center">{{ $t('pages.bulkMessages.thSent') }}</th>
+                  <th class="text-center">{{ $t('pages.bulkMessages.thDelivered') }}</th>
+                  <th class="text-center">{{ $t('pages.bulkMessages.thFailed') }}</th>
+                  <th class="text-center">{{ $t('pages.bulkMessages.thExpired') }}</th>
                 </tr>
               </thead>
               <tbody>

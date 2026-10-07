@@ -21,9 +21,18 @@ const hasDrawer = computed(() => {
 
 onMounted(() => {
   setTimeout(() => {
-    const pusher = new Pusher(config.public.pusherKey as string, {
-      cluster: config.public.pusherCluster as string,
-    })
+    const pusherOptions = config.public.useSoketi ? {
+      wsHost: window.location.hostname,
+      wsPort: window.location.port ? Number(window.location.port) : (window.location.protocol === 'https:' ? 443 : 80),
+      wssPort: window.location.port ? Number(window.location.port) : (window.location.protocol === 'https:' ? 443 : 80),
+      forceTLS: window.location.protocol === 'https:',
+      disableStats: true,
+      enabledTransports: ['ws', 'wss'],
+      cluster: ''
+    } : {
+      cluster: config.public.soketiCluster as string,
+    }
+    const pusher = new Pusher(config.public.soketiKey as string, pusherOptions)
 
     if (authStore.authUser) {
       const channel = pusher.subscribe(authStore.authUser.id)

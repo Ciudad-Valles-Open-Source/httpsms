@@ -23,20 +23,22 @@ definePageMeta({
 })
 
 useHead({
-  title: 'Contacts - httpSMS',
+  title: computed(() => $t('pages.contacts.title')),
 })
 
 const contactsStore = useContactsStore()
 const { formatPhoneNumber, formatTimestamp, humanizeTimeShort } = useFilters()
 
-const headers = [
-  { title: 'Name', key: 'name', sortable: true },
-  { title: 'Phone Numbers', key: 'phone_numbers', sortable: false },
-  { title: 'Emails', key: 'emails', sortable: false },
-  { title: 'Created', key: 'created_at', sortable: false },
-  { title: 'Updated', key: 'updated_at', sortable: true },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
-]
+const { t } = useI18n()
+
+const headers = computed(() => [
+  { title: t('pages.contacts.thName'), key: 'name', sortable: true },
+  { title: t('pages.contacts.thPhoneNumbers'), key: 'phone_numbers', sortable: false },
+  { title: t('pages.contacts.thEmails'), key: 'emails', sortable: false },
+  { title: t('pages.contacts.thCreated'), key: 'created_at', sortable: false },
+  { title: t('pages.contacts.thUpdated'), key: 'updated_at', sortable: true },
+  { title: t('pages.contacts.thActions'), key: 'actions', sortable: false, align: 'end' as const },
+])
 
 const itemsPerPageOptions = [
   { value: 10, title: '10' },
@@ -209,10 +211,10 @@ onBeforeUnmount(() => {
 <template>
   <VContainer fluid class="px-0 pt-0">
     <VAppBar>
-      <VBtn icon to="/threads" aria-label="Back to messages">
+      <VBtn icon to="/threads" :aria-label="$t('pages.contacts.ariaBackToMessages')">
         <VIcon :icon="mdiArrowLeft" />
       </VBtn>
-      <VToolbarTitle>Contacts</VToolbarTitle>
+      <VToolbarTitle>{{ $t('pages.contacts.titleContacts') }}</VToolbarTitle>
       <VProgressLinear
         :active="contactsStore.loading"
         :indeterminate="contactsStore.loading"
@@ -226,7 +228,7 @@ onBeforeUnmount(() => {
       <VRow>
         <VCol cols="12">
           <div class="d-flex align-center">
-            <h1 class="text-display-large mb-1">Contacts</h1>
+            <h1 class="text-display-large mb-1">{{ $t('pages.contacts.titleContacts') }}</h1>
             <VSpacer />
             <div class="mt-12">
               <VBtn
@@ -235,7 +237,7 @@ onBeforeUnmount(() => {
                 :prepend-icon="mdiFileUpload"
                 @click="openImport"
               >
-                Import CSV
+                {{ $t('pages.contacts.btnImportCsv') }}
               </VBtn>
               <VBtn
                 class="ml-4 mb-4"
@@ -244,28 +246,17 @@ onBeforeUnmount(() => {
                 :prepend-icon="mdiAccountPlus"
                 @click="openAdd"
               >
-                Add Contact
+                {{ $t('pages.contacts.btnAddContact') }}
               </VBtn>
             </div>
           </div>
-          <p class="text-medium-emphasis mb-6">
-            Use httpSMS as a lightweight CRM by adding your contacts here. Your
-            message threads will show contact names instead of phone numbers,
-            making conversations easier to recognize and manage. Add contacts
-            individually, or fill in our
-            <a
-              class="text-decoration-none hover:text-decoration-underline"
-              href="/templates/httpsms-contacts.csv"
-              download
-              >CSV template</a
-            >
-            and upload it to import your contact list in bulk.
+          <p class="text-medium-emphasis mb-6" v-html="$t('pages.contacts.description')">
           </p>
 
           <VTextField
             v-model="searchTerm"
             :prepend-inner-icon="mdiMagnify"
-            label="Search by name, phone number or email"
+            :label="$t('pages.contacts.searchPlaceholder')"
             variant="outlined"
             density="compact"
             autocomplete="search-query"
@@ -289,7 +280,7 @@ onBeforeUnmount(() => {
             :items-per-page-options="itemsPerPageOptions"
             item-value="id"
             hover
-            loading-text="Loading contacts…"
+            :loading-text="$t('pages.contacts.loadingContacts')"
             @update:options="onUpdateOptions"
           >
             <template #[`item.name`]="{ item }">
@@ -369,7 +360,7 @@ onBeforeUnmount(() => {
                   variant="text"
                   class="mr-2"
                   density="comfortable"
-                  aria-label="Edit contact"
+                  :aria-label="$t('pages.contacts.ariaEditContact')"
                   @click="openEdit(item)"
                 />
                 <VBtn
@@ -377,7 +368,7 @@ onBeforeUnmount(() => {
                   variant="text"
                   density="comfortable"
                   color="error"
-                  aria-label="Delete contact"
+                  :aria-label="$t('pages.contacts.ariaDeleteContact')"
                   @click="openDelete(item)"
                 />
               </div>
@@ -393,15 +384,15 @@ onBeforeUnmount(() => {
                 <p class="text-title-medium mb-1">
                   {{
                     searchTerm
-                      ? 'No contacts match your search'
-                      : 'No contacts yet'
+                      ? $t('pages.contacts.noContactsMatch')
+                      : $t('pages.contacts.noContactsYet')
                   }}
                 </p>
                 <p class="text-medium-emphasis mb-4">
                   {{
                     searchTerm
-                      ? 'Try a different name, phone number or email.'
-                      : 'Add your first contact or import them from a CSV file.'
+                      ? $t('pages.contacts.tryDifferentSearch')
+                      : $t('pages.contacts.addFirstContact')
                   }}
                 </p>
                 <VBtn
@@ -411,7 +402,7 @@ onBeforeUnmount(() => {
                   :prepend-icon="mdiAccountPlus"
                   @click="openAdd"
                 >
-                  Add Contact
+                  {{ $t('pages.contacts.btnAddContact') }}
                 </VBtn>
               </div>
             </template>
@@ -426,21 +417,18 @@ onBeforeUnmount(() => {
     <VDialog v-model="deleteDialog" max-width="480" opacity="0.9">
       <VCard>
         <VCardTitle class="d-flex align-center">
-          <span>Delete Contact</span>
+          <span>{{ $t('pages.contacts.deleteContactTitle') }}</span>
           <VSpacer />
           <VBtn
             :icon="mdiClose"
             variant="text"
             color="warning"
             size="small"
-            aria-label="Close dialog"
+            :aria-label="$t('pages.contacts.ariaCloseDialog')"
             @click="deleteDialog = false"
           />
         </VCardTitle>
-        <VCardText class="mt-n2 text-medium-emphasis">
-          Are you sure you want to delete
-          <v-code>{{ pendingDelete?.name }}</v-code
-          >? This action cannot be undone.
+        <VCardText class="mt-n2 text-medium-emphasis" v-html="$t('pages.contacts.deleteConfirmText').replace('{name}', pendingDelete?.name || '')">
         </VCardText>
         <VCardActions class="mb-2">
           <VBtn
@@ -451,11 +439,11 @@ onBeforeUnmount(() => {
             :disabled="saving"
             @click="confirmDelete"
           >
-            Delete Contact
+            {{ $t('pages.contacts.btnDeleteContact') }}
           </VBtn>
           <VSpacer />
           <VBtn color="warning" variant="text" @click="deleteDialog = false">
-            Close
+            {{ $t('pages.contacts.btnClose') }}
           </VBtn>
         </VCardActions>
       </VCard>
@@ -465,31 +453,23 @@ onBeforeUnmount(() => {
     <VDialog v-model="importDialog" max-width="600" opacity="0.9">
       <VCard>
         <VCardTitle class="d-flex align-center">
-          <span>Import Contacts from CSV</span>
+          <span>{{ $t('pages.contacts.importDialogTitle') }}</span>
           <VSpacer />
           <VBtn
             :icon="mdiClose"
             variant="text"
             color="warning"
             size="small"
-            aria-label="Close dialog"
+            :aria-label="$t('pages.contacts.ariaCloseDialog')"
             @click="importDialog = false"
           />
         </VCardTitle>
         <VCardText>
-          <p class="mb-4 mt-n2 text-medium-emphasis">
-            Download the
-            <a
-              class="text-decoration-none hover:text-decoration-underline"
-              href="/templates/httpsms-contacts.csv"
-              download
-              >CSV template</a
-            >, fill it in and upload it here. Separate multiple emails or phone
-            numbers within a cell using a semicolon (<code>;</code>).
+          <p class="mb-4 mt-n2 text-medium-emphasis" v-html="$t('pages.contacts.importDialogDesc')">
           </p>
           <VFileInput
             v-model="importFile"
-            label="CSV file"
+            :label="$t('pages.contacts.csvFileLabel')"
             color="primary"
             accept=".csv,text/csv"
             variant="outlined"
@@ -505,7 +485,7 @@ onBeforeUnmount(() => {
             class="mt-4"
             :icon="mdiAlertCircleOutline"
           >
-            <p class="font-weight-medium mb-1">We couldn't import your file:</p>
+            <p class="font-weight-medium mb-1">{{ $t('pages.contacts.importErrorTitle') }}</p>
             <ul class="pl-4 mb-0">
               <li v-for="message in importErrors" :key="message">
                 {{ message }}
@@ -522,11 +502,11 @@ onBeforeUnmount(() => {
             :disabled="saving || !importFile"
             @click="submitImport"
           >
-            Import
+            {{ $t('pages.contacts.btnImport') }}
           </VBtn>
           <v-spacer />
           <VBtn color="warning" variant="text" @click="importDialog = false">
-            Close
+            {{ $t('pages.contacts.btnClose') }}
           </VBtn>
         </VCardActions>
       </VCard>
