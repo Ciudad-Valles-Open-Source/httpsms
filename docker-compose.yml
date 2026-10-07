@@ -188,6 +188,8 @@ services:
     depends_on:
       api:
         condition: service_healthy
+      soketi:
+        condition: service_started
     restart: unless-stopped
     healthcheck:
       test:
