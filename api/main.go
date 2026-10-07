@@ -35,6 +35,8 @@ func main() {
 	}
 
 	if host := strings.TrimSpace(os.Getenv("SWAGGER_HOST")); len(host) > 0 {
+		host = strings.TrimPrefix(host, "http://")
+		host = strings.TrimPrefix(host, "https://")
 		docs.SwaggerInfo.Host = host
 	}
 	if len(Version) > 0 {
