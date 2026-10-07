@@ -89,6 +89,7 @@
       "phoneApiKeys": "Phone API Keys",
       "downloadApp": "Download App",
       "usageBilling": "Usage & Billing",
+      "statistics": "Statistics",
       "logout": "Logout"
     },
     "redirectPromptPopover": {
@@ -154,6 +155,9 @@
     }
   },
   "pages": {
+    "statistics": {
+      "title": "Usage Statistics"
+    },
     "searchMessages": {
       "title": "Search your Messages - httpSMS",
       "errorMessageSearch": "Error while searching messages. Contact us via email",

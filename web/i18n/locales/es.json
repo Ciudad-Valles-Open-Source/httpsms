@@ -89,6 +89,7 @@
       "phoneApiKeys": "Claves API de Teléfono",
       "downloadApp": "Descargar App",
       "usageBilling": "Uso y Facturación",
+      "statistics": "Estadísticas",
       "logout": "Cerrar Sesión"
     },
     "redirectPromptPopover": {
@@ -154,6 +155,9 @@
     }
   },
   "pages": {
+    "statistics": {
+      "title": "Estadísticas de Uso"
+    },
     "searchMessages": {
       "title": "Busca tus Mensajes - httpSMS",
       "errorMessageSearch": "Error al buscar mensajes. Contáctanos por correo electrónico",

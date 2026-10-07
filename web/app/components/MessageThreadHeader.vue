@@ -8,6 +8,7 @@ import {
   mdiCellphoneKey,
   mdiDownload,
   mdiFinance,
+  mdiChartBar,
   mdiBatteryChargingHigh,
   mdiPackageUp,
   mdiPackageDown,
@@ -209,6 +210,10 @@ async function logout() {
         <v-list-item v-if="config.public.enableBilling" :to="{ name: 'billing' }">
           <template #prepend><v-icon :icon="mdiFinance" /></template>
           <v-list-item-title>{{ $t('components.messageThreadHeader.usageBilling') }}</v-list-item-title>
+        </v-list-item>
+        <v-list-item :to="{ name: 'statistics' }">
+          <template #prepend><v-icon :icon="mdiChartBar" /></template>
+          <v-list-item-title>{{ $t('components.messageThreadHeader.statistics') }}</v-list-item-title>
         </v-list-item>
         <v-list-item @click.prevent="logout">
           <template #prepend><v-icon :icon="mdiLogout" /></template>
