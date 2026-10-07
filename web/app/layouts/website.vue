@@ -21,6 +21,7 @@ const route = useRoute()
 const { lgAndUp, mdAndUp } = useDisplay()
 const authStore = useAuthStore()
 const appStore = useAppStore()
+const config = useRuntimeConfig()
 
 function goToPricing() {
   if (route.name === 'index') {
