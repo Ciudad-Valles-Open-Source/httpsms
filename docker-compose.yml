@@ -125,11 +125,14 @@ services:
       # ── Cloudflare Turnstile ────────────────────────────────────────────
       CLOUDFLARE_TURNSTILE_SECRET_KEY: ${CLOUDFLARE_TURNSTILE_SECRET_KEY:-}
 
-      # ── Optional: Pusher (real-time frontend updates) ───────────────────
-      PUSHER_APP_ID: ${PUSHER_APP_ID:-}
-      PUSHER_KEY: ${PUSHER_KEY:-}
-      PUSHER_SECRET: ${PUSHER_SECRET:-}
-      PUSHER_CLUSTER: ${PUSHER_CLUSTER:-}
+      # ── Optional: Soketi (real-time frontend updates) ───────────────
+      SOKETI_APP_ID: ${SOKETI_APP_ID:-app-id}
+      SOKETI_KEY: ${SOKETI_KEY:-app-key}
+      SOKETI_SECRET: ${SOKETI_SECRET:-app-secret}
+      SOKETI_CLUSTER: ${SOKETI_CLUSTER:-mt1}
+      SOKETI_HOST: ${SOKETI_HOST:-soketi:6001}
+      SOKETI_SECURE: ${SOKETI_SECURE:-false}
+      ENABLE_BILLING: ${ENABLE_BILLING:-false}
 
       # ── Optional: Axiom observability ───────────────────────────────────
       AXIOM_TOKEN: ${AXIOM_TOKEN:-}
@@ -138,6 +141,20 @@ services:
 
       # ── Optional: GCS for MMS attachments ───────────────────────────────
       GCS_BUCKET_NAME: ${GCS_BUCKET_NAME:-}
+
+  # ---------------------------------------------------------------------------
+  # Soketi WebSockets (Reemplaza a Pusher externo)
+  # ---------------------------------------------------------------------------
+  soketi:
+    image: quay.io/soketi/soketi:1.6-16-alpine
+    environment:
+      SOKETI_DEBUG: '1'
+      SOKETI_DEFAULT_APP_ID: ${SOKETI_APP_ID:-app-id}
+      SOKETI_DEFAULT_APP_KEY: ${SOKETI_KEY:-app-key}
+      SOKETI_DEFAULT_APP_SECRET: ${SOKETI_SECRET:-app-secret}
+    ports:
+      - "${SOKETI_PORT:-6001}:6001"
+    restart: unless-stopped
 
   # ---------------------------------------------------------------------------
   # httpSMS Web UI  (Nuxt SPA → nginx)
@@ -164,8 +181,10 @@ services:
         FIREBASE_APP_ID: ${FIREBASE_APP_ID:-}
         FIREBASE_MEASUREMENT_ID: ${FIREBASE_MEASUREMENT_ID:-}
         CLOUDFLARE_TURNSTILE_SITE_KEY: ${CLOUDFLARE_TURNSTILE_SITE_KEY:-}
-        PUSHER_KEY: ${PUSHER_KEY:-}
-        PUSHER_CLUSTER: ${PUSHER_CLUSTER:-}
+        SOKETI_KEY: ${SOKETI_KEY:-app-key}
+        SOKETI_CLUSTER: ${SOKETI_CLUSTER:-mt1}
+        USE_SOKETI: ${USE_SOKETI:-true}
+        ENABLE_BILLING: ${ENABLE_BILLING:-false}
     ports:
       - "${WEB_PORT:-3000}:3000"
     depends_on:

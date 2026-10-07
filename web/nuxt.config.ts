@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@nuxtjs/google-fonts',
     '@nuxtjs/seo',
+    '@nuxtjs/i18n',
   ],
 
   googleFonts: {
@@ -21,6 +22,22 @@ export default defineNuxtConfig({
   },
 
   css: ['vuetify/styles'],
+
+  i18n: {
+    locales: [
+      { code: 'en', name: 'English', file: 'en.json' },
+      { code: 'es', name: 'Español', file: 'es.json' },
+    ],
+    defaultLocale: 'en',
+    lazy: true,
+    langDir: 'locales/',
+    strategy: 'no_prefix',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root',
+    },
+  },
 
   site: {
     url: process.env.APP_URL || 'https://httpsms.com',
@@ -127,8 +144,8 @@ export default defineNuxtConfig({
       enterpriseCheckoutUrl: process.env.ENTERPRISE_CHECKOUT_URL || '',
       cloudflareTurnstileSiteKey:
         process.env.CLOUDFLARE_TURNSTILE_SITE_KEY || '',
-      pusherKey: process.env.PUSHER_KEY || '',
-      pusherCluster: process.env.PUSHER_CLUSTER || '',
+      soketiKey: process.env.SOKETI_KEY || '',
+      soketiCluster: process.env.SOKETI_CLUSTER || '',
       firebaseApiKey: process.env.FIREBASE_API_KEY || '',
       firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN || '',
       firebaseProjectId: process.env.FIREBASE_PROJECT_ID || '',
@@ -136,6 +153,8 @@ export default defineNuxtConfig({
       firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '',
       firebaseAppId: process.env.FIREBASE_APP_ID || '',
       firebaseMeasurementId: process.env.FIREBASE_MEASUREMENT_ID || '',
+      enableBilling: process.env.ENABLE_BILLING !== 'false',
+      useSoketi: process.env.USE_SOKETI === 'true',
     },
   },
 

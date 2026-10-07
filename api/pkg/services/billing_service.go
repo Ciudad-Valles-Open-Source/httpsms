@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/NdoleStudio/httpsms/pkg/cache"
@@ -56,6 +57,10 @@ func (service *BillingService) IsEntitledWithCount(ctx context.Context, userID e
 	user, err := service.userRepository.Load(ctx, userID)
 	if err != nil {
 		ctxLogger.Error(service.tracer.WrapErrorSpan(span, stacktrace.Propagatef(err, "cannot load user with ID [%s], entitlement successful", userID)))
+		return nil
+	}
+
+	if os.Getenv("ENABLE_BILLING") == "false" {
 		return nil
 	}
 
