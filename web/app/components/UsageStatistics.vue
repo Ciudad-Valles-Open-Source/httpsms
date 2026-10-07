@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { mdiCallMade, mdiCallReceived } from '@mdi/js'
 import { useBillingStore } from '~/stores/billing'
-import { useVDisplay } from '~/composables/display'
 
 const billingStore = useBillingStore()
 const { lgAndUp } = useVDisplay()
