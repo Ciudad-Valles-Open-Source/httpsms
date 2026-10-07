@@ -169,6 +169,15 @@ fun SettingsScreen(
                 onCheckedChange = { viewModel.setDebugLogEnabled(context, it) }
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = uiState.serverUrl,
+                onValueChange = { viewModel.setServerUrl(context, it) },
+                label = { Text(stringResource(id = R.string.server_url)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(

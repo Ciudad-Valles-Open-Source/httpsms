@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">httpSMS</string>
+    <string name="nextRefreshTime">23/06/2022 18:58:30</string>
+    <string name="menuIconDescription">Icono de Menú</string>
+    <string name="menuIconName">Más</string>
+    <string name="notification_channel_default">com.httpsms.notification.default</string>
+    <string name="sign_in_button">Iniciar Sesión con API Key</string>
+    <string name="text_area_api_key">API Key</string>
+    <string name="img_http_sms_logo">Logo de HTTP Sms</string>
+    <string name="get_your_api_key">Consigue tu API Key en\nhttpsms.com/settings</string>
+    <string name="main_log_out">Cerrar Sesión</string>
+    <string name="login_phone_number_hint">ej. +18005550199 (formato internacional)</string>
+    <string name="login_server_url_hint">ej. https://api.httpsms.com</string>
+    <string name="phone_number">Número de Teléfono</string>
+    <string name="send_heartbeat">Enviar Latido (Heartbeat)</string>
+    <string name="server_url">URL del Servidor</string>
+    <string name="default_server_url">https://api.httpsms.com</string>
+    <string name="app_version">httpsms.com - %s</string>
+    <string name="disable_battery_optimization">Desactivar Optimización de Batería</string>
+    <string name="enable_sms_permission">Habilitar Permiso de SMS</string>
+    <string name="main_app_settings">Configuración de la App</string>
+    <string name="settings_sim1">SIM1</string>
+    <string name="settings_sim_2">SIM2</string>
+    <string name="settings_outgoing_messages_sim1">Habilitar mensajes salientes de SIM1</string>
+    <string name="settings_incoming_messages_sim1">Habilitar mensajes entrantes de SIM1</string>
+    <string name="settings_incoming_messages_sim2">Habilitar mensajes entrantes de SIM2</string>
+    <string name="settings_outgoing_messages_sim2">Habilitar mensajes salientes de SIM2</string>
+    <string name="login_phone_number_sim1">Número de teléfono (SIM1)</string>
+    <string name="login_phone_number_sim2">Número de teléfono (SIM2)</string>
+    <string name="encryption_key">Clave de Encriptación</string>
+    <string name="encrypt_received_messages">Encriptar mensajes recibidos</string>
+    <string name="enable_debug_logs">Habilitar registros de depuración</string>
+    <string name="enable_incoming_call_events_sim1">Habilitar eventos de llamadas perdidas SIM1</string>
+    <string name="enable_sim2_incoming_call_events">Habilitar eventos de llamadas perdidas SIM2</string>
+</resources>

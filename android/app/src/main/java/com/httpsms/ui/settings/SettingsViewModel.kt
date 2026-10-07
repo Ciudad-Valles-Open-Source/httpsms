@@ -19,7 +19,8 @@ data class SettingsUiState(
     val isActiveSIM2: Boolean = false,
     val isIncomingCallEventsSIM2Enabled: Boolean = false,
     val encryptionKey: String = "",
-    val isEncryptReceivedMessagesEnabled: Boolean = false
+    val isEncryptReceivedMessagesEnabled: Boolean = false,
+    val serverUrl: String = ""
 )
 
 class SettingsViewModel : ViewModel() {
@@ -39,7 +40,8 @@ class SettingsViewModel : ViewModel() {
             isActiveSIM2 = Settings.getActiveStatus(context, Constants.SIM2),
             isIncomingCallEventsSIM2Enabled = Settings.isIncomingCallEventsEnabled(context, Constants.SIM2),
             encryptionKey = Settings.getEncryptionKey(context) ?: "",
-            isEncryptReceivedMessagesEnabled = Settings.encryptReceivedMessages(context)
+            isEncryptReceivedMessagesEnabled = Settings.encryptReceivedMessages(context),
+            serverUrl = Settings.getServerUrlOrDefault(context).toString()
         )
     }
 
@@ -93,6 +95,17 @@ class SettingsViewModel : ViewModel() {
     fun setEncryptReceivedMessagesEnabled(context: Context, enabled: Boolean) {
         Settings.setEncryptReceivedMessages(context, enabled)
         _uiState.value = _uiState.value.copy(isEncryptReceivedMessagesEnabled = enabled)
+    }
+
+    fun setServerUrl(context: Context, url: String) {
+        val trimmedUrl = url.trim()
+        if (trimmedUrl.isEmpty()) {
+            Settings.setServerUrlAsync(context, null)
+            _uiState.value = _uiState.value.copy(serverUrl = "")
+        } else {
+            Settings.setServerUrlAsync(context, trimmedUrl)
+            _uiState.value = _uiState.value.copy(serverUrl = trimmedUrl)
+        }
     }
 
     fun logout(context: Context, onLogoutComplete: () -> Unit) {
