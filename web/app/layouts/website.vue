@@ -59,8 +59,9 @@ function goToPricing() {
               </h3>
             </NuxtLink>
             <v-spacer />
+            <LanguageSwitcher class="mt-6" />
             <v-btn
-              v-show="lgAndUp"
+              v-show="lgAndUp && config.public.enableBilling"
               size="large"
               variant="text"
               color="primary"

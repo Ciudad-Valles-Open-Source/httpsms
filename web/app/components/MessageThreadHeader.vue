@@ -147,6 +147,7 @@ async function logout() {
       </div>
     </div>
     <v-spacer />
+    <LanguageSwitcher class="mt-4 mr-1" />
     <v-menu>
       <template #activator="{ props: menuProps }">
         <v-btn v-bind="menuProps" icon variant="text" class="mt-2 mr-n3">

@@ -287,6 +287,7 @@ onMounted(async () => {
         <VRow>
           <VCol cols="12" md="9" offset-md="1" xl="8" offset-xl="2">
             <!-- Current Plan -->
+            <template v-if="config.public.enableBilling">
             <h4 class="text-headline-large mb-3 mt-0">{{ $t('pages.billing.currentPlan') }}</h4>
             <VRow v-if="authStore.user">
               <VCol md="6">
@@ -317,6 +318,9 @@ onMounted(async () => {
                       class="text-medium-emphasis"
                       v-html="$t('pages.billing.downgradedFree').replace('{date}', new Date(authStore.user.subscription_ends_at!).toLocaleDateString())"
                     >
+                    </p>
+                    <p v-if="!config.public.enableBilling" class="text-medium-emphasis mt-1">
+                      {{ formatDecimal(totalMessages) }} {{ $t('pages.billing.messagesSent') }}
                     </p>
                     <p v-else class="text-medium-emphasis mt-1">
                       {{ $t('pages.billing.messagesRatio').replace('{used}', formatDecimal(totalMessages)).replace('{total}', formatDecimal(plan.messagesPerMonth)) }}
@@ -443,6 +447,7 @@ onMounted(async () => {
                   </VCard>
                 </VCol>
               </VRow>
+            </template>
             </template>
 
             <!-- Overview -->

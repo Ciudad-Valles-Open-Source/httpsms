@@ -642,6 +642,7 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
     </VContainer>
 
     <!-- Pricing Section -->
+    <template v-if="config.public.enableBilling">
     <VSheet class="mt-16 pb-16">
       <VContainer>
         <VRow>
@@ -915,6 +916,7 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
         </VRow>
       </VContainer>
     </VSheet>
+    </template>
 
     <!-- Testimonials Section -->
     <VContainer class="mt-16">
