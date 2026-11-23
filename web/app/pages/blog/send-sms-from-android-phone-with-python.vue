@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { mdAndUp } = useVDisplay()
+const { assetUrl, settingsUrl, downloadUrl, sendMessageUrl } = usePublicUrls()
 
 definePageMeta({ layout: 'website' })
 
@@ -10,8 +11,9 @@ useSeoMeta({
   ogTitle: 'Send an SMS from your Android phone with Python',
   ogDescription:
     'Configure your Android phone as an SMS gateway to automate sending text messages with the Python programing language.',
-  ogImage:
-    'https://httpsms.com/img/blog/send-sms-from-android-phone-with-python/header.png',
+  ogImage: assetUrl(
+    '/img/blog/send-sms-from-android-phone-with-python/header.png',
+  ),
   twitterCard: 'summary_large_image',
 })
 </script>
@@ -64,16 +66,15 @@ useSeoMeta({
 
         <h3 class="text-headline-large mt-8 mb-2">Step 1: Get your API Key</h3>
         <p>
-          Create an account on
-          <NuxtLink class="text-decoration-none" to="/">httpsms.com</NuxtLink>
-          and copy your API key from the settings page
-          <NuxtLink class="text-decoration-none" to="/settings"
-            >https://httpsms.com/settings</NuxtLink
-          >
+          Sign in to your httpSMS dashboard and copy your API key from the
+          settings page
+          <NuxtLink class="text-decoration-none" to="/settings">{{
+            settingsUrl
+          }}</NuxtLink>
         </p>
         <VImg
           style="border-radius: 4px"
-          alt="httpsms.com settings page"
+          alt="httpSMS settings page"
           src="/img/blog/forward-incoming-sms-from-phone-to-webhook/settings.png"
         />
 
@@ -81,9 +82,7 @@ useSeoMeta({
           Step 2: Install the httpSMS android app
         </h3>
         <p>
-          <a
-            class="text-decoration-none"
-            href="https://github.com/NdoleStudio/httpsms/releases/latest/download/HttpSms.apk"
+          <a class="text-decoration-none" :href="downloadUrl"
             >⬇️ Download and install</a
           >
           the httpSMS android app on your phone and sign in using your API KEY
@@ -119,9 +118,9 @@ useSeoMeta({
         ><code class="language-python text-body-medium">import requests
 import json
 
-api_key = "" # Get API Key from https://httpsms.com/settings
+api_key = "" # Get API Key from {{ settingsUrl }}
 
-url = 'https://api.httpsms.com/v1/messages/send'
+url = '{{ sendMessageUrl }}'
 
 headers = {
     'x-api-key': api_key,

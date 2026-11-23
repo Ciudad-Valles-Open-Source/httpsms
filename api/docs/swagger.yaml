@@ -1002,8 +1002,9 @@ definitions:
         example: false
         type: boolean
       fcm_token:
-        description: FcmToken is either a Firebase registration token or a public
-          HTTPS adapter callback URL.
+        description: |-
+          FcmToken is either a Firebase registration token or a public HTTPS adapter callback URL.
+          When it is omitted, null or empty, the phone keeps its current token.
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzd.....
         type: string
       max_send_attempts:
@@ -1017,12 +1018,18 @@ definitions:
         example: 12345
         type: integer
       message_send_schedule_id:
+        description: |-
+          MessageSendScheduleID is the ID of the send schedule attached to the phone.
+          When it is omitted the current schedule is kept; null or an empty string detaches it.
         example: 32343a19-da5e-4b1b-a767-3298a73703cb
         type: string
       messages_per_minute:
         example: 1
         type: integer
       missed_call_auto_reply:
+        description: |-
+          MissedCallAutoReply is the SMS sent back when the phone misses a call.
+          When it is omitted the current value is kept; null or an empty string removes it.
         example: e.g. This phone cannot receive calls. Please send an SMS instead.
         type: string
       phone_number:
@@ -1039,14 +1046,8 @@ definitions:
         example: false
         type: boolean
     required:
-    - fcm_token
-    - max_send_attempts
-    - message_expiration_seconds
-    - messages_per_minute
-    - missed_call_auto_reply
     - phone_number
     - sim
-    - unarchive_thread
     type: object
   requests.UserNotificationUpdate:
     properties:
@@ -3260,7 +3261,8 @@ paths:
       - application/json
       description: Updates properties of a user's phone. If the phone with this number
         does not exist, a new one will be created. Think of this method like an 'upsert'.
-        URL-backed phone gateways receive FCM-compatible HTTP wake-ups.
+        Fields omitted from the payload keep their current value. URL-backed phone
+        gateways receive FCM-compatible HTTP wake-ups.
       parameters:
       - description: Payload of new phone number.
         in: body

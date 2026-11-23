@@ -18,8 +18,8 @@ WORKDIR /app
 ARG API_BASE_URL=http://localhost:8000
 ARG APP_URL=http://localhost:3000
 ARG APP_NAME=httpSMS
-ARG APP_GITHUB_URL=https://github.com/NdoleStudio/httpsms
-ARG APP_DOWNLOAD_URL=https://github.com/NdoleStudio/httpsms/releases/latest/download/HttpSms.apk
+ARG APP_GITHUB_URL=https://github.com/Ciudad-Valles-Open-Source/httpsms
+ARG APP_DOWNLOAD_URL=https://github.com/Ciudad-Valles-Open-Source/httpsms/releases/latest/download/HttpSms.apk
 ARG APP_ENV=production
 ARG FIREBASE_API_KEY=
 ARG FIREBASE_AUTH_DOMAIN=

@@ -10,14 +10,12 @@
     "forFree": "For Free",
     "dashboard": "Dashboard",
     "madeWith": "Made With",
-    "inTallinn": "in Tallinn",
+    "inTallinn": "by the community",
     "resources": "Resources",
     "affiliates": "Affiliates",
-    "siteStatus": "Site status",
     "developers": "Developers",
     "documentation": "Documentation",
     "github": "Github",
-    "sandbox": "Sandbox",
     "requestFeature": "Request Feature",
     "legal": "Legal",
     "termsAndConditions": "Terms & Conditions",
@@ -63,7 +61,7 @@
       "startSendingMessages": "Start sending messages",
       "newMessage": "New Message",
       "installAppPrompt": "Install the mobile app on your Android phone to start sending messages. You can also",
-      "messageDiscord": "message us on Discord",
+      "messageDiscord": "open an issue on GitHub",
       "setupHelp": "to help set things up.",
       "downloadApp": "Download App",
       "status": {
@@ -215,37 +213,6 @@
       "typeMissedCallsLabel": "Missed Calls",
       "statusPendingLabel": "Pending"
     },
-    "privacy": {
-      "title": "Privacy Policy - httpSMS",
-      "descriptionMeta": "Read the httpSMS privacy policy to learn what personal information we collect, how it is used, and the steps we take to protect your data.",
-      "titlePrivacy": "Privacy Policy",
-      "p1": "Ndole Studio built the httpSMS service as an open source project. This SERVICE is provided by Ndole Studio and is intended for use as is. This page is used to inform visitors regarding our policies with the collection, use, and disclosure of Personal Information if anyone decided to use our Service. If you choose to use our Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that we collect is used for providing and improving the Service. We will not use or share your information with anyone except as described in this Privacy Policy. The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which are accessible at httpSMS unless otherwise defined in this Privacy Policy.",
-      "titleInfo": "Information Collection and Use",
-      "p2": "For a better experience, while using our Service, we may require you to provide us with certain personally identifiable information, including but not limited to email, full name. The information that we request will be retained by us and used as described in this privacy policy.",
-      "p3": "httpSMS does use third-party services that may collect information used to identify you. Link to the privacy policy of third-party service providers used by httpSMS:",
-      "titleLogData": "Log Data",
-      "pLogData": "We want to inform you that whenever you use our Service, in a case of an error in the app we collect data and information (through third-party products) on your phone and computer called Log Data. This Log Data may include information such as your device Internet Protocol ('IP') address, device name, operating system version, the configuration of the app when utilizing our Service, the time and date of your use of the Service, and other statistics.",
-      "titleCookies": "Cookies",
-      "pCookies": "Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device's internal memory. This Service does not use these 'cookies' explicitly. However, the app may use third-party code and libraries that use 'cookies' to collect information and improve their services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be able to use some portions of this Service.",
-      "titleProviders": "Service Providers",
-      "pProviders1": "We may employ third-party companies and individuals due to the following reasons:",
-      "liProv1": "To facilitate our Service;",
-      "liProv2": "To provide the Service on our behalf;",
-      "liProv3": "To perform Service-related services; or",
-      "liProv4": "To assist us in analyzing how our Service is used.",
-      "pProviders2": "We want to inform users of this Service that these third parties have access to their Personal Information. The reason is to perform the tasks assigned to them on our behalf. However, they are obligated not to disclose or use the information for any other purpose.",
-      "titleSecurity": "Security",
-      "pSecurity": "We value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and we cannot guarantee its absolute security.",
-      "titleLinks": "Links to Other Sites",
-      "pLinks": "This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by us. Therefore, we strongly advise you to review the Privacy Policy of these websites. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.",
-      "titleChildren": "Children's Privacy",
-      "pChildren": "These Services do not address anyone under the age of 13. We do not knowingly collect personally identifiable information from children under 13 years of age. In the case we discover that a child under 13 has provided us with personal information, we immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact us so that we will be able to do the necessary actions.",
-      "titleChanges": "Changes to This Privacy Policy",
-      "pChanges1": "We may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. We will notify you of any changes by posting the new Privacy Policy on this page.",
-      "pChanges2": "This policy is effective as of 2022-10-09",
-      "titleContact": "Contact Us",
-      "pContact": "If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact us at support{'@'}httpsms.com."
-    },
     "phoneApiKeys": {
       "title": "Phone API Keys - httpSMS",
       "errorMessageLoad": "Failed to load Phone API Keys",
@@ -277,7 +244,7 @@
       "keyText": "Key",
       "btnClose": "Close",
       "dialogQrTitle": "Phone API Key QR Code",
-      "dialogQrSubtitle": "Scan this QR code with the httpSMS app on your Android phone to login.",
+      "dialogQrSubtitle": "Scan this QR code with the httpSMS app on your Android phone to log in. It sets both the server URL and the API key.",
       "copyApiKey": "Copy API key",
       "copySuccess": "Phone API Key copied successfully",
       "dialogDeleteTitle": "Are you sure you want to delete the phone API Key?",
@@ -443,7 +410,7 @@
       "testimonial1": "httpSMS is free platform which transforms your phone into an sms server! It has no hard limit also. It is an innovative idea, I have not seen such tech before. If you have an sms active pack in your phone then good to go with httpSMS.",
       "testimonial2": "\"Outstanding product. Literally have been using this for years since we don't have an sms gateways that can handle http requests costing less than 50 cent per sms in my Country. Love the product and the support! Great work Arnold!\"",
       "faqTitle": "Frequently Asked Questions",
-      "faqDesc": "If you still cannot find the answer to your question, send us an email or ask in our Discord channel.",
+      "faqDesc": "If you still cannot find the answer to your question, open an issue on GitHub.",
       "faq1Question": "Can I install the app on my iPhone?",
       "faq1Answer": "The httpSMS application works only on Android phones at the moment since Apple doesn't allow you to install a custom SMS messaging app.",
       "faq2Question": "What's the minimum supported Android version?",
@@ -459,8 +426,7 @@
       "heroTitle": "Convert your Android phone into an SMS gateway.",
       "heroSubtitle": "Save money by using your phone to send and receive SMS messages via a simple programmable API with end-to-end encryption.",
       "getStartedBtn": "Get Started",
-      "liveDemoBtn": "Live Demo",
-      "trustedBy": "⚡Trusted by 23,273+ users who send/receive more than 500,000 messages per month.",
+      "trustedBy": "⚡Free, open source and self-hosted: your messages stay on your own server.",
       "freeToUse": "Free to use",
       "openSourceBadge": "100% Open Source",
       "bulkSmsTitle": "Bulk SMS",
@@ -506,7 +472,7 @@
     },
     "login": {
       "welcome": "Welcome",
-      "joinUsers": "Join 23,273+ users who send/receive more than  500,000 messages per month",
+      "joinUsers": "⚡Free, open source and self-hosted: your messages stay on your own server.",
       "metaTitle": "Log in to your account - httpSMS",
       "metaDescription": "Log in to httpSMS to send and receive SMS messages through your own Android phone with a simple HTTP API."
     }
@@ -558,7 +524,7 @@
     "api_key_copied": "API Key copied successfully",
     "show_qr_code": "Show QR Code",
     "qr_code_title": "API Key QR Code",
-    "qr_code_desc": "Scan this QR code with the httpSMS app on your Android phone to login.",
+    "qr_code_desc": "Scan this QR code with the httpSMS app on your Android phone to log in. It sets both the server URL and the API key.",
     "close": "Close",
     "documentation": "Documentation",
     "rotate_api_key": "Rotate API Key",
@@ -664,7 +630,7 @@
   },
   "threads": {
     "select_message": "Select a Message",
-    "discord_help_desc": "Don't hesitate to message us on Discord if you have any questions",
+    "discord_help_desc": "Don't hesitate to open an issue on GitHub if you have any questions",
     "id": {
       "message_length_error": "Message must be less than 2048 characters",
       "message_id_copied": "Message ID copied to clipboard",
@@ -681,28 +647,245 @@
       "cannot_send_messages": "You cannot send messages to {contact}"
     }
   },
-  "terms": {
-    "meta_title": "Terms and Conditions - httpSMS",
-    "meta_description": "Read the terms and conditions for using httpSMS to send and receive SMS messages through your Android phone.",
-    "title": "Terms and Conditions",
-    "p1": "By downloading or using the app and using the HTTP SMS service, these terms will automatically apply to you – you should make sure therefore that you read them carefully before using the app. You're not allowed to copy or modify the app, any part of the app, or our trademarks in any way. You're not allowed to attempt to extract the source code of the app, and you also shouldn't try to translate the app into other languages or make derivative versions. The app itself, and all the trademarks, copyright, database rights, and other intellectual property rights related to it, still belong to Ndole Studio.",
-    "p2": "Ndole Studio is committed to ensuring that the app is as useful and efficient as possible. For that reason, we reserve the right to make changes to the app or to charge for its services, at any time and for any reason. We will never charge you for the app or its services without making it very clear to you exactly what you're paying for.",
-    "p3": "The HTTP SMS app stores and processes personal data that you have provided to us, to provide our Service. It's your responsibility to keep your phone and access to the app secure. We therefore recommend that you do not jailbreak or root your phone, which is the process of removing software restrictions and limitations imposed by the official operating system of your device. It could make your phone vulnerable to malware/viruses/malicious programs, compromise your phone's security features and it could mean that the HTTP SMS app won't work properly or at all.",
-    "p4": "HTTP SMS does use third-party services that declare their Terms and Conditions. Link to Terms and Conditions of third-party service providers used by the app:",
-    "google_play": "Google Play Services",
-    "google_analytics": "Google Analytics for Firebase",
-    "sentry": "Sentry",
-    "segment": "Segment",
-    "p5": "You should be aware that there are certain things that Ndole Studio will not take responsibility for. Certain functions of the app will require the app to have an active internet connection. The connection can be Wi-Fi or provided by your mobile network provider, but Ndole Studio cannot take responsibility for the app not working at full functionality if you don't have access to Wi-Fi, and you don't have any of your data allowance left.",
-    "p6": "If you're using the app outside of an area with Wi-Fi, you should remember that the terms of the agreement with your mobile network provider will still apply. As a result, you may be charged by your mobile provider for the cost of data for the duration of the connection while accessing the app, or other third-party charges. In using the app, you're accepting responsibility for any such charges, including roaming data charges if you use the app outside of your home territory (i.e. region or country) without turning off data roaming. If you are not the bill payer for the device on which you're using the app, please be aware that we assume that you have received permission from the bill payer for using the app.",
-    "p7": "Along the same lines, Ndole Studio cannot always take responsibility for the way you use the app i.e. You need to make sure that your device stays charged – if it runs out of battery and you can't turn it on to avail the Service, Ndole Studio cannot accept responsibility.",
-    "p8": "With respect to Ndole Studio's responsibility for your use of the app, when you're using the app, it's important to bear in mind that although we endeavor to ensure that it is updated and correct at all times, we do rely on third parties to provide information to us so that we can make it available to you. Ndole Studio accepts no liability for any loss, direct or indirect, you experience as a result of relying wholly on this functionality of the app.",
-    "p9": "At some point, we may wish to update the app. The app is currently available on Android – the requirements for the system (and for any additional systems we decide to extend the availability of the app to) may change, and you'll need to download the updates if you want to keep using the app. Ndole Studio does not promise that it will always update the app so that it is relevant to you and/or works with the Android version that you have installed on your device. However, you promise to always accept updates to the application when offered to you. We may also wish to stop providing the app, and may terminate use of it at any time without giving notice of termination to you. Unless we tell you otherwise, upon any termination, (a) the rights and licenses granted to you in these terms will end; (b) you must stop using the app, and (if needed) delete it from your device.",
-    "changes_title": "Changes to This Terms and Conditions",
-    "changes_desc": "We may update our Terms and Conditions from time to time. Thus, you are advised to review this page periodically for any changes. We will notify you of any changes by posting the new Terms and Conditions on this page.",
-    "effective_date": "These terms and conditions are effective as of 2022-10-09",
-    "contact_us": "Contact Us",
-    "contact_desc": "If you have any questions or suggestions about our Terms and Conditions, do not hesitate to contact us at support{'@'}httpsms.com."
+  "legal": {
+    "lastUpdated": "Last updated: November 23, 2026",
+    "noticeTitle": "General template, not legal advice",
+    "notice": "This text is a general template that ships with the software. Anyone who installs httpSMS should review it and adapt it to their own situation and to the laws of their jurisdiction. It is not legal advice.",
+    "links": {
+      "issues": "the project's GitHub issues",
+      "settings": "Settings",
+      "license": "GNU Affero General Public License v3.0 (AGPL-3.0)",
+      "repo": "GitHub",
+      "privacy": "Privacy Policy"
+    },
+    "privacy": {
+      "metaTitle": "Privacy Policy - httpSMS",
+      "metaDescription": "What data httpSMS, free self-hosted software to send and receive SMS from an Android phone, processes, who is responsible for it and how to delete it.",
+      "title": "Privacy Policy",
+      "intro": {
+        "p1": "httpSMS is free and open-source software that turns an Android phone into an SMS gateway: you can send and receive text messages through an HTTP API and a web dashboard. Anyone can install it for free on their own server; there are no paid plans, payments or subscriptions.",
+        "p2": "This policy explains what data the software processes, what it is used for and who is responsible for it. It applies to the httpSMS installation where you are reading it. We call the person or organization that installs and runs that installation the “operator”, and the people who develop the open-source project the “maintainers”."
+      },
+      "sections": {
+        "controller": {
+          "title": "Who is responsible for your data",
+          "p1": "There is no central httpSMS service. Each installation runs on its operator's server, and the data is stored there: in the operator's database and in the services the operator has configured.",
+          "p2": "That is why the operator of each installation is the data controller for the personal data processed in it. The project maintainers do not run third-party installations and have no access to their data."
+        },
+        "data": {
+          "title": "Data the software processes",
+          "p1": "To work, httpSMS stores and processes the following data on the operator's server:",
+          "items": {
+            "account": {
+              "label": "Account:",
+              "text": "email address, name and profile picture (if the sign-in provider shares them), Firebase Authentication user ID, time zone and notification preferences."
+            },
+            "phones": {
+              "label": "Phones:",
+              "text": "phone number, SIM in use, push notification token (FCM) and each phone's settings, such as the messages-per-minute limit, send schedules or retries."
+            },
+            "messages": {
+              "label": "Messages:",
+              "text": "content of sent and received SMS, sender and recipient numbers, timestamps, delivery status, failure reasons and, where applicable, attachments."
+            },
+            "contacts": {
+              "label": "Contacts and threads:",
+              "text": "your contacts' numbers and names, and conversations with their state (read, archived)."
+            },
+            "heartbeats": {
+              "label": "Heartbeats and device data:",
+              "text": "periodic signals sent by the Android app with the time, the app version and whether the phone is charging, plus events such as missed calls when the app reports them."
+            },
+            "apiKeys": {
+              "label": "API keys:",
+              "text": "your account API key and any phone API keys you create."
+            },
+            "integrations": {
+              "label": "Webhooks and integrations:",
+              "text": "your webhook URLs, their signing keys and the data of any optional integrations you connect (for example, Discord)."
+            },
+            "logs": {
+              "label": "Technical logs:",
+              "text": "request data such as IP address, browser or client, date and result, which may be kept in the application logs for security and troubleshooting."
+            }
+          }
+        },
+        "encryption": {
+          "title": "End-to-end encryption (optional)",
+          "p1": "httpSMS lets you encrypt message content with a key that you set in the Android app and in your own application. When you use this feature, the content travels and is stored encrypted, and the server cannot read it.",
+          "p2": "The server still sees the data it needs to deliver messages, such as phone numbers, timestamps and status. If you lose your key, nobody can recover the encrypted content."
+        },
+        "uses": {
+          "title": "How the data is used",
+          "p1": "The software uses this data only to:",
+          "items": {
+            "i1": "Send and receive SMS through your phone and show them in the web dashboard.",
+            "i2": "Notify your phone, through push notifications, that there are messages to send.",
+            "i3": "Deliver events to your webhooks and integrations.",
+            "i4": "Send you service emails, such as phone-offline or API-key-change alerts, if the operator has configured an email server.",
+            "i5": "Protect the installation from abuse and troubleshoot errors."
+          },
+          "closing": "httpSMS shows no ads and does not sell data. If the operator adds other tools, such as analytics, they should disclose it in their own version of this policy."
+        },
+        "providers": {
+          "title": "Third-party services",
+          "p1": "A standard httpSMS installation relies on the following services. Some are optional and are only used if the operator configures them. Each provider has its own privacy policy:",
+          "items": {
+            "firebaseAuth": "sign-in to the web dashboard (email, Google or other providers).",
+            "fcm": "push notifications that tell the Android app there are messages to send.",
+            "googleCloud": "depending on the operator's setup, for example the task queue (Cloud Tasks) or attachment storage (Cloud Storage).",
+            "smtp": "sending notification emails (optional; chosen by the operator).",
+            "turnstile": "bot protection on some features, such as message search (optional).",
+            "axiom": "server logs, traces and metrics (optional).",
+            "soketi": "real-time dashboard updates. It is usually hosted by the operator, so that data stays on their infrastructure.",
+            "discord": "only if you connect the Discord integration (optional).",
+            "androidApp": "depending on how it was built, the Android app may send crash reports (Sentry) and usage statistics (Google Analytics for Firebase)."
+          },
+          "smtpName": "Email provider (SMTP)",
+          "androidAppName": "Android app",
+          "closing": "In addition, your mobile carrier processes the SMS you send and receive, and the operator may use other hosting or database providers. If you need the details, ask the operator of the installation."
+        },
+        "cookies": {
+          "title": "Cookies and local storage",
+          "p1": "The web dashboard uses very little storage in your browser, and only to work:",
+          "items": {
+            "language": {
+              "label": "i18n_redirected cookie:",
+              "text": "remembers the language you chose."
+            },
+            "session": {
+              "label": "Firebase Authentication session:",
+              "text": "Firebase keeps your session in the browser's storage so you don't have to sign in every time."
+            },
+            "preferences": {
+              "label": "Preferences in localStorage:",
+              "text": "for example, the last sign-in method you used (httpsms_last_login_method) or whether you prefer to open your conversations directly (httpsms_redirect_to_threads)."
+            },
+            "turnstile": {
+              "label": "Cloudflare Turnstile:",
+              "text": "if the installation uses it, it may store its own technical data to check that you are not a bot."
+            }
+          },
+          "closing": "httpSMS does not use advertising cookies. You can clear cookies and local storage from your browser; if you do, you will be signed out and these preferences will be lost."
+        },
+        "retention": {
+          "title": "Retention and deletion",
+          "p1": "Data is kept while your account exists or until you delete it. From the dashboard you can delete messages, threads, phones and webhooks at any time.",
+          "p2": "You can also delete your account from the {settings} page. When you do, the server deletes your account and its associated data (phones, messages, threads, contacts, heartbeats, API keys, webhooks, integrations and send schedules) and removes your Firebase Authentication user.",
+          "p3": "Copies may remain for some time in backups, technical logs or third-party services, according to the policies of the installation's operator."
+        },
+        "security": {
+          "title": "Security",
+          "p1": "The operator is responsible for securing their installation: keeping the software up to date, using HTTPS, restricting access to the server and database, and making backups.",
+          "p2": "You are responsible for protecting your credentials and API keys. If you think a key has leaked, rotate it from the {settings} page. No system is completely secure, and the software makes no security guarantees."
+        },
+        "rights": {
+          "title": "Your rights",
+          "p1": "Depending on the laws of your country, you may have the right to access, correct or delete your personal data, or to object to its processing (for example, ARCO rights in Mexico or the rights granted by the GDPR in the European Union).",
+          "p2": "You can exercise many of these rights yourself from the dashboard. For any other request, contact the operator of the installation, who holds your data."
+        },
+        "children": {
+          "title": "Minors",
+          "p1": "httpSMS is a technical tool that is not aimed at minors. Operators should not let minors use it without the authorization and supervision required by applicable law."
+        },
+        "changes": {
+          "title": "Changes to this policy",
+          "p1": "This policy may be updated along with the software; the last-updated date is shown at the top of the page. Each operator may adapt their copy, and the version published on their installation is the one that applies to it."
+        },
+        "contact": {
+          "title": "Contact",
+          "p1": "For questions, bugs or suggestions about the software, open an issue in {issues}. The project has no support email. Issues are public: do not share personal data or API keys in them.",
+          "p2": "For questions or requests about your data on a specific installation, contact whoever operates it. The project maintainers cannot view, change or delete data on installations they do not run."
+        }
+      }
+    },
+    "terms": {
+      "metaTitle": "Terms and Conditions - httpSMS",
+      "metaDescription": "Terms of use for httpSMS, free self-hosted software that turns an Android phone into an SMS gateway: responsibilities, prohibited uses and no warranty.",
+      "title": "Terms and Conditions",
+      "intro": {
+        "p1": "These terms govern the use of httpSMS and of the installation where you are reading them. By installing, accessing or using httpSMS, you agree to these terms. If you do not agree, do not use it.",
+        "p2": "We call the person or organization that installs and runs an httpSMS installation the “operator”, anyone with an account on it a “user”, and the people who develop and contribute to the open-source project the “maintainers”."
+      },
+      "sections": {
+        "about": {
+          "title": "What httpSMS is",
+          "p1": "httpSMS is free and open-source software that turns an Android phone into an SMS gateway. It lets you send and receive text messages from your own applications through an HTTP API, webhooks and a web dashboard.",
+          "p2": "It is 100% free and anyone can install it on their own server. There are no paid plans, payments or subscriptions. Messages are sent from your phone's SIM, so sending costs depend on your mobile carrier."
+        },
+        "license": {
+          "title": "Open-source license",
+          "p1": "The source code is available on {repo} and is distributed under the {license}. These terms do not limit the rights that license grants you; as far as the software is concerned, the license prevails in case of any conflict.",
+          "p2": "If you modify the software and offer it to other people over a network, the AGPL-3.0 requires you to make the source code of your modified version available to them."
+        },
+        "operators": {
+          "title": "Each installation is run by whoever deploys it",
+          "p1": "There is no central httpSMS service. Each installation is managed by its own operator, who decides who can sign up, how it is configured and which third-party services it uses. The operator is responsible for their installation and may publish additional terms.",
+          "p2": "The project maintainers only publish the software. They do not run, monitor or control third-party installations, nor the messages sent through them."
+        },
+        "responsibilities": {
+          "title": "Operator and user responsibilities",
+          "p1": "Whoever runs an installation and whoever uses it are solely responsible for:",
+          "items": {
+            "i1": "Complying with applicable laws, including telecommunications, personal data protection and marketing or unsolicited messaging laws (for example, in Mexico the Federal Law on the Protection of Personal Data Held by Private Parties and PROFECO's REPEP do-not-contact registry; in the United States the TCPA; in the European Union the GDPR).",
+            "i2": "Obtaining the consent of the people they message when the law requires it, and honoring their requests to stop receiving messages.",
+            "i3": "Following their mobile carrier's terms, including its sending limits and its rules on bulk or commercial messages.",
+            "i4": "The content of every message sent from their accounts and phones.",
+            "i5": "SIM and phone plan costs, and the consequences of misuse, such as the line being blocked or suspended.",
+            "i6": "Server security: keeping the software up to date, using HTTPS, protecting the database and making backups.",
+            "i7": "Keeping API keys and credentials secret, and rotating them if they leak. Anything done with a key is considered done by its owner.",
+            "i8": "Keeping the Android phone on, charged, connected to the internet and with the permissions the app needs."
+          }
+        },
+        "prohibited": {
+          "title": "Prohibited uses",
+          "p1": "You may not use httpSMS to:",
+          "items": {
+            "i1": "Send spam or unsolicited bulk messages, including advertising without consent.",
+            "i2": "Commit fraud, phishing or smishing, impersonate other people or organizations, or deceive recipients.",
+            "i3": "Harass, threaten, extort or intimidate anyone.",
+            "i4": "Send illegal content, including content that infringes the rights of others or exploits minors.",
+            "i5": "Distribute malware or malicious links.",
+            "i6": "Bypass carrier limits, filters or controls, for example through SIM farms or unauthorized traffic routes.",
+            "i7": "Collect or process personal data unlawfully.",
+            "i8": "Attack, overload or attempt unauthorized access to an httpSMS installation or any other system."
+          }
+        },
+        "suspension": {
+          "title": "Account suspension and termination",
+          "p1": "The operator of each installation may suspend or delete accounts, phones or API keys that breach these terms or the law, or that put the installation at risk, to the extent permitted by applicable law.",
+          "p2": "You may stop using httpSMS at any time and delete your account from the {settings} page."
+        },
+        "warranty": {
+          "title": "No warranty",
+          "p1": "The software is provided “AS IS”, without warranty of any kind, either expressed or implied, including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose, as set out in section 15 of the AGPL-3.0. The entire risk as to the quality and performance of the software is with you.",
+          "p2": "In particular, there is no guarantee that messages will be delivered or arrive on time, that the service will be available without interruption, or that the software is free of errors. SMS delivery depends on your phone, your connection and your mobile carrier."
+        },
+        "liability": {
+          "title": "Limitation of liability",
+          "p1": "In no event, unless required by applicable law or agreed to in writing, will the maintainers, contributors, copyright holders or any other party who modifies or conveys the software be liable to you for damages, including any general, special, incidental or consequential damages arising out of the use or inability to use the software, as set out in section 16 of the AGPL-3.0.",
+          "p2": "This includes, among others, loss or corruption of data, messages that were not delivered or were sent by mistake, carrier charges, your line being blocked, penalties from authorities and third-party claims arising from how you or the users of your installation use the software.",
+          "p3": "The maintainers are not responsible for misuse of the software by operators or users."
+        },
+        "indemnity": {
+          "title": "Indemnification",
+          "p1": "To the extent permitted by law, you agree to hold harmless the project's maintainers and contributors from any claim, damage or expense arising from your use of the software or from your breach of these terms or of the law."
+        },
+        "thirdParty": {
+          "title": "Third-party services",
+          "p1": "Depending on its configuration, each installation relies on third-party services such as Google Firebase (sign-in and push notifications), Google Cloud, an email provider, Cloudflare Turnstile or Axiom, as well as your mobile carrier. Their use is subject to each provider's own terms and policies. See the {privacy} for details."
+        },
+        "changes": {
+          "title": "Changes to these terms",
+          "p1": "These terms may be updated along with the software; the last-updated date is shown at the top of the page. If you keep using httpSMS after a change, you accept the new version. Each operator may adapt their copy, and the version published on their installation is the one that applies to it."
+        },
+        "contact": {
+          "title": "Contact",
+          "p1": "For questions, bugs or suggestions about the software, open an issue in {issues}. The project has no support email. Issues are public: do not share personal data or API keys in them.",
+          "p2": "For anything about a specific installation, such as your account, your data or a suspension, contact whoever operates it."
+        }
+      }
+    }
   },
   "blog": {
     "title": "Blog",

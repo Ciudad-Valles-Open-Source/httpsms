@@ -2520,7 +2520,7 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Updates properties of a user's phone. If the phone with this number does not exist, a new one will be created. Think of this method like an 'upsert'. URL-backed phone gateways receive FCM-compatible HTTP wake-ups.",
+                "description": "Updates properties of a user's phone. If the phone with this number does not exist, a new one will be created. Think of this method like an 'upsert'. Fields omitted from the payload keep their current value. URL-backed phone gateways receive FCM-compatible HTTP wake-ups.",
                 "consumes": [
                     "application/json"
                 ],
@@ -4783,14 +4783,8 @@
         "requests.PhoneUpsert": {
             "type": "object",
             "required": [
-                "fcm_token",
-                "max_send_attempts",
-                "message_expiration_seconds",
-                "messages_per_minute",
-                "missed_call_auto_reply",
                 "phone_number",
-                "sim",
-                "unarchive_thread"
+                "sim"
             ],
             "properties": {
                 "archive_new_outgoing_message_threads": {
@@ -4799,7 +4793,7 @@
                     "example": false
                 },
                 "fcm_token": {
-                    "description": "FcmToken is either a Firebase registration token or a public HTTPS adapter callback URL.",
+                    "description": "FcmToken is either a Firebase registration token or a public HTTPS adapter callback URL.\nWhen it is omitted, null or empty, the phone keeps its current token.",
                     "type": "string",
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzd....."
                 },
@@ -4814,6 +4808,7 @@
                     "example": 12345
                 },
                 "message_send_schedule_id": {
+                    "description": "MessageSendScheduleID is the ID of the send schedule attached to the phone.\nWhen it is omitted the current schedule is kept; null or an empty string detaches it.",
                     "type": "string",
                     "example": "32343a19-da5e-4b1b-a767-3298a73703cb"
                 },
@@ -4822,6 +4817,7 @@
                     "example": 1
                 },
                 "missed_call_auto_reply": {
+                    "description": "MissedCallAutoReply is the SMS sent back when the phone misses a call.\nWhen it is omitted the current value is kept; null or an empty string removes it.",
                     "type": "string",
                     "example": "e.g. This phone cannot receive calls. Please send an SMS instead."
                 },

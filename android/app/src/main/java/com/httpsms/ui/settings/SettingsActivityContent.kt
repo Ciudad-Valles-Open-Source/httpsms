@@ -1,6 +1,7 @@
 package com.nerus.httpsms.ui.settings
 
 import android.app.Activity
+import android.widget.Toast
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -43,6 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import com.nerus.httpsms.R
+import com.nerus.httpsms.ServerUrl
+import com.nerus.httpsms.ui.ServerUrlField
 import com.nerus.httpsms.ui.theme.LogoGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,7 +73,7 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("App Settings") },
+                title = { Text(stringResource(id = R.string.main_app_settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -171,12 +175,27 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
+            val saveServerUrl = {
+                if (viewModel.saveServerUrl(context)) {
+                    Toast.makeText(context, R.string.server_url_saved, Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            ServerUrlField(
                 value = uiState.serverUrl,
-                onValueChange = { viewModel.setServerUrl(context, it) },
-                label = { Text(stringResource(id = R.string.server_url)) },
-                modifier = Modifier.fillMaxWidth()
+                onValueChange = { viewModel.onServerUrlChange(it) },
+                error = uiState.serverUrlError,
+                modifier = Modifier.fillMaxWidth(),
+                onDone = saveServerUrl
             )
+
+            OutlinedButton(
+                onClick = saveServerUrl,
+                enabled = ServerUrl.normalize(uiState.serverUrl) != uiState.savedServerUrl,
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text(stringResource(id = R.string.server_url_save))
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 

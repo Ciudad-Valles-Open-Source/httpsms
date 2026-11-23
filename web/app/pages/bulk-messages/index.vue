@@ -15,6 +15,7 @@ useHead({
 
 const router = useRouter()
 const { mdAndUp } = useVDisplay()
+const { githubIssuesUrl } = usePublicUrls()
 const authStore = useAuthStore()
 const notificationsStore = useNotificationsStore()
 const { formatTimestamp } = useFilters()
@@ -176,7 +177,7 @@ onMounted(async () => {
                   v-if="mdAndUp"
                   variant="plain"
                   color="info"
-                  href="mailto:arnold@httpsms.com?subject=I'm having trouble with the bulk messages"
+                  :href="githubIssuesUrl"
                 >
                   {{ $t('pages.bulkMessages.btnNeedHelp') }}
                 </VBtn>

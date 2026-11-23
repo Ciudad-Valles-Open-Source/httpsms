@@ -2,6 +2,7 @@
 import { mdiDotsVertical } from '@mdi/js'
 
 const { mdAndUp } = useVDisplay()
+const { assetUrl } = usePublicUrls()
 
 definePageMeta({ layout: 'website' })
 
@@ -13,7 +14,7 @@ useSeoMeta({
   ogTitle: 'How to grant SEND_SMS and RECEIVE_SMS permissions on Android 14+',
   ogDescription:
     'In Android 15 (Vanilla Ice Cream), the SEND_SMS and RECEIVE_SMS permissions are now hard restricted. Learn how to grant these permissions step by step.',
-  ogImage: 'https://httpsms.com/header.png',
+  ogImage: assetUrl('/header.png'),
   twitterCard: 'summary_large_image',
 })
 </script>

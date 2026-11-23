@@ -204,6 +204,46 @@ Antes de compilar la aplicación Android, reemplaza `android/app/google-services
 
 Abre el proyecto en [Android Studio](https://developer.android.com/studio) y compila un APK de release. Instálalo en el teléfono Android que funcionará como tu Gateway SMS.
 
+### URL del servidor
+
+La aplicación no incluye ningún servidor por defecto: al abrirla por primera vez, el usuario escribe la URL de **su propia** API de httpSMS (por ejemplo `https://api.tu-dominio.com`) o escanea el código QR de inicio de sesión del panel. La URL se puede cambiar después en **Configuración de la App** sin reinstalar. Los espacios, una `/` final y un `/v1` final se eliminan automáticamente.
+
+Opcionalmente, puedes pre-rellenar el campo URL del Servidor al compilar con la propiedad de Gradle o variable de entorno `HTTPSMS_DEFAULT_SERVER_URL` (vacía por defecto):
+
+```bash
+cd android
+./gradlew assembleRelease -PHTTPSMS_DEFAULT_SERVER_URL=https://api.tu-dominio.com
+# o bien
+HTTPSMS_DEFAULT_SERVER_URL=https://api.tu-dominio.com ./gradlew assembleRelease
+```
+
+También puedes añadir `HTTPSMS_DEFAULT_SERVER_URL=https://api.tu-dominio.com` a `android/gradle.properties` o a `~/.gradle/gradle.properties`. El valor debe comenzar con `http://` o `https://`.
+
+Se permiten URLs `http://` (por ejemplo una IP de tu red local como `http://192.168.1.10:8000`), pero la aplicación muestra una advertencia porque la API Key y los mensajes viajan sin cifrar. Usa `https://` siempre que el teléfono se conecte al servidor a través de internet.
+
+### Código QR de inicio de sesión
+
+Los códigos QR de las páginas **Configuración** y **Claves API de Teléfono** del panel contienen la URL del servidor y la API Key:
+
+```
+httpsms://login?server=<URL de la API codificada>&key=<API Key codificada>
+```
+
+La URL del servidor es el `API_BASE_URL` del panel, por lo que debe ser accesible desde el teléfono (no `localhost`). Escanear un código QR que solo contiene la API Key (paneles anteriores) sigue funcionando y rellena únicamente la API Key.
+
+### Propiedades de compilación opcionales
+
+Todas son opcionales y están vacías por defecto. Pásalas con `-PNOMBRE=valor`, ponlas en `android/gradle.properties` o `~/.gradle/gradle.properties`, o defínelas como variables de entorno.
+
+| Propiedad | Por defecto | Efecto |
+| --- | --- | --- |
+| `HTTPSMS_DEFAULT_SERVER_URL` | vacía | Pre-rellena el campo URL del Servidor en la pantalla de inicio de sesión. |
+| `HTTPSMS_SENTRY_DSN` | vacía | DSN de **tu propio** proyecto de Sentry para reportes de fallos. Si está vacía, el SDK de Sentry no se inicializa y no se envía nada. |
+| `HTTPSMS_LOGS_URL` | vacía | Endpoint que recibe los registros de depuración como un arreglo JSON vía `POST` (por ejemplo, la URL de ingesta de un dataset de Axiom). |
+| `HTTPSMS_LOGS_TOKEN` | vacía | Se envía como `Authorization: Bearer <token>` a `HTTPSMS_LOGS_URL`. |
+
+Una compilación por defecto no envía reportes de fallos ni registros a ningún tercero. Los registros remotos solo se envían cuando `HTTPSMS_LOGS_URL` y `HTTPSMS_LOGS_TOKEN` están definidas **y** el usuario activa **Habilitar registros de depuración** en la Configuración de la App. Sin ellas, ese interruptor solo habilita la salida local en Logcat.
+
 ---
 
 ## Verificación Post-Despliegue

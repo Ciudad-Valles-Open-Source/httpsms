@@ -3,6 +3,8 @@ package com.nerus.httpsms.ui.settings
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.nerus.httpsms.Constants
+import com.nerus.httpsms.R
+import com.nerus.httpsms.ServerUrl
 import com.nerus.httpsms.Settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +22,9 @@ data class SettingsUiState(
     val isIncomingCallEventsSIM2Enabled: Boolean = false,
     val encryptionKey: String = "",
     val isEncryptReceivedMessagesEnabled: Boolean = false,
-    val serverUrl: String = ""
+    val serverUrl: String = "",
+    val savedServerUrl: String = "",
+    val serverUrlError: String? = null
 )
 
 class SettingsViewModel : ViewModel() {
@@ -41,7 +45,8 @@ class SettingsViewModel : ViewModel() {
             isIncomingCallEventsSIM2Enabled = Settings.isIncomingCallEventsEnabled(context, Constants.SIM2),
             encryptionKey = Settings.getEncryptionKey(context) ?: "",
             isEncryptReceivedMessagesEnabled = Settings.encryptReceivedMessages(context),
-            serverUrl = Settings.getServerUrlOrDefault(context).toString()
+            serverUrl = Settings.getServerUrl(context) ?: "",
+            savedServerUrl = Settings.getServerUrl(context) ?: ""
         )
     }
 
@@ -97,15 +102,37 @@ class SettingsViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(isEncryptReceivedMessagesEnabled = enabled)
     }
 
-    fun setServerUrl(context: Context, url: String) {
-        val trimmedUrl = url.trim()
-        if (trimmedUrl.isEmpty()) {
-            Settings.setServerUrlAsync(context, null)
-            _uiState.value = _uiState.value.copy(serverUrl = "")
-        } else {
-            Settings.setServerUrlAsync(context, trimmedUrl)
-            _uiState.value = _uiState.value.copy(serverUrl = trimmedUrl)
+    fun onServerUrlChange(url: String) {
+        _uiState.value = _uiState.value.copy(serverUrl = url, serverUrlError = null)
+    }
+
+    /**
+     * Validates, normalizes and saves the server URL typed in the settings screen.
+     * Returns true when the URL was saved.
+     */
+    fun saveServerUrl(context: Context): Boolean {
+        val serverUrl = ServerUrl.normalize(_uiState.value.serverUrl)
+        val error = when (ServerUrl.validate(serverUrl)) {
+            ServerUrl.Validation.VALID -> null
+            ServerUrl.Validation.EMPTY -> context.getString(R.string.server_url_error_empty)
+            ServerUrl.Validation.INVALID -> context.getString(R.string.server_url_error_invalid, serverUrl)
         }
+        if (error != null) {
+            _uiState.value = _uiState.value.copy(serverUrl = serverUrl, serverUrlError = error)
+            return false
+        }
+
+        if (serverUrl != _uiState.value.savedServerUrl) {
+            Settings.setServerUrlAsync(context, serverUrl)
+            // Register this phone's FCM token with the new server the next time the app resumes.
+            Settings.setFcmTokenLastUpdateTimestampAsync(context, 0)
+        }
+        _uiState.value = _uiState.value.copy(
+            serverUrl = serverUrl,
+            savedServerUrl = serverUrl,
+            serverUrlError = null
+        )
+        return true
     }
 
     fun logout(context: Context, onLogoutComplete: () -> Unit) {

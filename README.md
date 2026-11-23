@@ -1,18 +1,13 @@
 # httpSMS
 
-[![CI/CD](https://github.com/NdoleStudio/httpsms/actions/workflows/ci.yaml/badge.svg)](https://github.com/NdoleStudio/httpsms/actions/workflows/ci.yaml)
-[![GitHub contributors](https://img.shields.io/github/contributors/NdoleStudio/httpsms)](https://github.com/NdoleStudio/httpsms/graphs/contributors)
-[![GitHub license](https://img.shields.io/github/license/NdoleStudio/httpsms?color=brightgreen)](https://github.com/NdoleStudio/httpsms/blob/master/LICENSE)
+[![GitHub contributors](https://img.shields.io/github/contributors/Ciudad-Valles-Open-Source/httpsms)](https://github.com/Ciudad-Valles-Open-Source/httpsms/graphs/contributors)
+[![GitHub license](https://img.shields.io/github/license/Ciudad-Valles-Open-Source/httpsms?color=brightgreen)](https://github.com/Ciudad-Valles-Open-Source/httpsms/blob/main/LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/NdoleStudio/httpsms/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/NdoleStudio/httpsms/?branch=main)
-[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/ldl5.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
-[![Greptile: The War on Bugs](https://www.greptile.com/badge.svg)](https://www.greptile.com/?utm_source=oss_badge&utm_medium=readme&utm_campaign=greptile_for_open_source)
-[![Sponsors](https://img.shields.io/github/sponsors/ndolestudio?logo=github)](https://github.com/sponsors/ndolestudio)
 [![Discord](https://img.shields.io/discord/1095778291488653372?label=Discord)](https://discord.gg/kGk8HVqeEZ)
 
 *🌎 [Leer en Español](README_ES.md)*
 
-[httpSMS](https://httpsms.com) is a service that lets you use your Android phone as an SMS Gateway to send and receive SMS messages.
+httpSMS is a free, open-source, self-hosted service that lets you use your Android phone as an SMS Gateway to send and receive SMS messages. This repository is a 100% free fork of [NdoleStudio/httpsms](https://github.com/NdoleStudio/httpsms): no paid plans, no limits, and no dependency on the hosted service.
 You make a request to a simple HTTP API and it triggers your Android phone to send an SMS. SMS messages received on your android phone can also be forwarded to your webhook endpoint.
 
 Quick Start Guide: open the **/docs** section of your web dashboard (e.g. `https://your-domain/docs`). The content lives in [`web/docs-content/`](./web/docs-content), and the API reference (Swagger) is served by the API at `/index.html`.
@@ -51,17 +46,20 @@ solution that could help me send/receive SMS messages using a mobile phone using
 
 ## Web UI
 
-The web interface https://httpsms.com is built using [Nuxt](https://nuxtjs.org/) and [Vuetify](https://vuetifyjs.com/en/).
+The web interface (served at your `APP_URL`) is built using [Nuxt](https://nuxtjs.org/) and [Vuetify](https://vuetifyjs.com/en/).
 It is hosted as a single page application on firebase. The source code is in the [web](./web) directory
 
 ## API
 
-The API https://api.httpsms.com is built using [Fiber](https://gofiber.io/), Go and [CockroachDB](https://www.cockroachlabs.com/) for the database.
-It runs as a serverless application on Google Cloud Run. The API documentation can be found here https://api.httpsms.com/index.html
+The API (served at your `API_BASE_URL`) is built using [Fiber](https://gofiber.io/), Go and [CockroachDB](https://www.cockroachlabs.com/) for the database.
+It runs in Docker next to the web app. The interactive API reference (Swagger) is served by the API itself at `/index.html` (Spanish: `/es/index.html`).
 
 ```go
 // Sending an SMS Message using Go
-client := htpsms.New(htpsms.WithAPIKey(/* API Key from https://httpsms.com/settings */))
+client := httpsms.New(
+    httpsms.WithAPIKey(/* API key from the Settings page of your dashboard */),
+    httpsms.WithBaseURL("https://api.your-domain.com"),
+)
 
 client.Messages.Send(context.Background(), &httpsms.MessageSendParams{
     Content: "This is a sample text message",
@@ -72,10 +70,10 @@ client.Messages.Send(context.Background(), &httpsms.MessageSendParams{
 
 ## Android App
 
-[The Android App](https://apk.httpsms.com/HttpSms.apk) is a native application built using Kotlin with material design principles.
+[The Android App](https://github.com/Ciudad-Valles-Open-Source/httpsms/releases/latest/download/HttpSms.apk) is a native application built using Kotlin with material design principles.
 This app must be installed on an Android phone before you can start sending and receiving SMS messages.
 
-[<img src=".github/ghbadge.png" alt="Get it on GitHub" height="80">](https://github.com/NdoleStudio/httpsms/releases/)
+[<img src=".github/ghbadge.png" alt="Get it on GitHub" height="80">](https://github.com/Ciudad-Valles-Open-Source/httpsms/releases/)
 
 ## Chat/forum
 
@@ -83,7 +81,7 @@ There are a few ways to get in touch with me and/or the rest of the community. F
 works best for you:
 
 - [Discord server](https://discord.gg/kGk8HVqeEZ) - direct chat with the community
-- [GitHub issues](https://github.com/NdoleStudio/httpsms/issues) - questions, features, bugs
+- [GitHub issues](https://github.com/Ciudad-Valles-Open-Source/httpsms/issues) - questions, features, bugs
 
 ## Features
 
@@ -143,12 +141,13 @@ The full self-hosting documentation is organized in the [`docs/`](./docs) direct
 | [docs/environment-variables.md](./docs/environment-variables.md) | Reference for all environment variables |
 | [docs/deployment-platforms.md](./docs/deployment-platforms.md) | Platform-specific instructions (Coolify, Portainer, CapRover, Swarm) |
 | [docs/docker-configuration.md](./docs/docker-configuration.md) | Dockerfile and docker-compose.yml technical reference |
+| [docs/secrets.md](./docs/secrets.md) | Handling secrets: what never to commit, Coolify, GitHub Secrets and the pre-commit scanner |
 | [docs/realtime.md](./docs/realtime.md) | Real-time updates with Soketi: setup, alphanumeric `SOKETI_KEY` and troubleshooting |
 
 ### Quick start (local development)
 
 ```bash
-git clone https://github.com/NdoleStudio/httpsms.git
+git clone https://github.com/Ciudad-Valles-Open-Source/httpsms.git
 cd httpsms
 cp .env.example .env
 # Edit .env with your Firebase, SMTP, and Cloudflare Turnstile credentials

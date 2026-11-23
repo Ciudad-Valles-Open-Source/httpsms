@@ -236,6 +236,46 @@ Before building the Android app, replace `android/app/google-services.json` with
 
 Open the project in [Android Studio](https://developer.android.com/studio) and build a release APK. Install it on the Android phone that will function as your SMS gateway.
 
+### Server URL
+
+The app does not ship with any default server: on first launch the user types the URL of **their own** httpSMS API (for example `https://api.your-domain.com`) or scans the login QR code from the dashboard. The URL can be changed later in **App Settings** without reinstalling. Spaces, a trailing `/` and a trailing `/v1` are removed automatically.
+
+Optionally, pre-fill the Server URL field at build time with the `HTTPSMS_DEFAULT_SERVER_URL` Gradle property or environment variable (empty by default):
+
+```bash
+cd android
+./gradlew assembleRelease -PHTTPSMS_DEFAULT_SERVER_URL=https://api.your-domain.com
+# or
+HTTPSMS_DEFAULT_SERVER_URL=https://api.your-domain.com ./gradlew assembleRelease
+```
+
+You can also add `HTTPSMS_DEFAULT_SERVER_URL=https://api.your-domain.com` to `android/gradle.properties` or `~/.gradle/gradle.properties`. The value must start with `http://` or `https://`.
+
+`http://` URLs (for example a LAN IP such as `http://192.168.1.10:8000`) are allowed, but the app shows a warning because the API key and messages travel unencrypted. Use `https://` whenever the phone reaches the server over the internet.
+
+### Login QR code
+
+The QR codes on the dashboard's **Settings** and **Phone API Keys** pages contain both the server URL and the API key:
+
+```
+httpsms://login?server=<url-encoded API URL>&key=<url-encoded API key>
+```
+
+The server URL is the dashboard's `API_BASE_URL`, so it must be reachable from the phone (not `localhost`). Scanning a QR code that contains only an API key (older dashboards) still works and fills just the API key.
+
+### Optional build properties
+
+All of these are optional and empty by default. Pass them with `-PNAME=value`, put them in `android/gradle.properties` or `~/.gradle/gradle.properties`, or set them as environment variables.
+
+| Property | Default | Effect |
+| --- | --- | --- |
+| `HTTPSMS_DEFAULT_SERVER_URL` | empty | Pre-fills the Server URL field on the login screen. |
+| `HTTPSMS_SENTRY_DSN` | empty | DSN of **your own** Sentry project for crash reports. When empty, the Sentry SDK is not initialised and nothing is sent. |
+| `HTTPSMS_LOGS_URL` | empty | Endpoint that receives debug logs as a JSON array via `POST` (for example an Axiom dataset ingest URL). |
+| `HTTPSMS_LOGS_TOKEN` | empty | Sent as `Authorization: Bearer <token>` to `HTTPSMS_LOGS_URL`. |
+
+A default build sends no crash reports or logs to any third party. Remote logs are only shipped when both `HTTPSMS_LOGS_URL` and `HTTPSMS_LOGS_TOKEN` are set **and** the user turns on **Enable debug logs** in App Settings. Without them, that switch only enables local Logcat output.
+
 ---
 
 ## Post-Deployment Verification

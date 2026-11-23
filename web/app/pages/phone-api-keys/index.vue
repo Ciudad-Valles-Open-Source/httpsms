@@ -21,6 +21,7 @@ const notificationsStore = useNotificationsStore()
 const { formatTimestamp, formatPhoneNumber } = useFilters()
 const { useApi } = useApiComposable()
 const { t } = useI18n()
+const config = useRuntimeConfig()
 
 const loading = ref(true)
 const phoneApiKeys = ref<EntitiesPhoneAPIKey[]>([])
@@ -121,11 +122,24 @@ function generateQrCode(text: string) {
   )
 }
 
+/**
+ * Login QR code read by the Android app. It carries the API server URL as well as
+ * the key, so scanning it configures the app for this self-hosted server:
+ *   httpsms://login?server=<url-encoded API base URL>&key=<url-encoded API key>
+ * Older app versions that expect a bare API key can still type it from the field above.
+ */
+function buildLoginQrValue(apiKey: string): string {
+  const server = new URL(config.public.apiBaseUrl, window.location.origin)
+    .toString()
+    .replace(/\/+$/, '')
+  return `httpsms://login?server=${encodeURIComponent(server)}&key=${encodeURIComponent(apiKey)}`
+}
+
 function showPhoneApiKey(apiKey: EntitiesPhoneAPIKey) {
   activePhoneApiKey.value = apiKey
   showPhoneApiKeyQrCode.value = true
   nextTick(() => {
-    generateQrCode(apiKey.api_key)
+    generateQrCode(buildLoginQrValue(apiKey.api_key))
   })
 }
 

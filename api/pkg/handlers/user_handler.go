@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"io"
 
 	"github.com/NdoleStudio/httpsms/pkg/requests"
 	"github.com/NdoleStudio/httpsms/pkg/validators"
@@ -171,42 +170,6 @@ func (h *UserHandler) UpdateNotifications(c fiber.Ctx) error {
 	return h.responseOK(c, "user notification settings updated successfully", user)
 }
 
-// subscriptionUpdateURL returns the subscription update URL for the authenticated entities.User
-// It is not routed in this self-hosted fork (paid plans were removed), so it is not documented in Swagger.
-func (h *UserHandler) subscriptionUpdateURL(c fiber.Ctx) error {
-	ctx, span := h.tracer.StartFromFiberCtx(c)
-	defer span.End()
-
-	ctxLogger := h.tracer.CtxLogger(h.logger, span)
-	authUser := h.userFromContext(c)
-
-	url, err := h.service.GetSubscriptionUpdateURL(ctx, authUser.ID)
-	if err != nil {
-		ctxLogger.Error(stacktrace.Propagatef(err, "cannot get subscription update URL for user with ID [%s]", authUser.ID))
-		return h.responseInternalServerError(c)
-	}
-
-	return h.responseOK(c, "Subscription update URL fetched successfully", url)
-}
-
-// cancelSubscription cancels the subscription for the authenticated entities.User
-// It is not routed in this self-hosted fork (paid plans were removed), so it is not documented in Swagger.
-func (h *UserHandler) cancelSubscription(c fiber.Ctx) error {
-	ctx, span := h.tracer.StartFromFiberCtx(c)
-	defer span.End()
-
-	ctxLogger := h.tracer.CtxLogger(h.logger, span)
-	authUser := h.userFromContext(c)
-
-	err := h.service.InitiateSubscriptionCancel(ctx, authUser.ID)
-	if err != nil {
-		ctxLogger.Error(stacktrace.Propagatef(err, "cannot get user with ID [%s]", authUser.ID))
-		return h.responseInternalServerError(c)
-	}
-
-	return h.responseNoContent(c, "Subscription cancelled successfully")
-}
-
 // DeleteAPIKey rotates the API Key for a user
 // @Summary      Rotate the user's API Key
 // @Description  Rotate the user's API key in case the current API Key is compromised
@@ -238,55 +201,4 @@ func (h *UserHandler) DeleteAPIKey(c fiber.Ctx) error {
 	}
 
 	return h.responseOK(c, "API Key rotated successfully", user)
-}
-
-// subscriptionPayments returns the last 10 payments of the currently authenticated user
-// It is not routed in this self-hosted fork (paid plans were removed), so it is not documented in Swagger.
-func (h *UserHandler) subscriptionPayments(c fiber.Ctx) error {
-	ctx, span, ctxLogger := h.tracer.StartFromFiberCtxWithLogger(c, h.logger)
-	defer span.End()
-
-	invoices, err := h.service.GetSubscriptionPayments(ctx, h.userIDFomContext(c))
-	if err != nil {
-		ctxLogger.Error(stacktrace.Propagatef(err, "cannot get current subscription invoices for user [%s]", h.userFromContext(c)))
-		return h.responseInternalServerError(c)
-	}
-
-	return h.responseOK(c, "fetched subscription invoices billing usage", invoices)
-}
-
-// subscriptionInvoice generates an invoice for a given subscription invoice ID
-// It is not routed in this self-hosted fork (paid plans were removed), so it is not documented in Swagger.
-func (h *UserHandler) subscriptionInvoice(c fiber.Ctx) error {
-	ctx, span, ctxLogger := h.tracer.StartFromFiberCtxWithLogger(c, h.logger)
-	defer span.End()
-
-	var request requests.UserPaymentInvoice
-	if err := c.Bind().Body(&request); err != nil {
-		ctxLogger.Warn(stacktrace.Propagatef(err, "cannot marshall params [%s] into %T", c.Body(), request))
-		return h.responseBadRequest(c, err)
-	}
-
-	request.SubscriptionInvoiceID = c.Params("subscriptionInvoiceID")
-	if errors := h.validator.ValidatePaymentInvoice(ctx, h.userIDFomContext(c), request.Sanitize()); len(errors) != 0 {
-		ctxLogger.Warn(stacktrace.NewErrorf("validation errors [%s], while validating subscription payment invoice request [%s]", spew.Sdump(errors), c.Body()))
-		return h.responseUnprocessableEntity(c, errors, "validation errors while generating payment invoice")
-	}
-
-	reader, err := h.service.GenerateReceipt(ctx, request.UserInvoiceGenerateParams(h.userIDFomContext(c)))
-	if err != nil {
-		ctxLogger.Error(stacktrace.Propagatef(err, "cannot generate receipt for invoice ID [%s] and user [%s]", request.SubscriptionInvoiceID, h.userFromContext(c)))
-		return h.responseInternalServerError(c)
-	}
-
-	c.Set(fiber.HeaderContentType, "application/pdf")
-	c.Set(fiber.HeaderContentDisposition, fmt.Sprintf("attachment; filename=\"httpsms.com - %s.pdf\"", request.SubscriptionInvoiceID))
-
-	data, err := io.ReadAll(reader)
-	if err != nil {
-		ctxLogger.Error(stacktrace.Propagatef(err, "cannot read invoice data with ID [%s] for user with ID [%s]", request.SubscriptionInvoiceID, h.userIDFomContext(c)))
-		return h.responseInternalServerError(c)
-	}
-
-	return c.Send(data)
 }

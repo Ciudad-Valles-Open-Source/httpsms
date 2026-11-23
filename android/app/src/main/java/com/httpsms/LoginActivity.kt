@@ -33,7 +33,9 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         redirectToMain()
 
-        viewModel.initialize(this, getString(R.string.default_server_url))
+        // Pre-fill a previously saved server, otherwise the optional build-time default
+        // (HTTPSMS_DEFAULT_SERVER_URL, empty unless set when building the app).
+        viewModel.initialize(this, Settings.getServerUrl(this) ?: BuildConfig.DEFAULT_SERVER_URL)
 
         setContent {
             HttpSmsTheme {
@@ -76,8 +78,13 @@ class LoginActivity : AppCompatActivity() {
 
     private val barcodeLauncher = registerForActivityResult(ScanContract()) { result ->
         if (result.contents != null) {
-            viewModel.onApiKeyChange(result.contents)
-            Toast.makeText(this, getString(R.string.scanned_qr, result.contents), Toast.LENGTH_LONG).show()
+            val qrLogin = viewModel.onQrCodeScanned(this, result.contents)
+            val message = when {
+                qrLogin == null -> R.string.scanned_qr_invalid
+                qrLogin.serverUrl != null -> R.string.scanned_qr_server_and_key
+                else -> R.string.scanned_qr_key
+            }
+            Toast.makeText(this, getString(message), Toast.LENGTH_LONG).show()
         } else {
             Toast.makeText(this, getString(R.string.scan_cancelled), Toast.LENGTH_SHORT).show()
         }

@@ -8,15 +8,14 @@
     <string name="sign_in_button">Iniciar Sesión con API Key</string>
     <string name="text_area_api_key">API Key</string>
     <string name="img_http_sms_logo">Logo de HTTP Sms</string>
-    <string name="get_your_api_key">Consigue tu API Key en\nhttpsms.com/settings</string>
+    <string name="get_your_api_key">Consigue tu API Key en la página de Configuración de tu panel httpSMS, o escanea su código QR.</string>
     <string name="main_log_out">Cerrar Sesión</string>
     <string name="login_phone_number_hint">ej. +18005550199 (formato internacional)</string>
-    <string name="login_server_url_hint">ej. https://api.httpsms.com</string>
+    <string name="login_server_url_hint">ej. https://api.tu-dominio.com</string>
     <string name="phone_number">Número de Teléfono</string>
     <string name="send_heartbeat">Enviar Latido (Heartbeat)</string>
     <string name="server_url">URL del Servidor</string>
-    <string name="default_server_url">https://api.httpsms.com</string>
-    <string name="app_version">httpsms.com - %s</string>
+    <string name="app_version">httpSMS - %s</string>
     <string name="disable_battery_optimization">Desactivar Optimización de Batería</string>
     <string name="enable_sms_permission">Habilitar Permiso de SMS</string>
     <string name="main_app_settings">Configuración de la App</string>
@@ -34,9 +33,17 @@
     <string name="enable_incoming_call_events_sim1">Habilitar eventos de llamadas perdidas SIM1</string>
     <string name="enable_sim2_incoming_call_events">Habilitar eventos de llamadas perdidas SIM2</string>
     <string name="fcm_token_missing">No se pudo encontrar el token FCM. Asegúrate de tener los Servicios de Google Play instalados</string>
-    <string name="scanned_qr">Escaneado: %s</string>
     <string name="scan_cancelled">Escaneo cancelado</string>
     <string name="scan_qr_prompt">Escanea un código QR</string>
     <string name="heartbeat_sent">Latido enviado con éxito</string>
     <string name="service_destroyed">Servicio destruido</string>
+    <string name="scanned_qr_key">API Key completada desde el código QR</string>
+    <string name="scanned_qr_server_and_key">URL del servidor y API Key completadas desde el código QR</string>
+    <string name="scanned_qr_invalid">Este código QR no contiene una API Key de httpSMS</string>
+    <string name="server_url_error_empty">Ingresa la URL de tu servidor httpSMS</string>
+    <string name="server_url_error_invalid">La URL del servidor [%s] no es válida. Debe comenzar con http:// o https://</string>
+    <string name="server_url_warning_http">Advertencia: http:// no está cifrado. Tu API Key y tus mensajes se envían como texto plano. Usa https:// siempre que sea posible.</string>
+    <string name="server_url_warning_localhost">localhost apunta a este teléfono, no a tu servidor. Usa la dirección IP o el dominio de tu servidor.</string>
+    <string name="server_url_save">Guardar URL del servidor</string>
+    <string name="server_url_saved">URL del servidor guardada</string>
 </resources>

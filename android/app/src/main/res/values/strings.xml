@@ -7,15 +7,14 @@
     <string name="sign_in_button">Login With API Key</string>
     <string name="text_area_api_key">API Key</string>
     <string name="img_http_sms_logo">HTTP Sms Logo</string>
-    <string name="get_your_api_key">Get Your API Key at\nhttpsms.com/settings</string>
+    <string name="get_your_api_key">Get your API key in the Settings page of your httpSMS dashboard, or scan its QR code.</string>
     <string name="main_log_out">Log Out</string>
     <string name="login_phone_number_hint">e.g +18005550199 (international format)</string>
-    <string name="login_server_url_hint">e.g https://api.httpsms.com</string>
+    <string name="login_server_url_hint">e.g. https://api.your-domain.com</string>
     <string name="phone_number">Phone Number</string>
     <string name="send_heartbeat">Send Heartbeat</string>
     <string name="server_url">Server URL</string>
-    <string name="default_server_url">https://api.httpsms.com</string>
-    <string name="app_version">httpsms.com - %s</string>
+    <string name="app_version">httpSMS - %s</string>
     <string name="disable_battery_optimization">Disable Battery Optimization</string>
     <string name="enable_sms_permission">Enable SMS Permission</string>
     <string name="main_app_settings">App Settings</string>
@@ -33,9 +32,17 @@
     <string name="enable_incoming_call_events_sim1">Enable SIM1 missed call events</string>
     <string name="enable_sim2_incoming_call_events">Enable SIM2 missed call events</string>
     <string name="fcm_token_missing">Cannot find FCM token. Make sure you have Google Play Services installed</string>
-    <string name="scanned_qr">Scanned: %s</string>
     <string name="scan_cancelled">Scan cancelled</string>
     <string name="scan_qr_prompt">Scan a QR code</string>
     <string name="heartbeat_sent">Heartbeat sent successfully</string>
     <string name="service_destroyed">Service destroyed</string>
+    <string name="scanned_qr_key">API key filled in from the QR code</string>
+    <string name="scanned_qr_server_and_key">Server URL and API key filled in from the QR code</string>
+    <string name="scanned_qr_invalid">This QR code does not contain an httpSMS API key</string>
+    <string name="server_url_error_empty">Enter the URL of your httpSMS server</string>
+    <string name="server_url_error_invalid">Server URL [%s] is invalid. It must start with http:// or https://</string>
+    <string name="server_url_warning_http">Warning: http:// is not encrypted. Your API key and messages are sent in plain text. Use https:// whenever possible.</string>
+    <string name="server_url_warning_localhost">localhost points to this phone, not to your server. Use the IP address or domain of your server.</string>
+    <string name="server_url_save">Save server URL</string>
+    <string name="server_url_saved">Server URL saved</string>
 </resources>

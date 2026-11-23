@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { mdiBookOpenVariant } from '@mdi/js'
+
+const { githubUrl } = usePublicUrls()
 </script>
 
 <template>
@@ -12,11 +14,9 @@ import { mdiBookOpenVariant } from '@mdi/js'
     </NuxtLink>
     <p class="mt-0">
       {{ $t('components.blogSidebar.descPart1') }}
-      <a
-        class="text-decoration-none"
-        href="https://github.com/NdoleStudio/httpsms"
-        >{{ $t('components.blogSidebar.openSource') }}</a
-      >
+      <a class="text-decoration-none" :href="githubUrl">{{
+        $t('components.blogSidebar.openSource')
+      }}</a>
       {{ $t('components.blogSidebar.descPart2') }}
     </p>
     <VBtn variant="tonal" to="/docs">

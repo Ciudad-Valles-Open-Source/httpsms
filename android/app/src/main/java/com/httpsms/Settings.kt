@@ -5,6 +5,7 @@ import android.os.BatteryManager
 import androidx.preference.PreferenceManager
 import timber.log.Timber
 import java.net.URI
+import java.net.URISyntaxException
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -322,7 +323,7 @@ object Settings {
     }
 
     fun isLoggedIn(context: Context): Boolean {
-        return getApiKey(context) != null && hasOwner(context)
+        return getApiKey(context) != null && hasOwner(context) && hasServerUrl(context)
     }
 
     fun isDualSIM(context: Context): Boolean {
@@ -365,12 +366,22 @@ object Settings {
         return userID ?: ""
     }
 
-    fun getServerUrlOrDefault(context: Context): URI {
-        val urlString = getServerUrl(context) ?: "https://api.httpsms.com"
-        return URI(urlString)
+    /**
+     * Returns the URI of the user's httpSMS server, or null when none is configured.
+     * There is deliberately no fallback server: the user must provide their own.
+     */
+    fun getServerUri(context: Context): URI? {
+        val serverUrl = getServerUrl(context) ?: return null
+        return try {
+            URI(serverUrl)
+        } catch (e: URISyntaxException) {
+            Timber.e(e, "invalid server url [$serverUrl]")
+            null
+        }
     }
 
-    private fun getServerUrl(context: Context): String? {
+    /** Returns the normalized server URL, or null when none is configured. */
+    fun getServerUrl(context: Context): String? {
         Timber.d(Settings::getServerUrl.name)
 
         val serverUrl = PreferenceManager
@@ -378,15 +389,17 @@ object Settings {
             .getString(this.SETTINGS_SERVER_URL, null)
 
         Timber.d("SETTINGS_SERVER_URL: [$serverUrl]")
-        return serverUrl
+        return ServerUrl.normalize(serverUrl).ifEmpty { null }
     }
+
+    fun hasServerUrl(context: Context): Boolean = getServerUri(context) != null
 
     fun setServerUrlAsync(context: Context, serverURL: String?) {
         Timber.d(Settings::SETTINGS_SERVER_URL.name)
 
         PreferenceManager.getDefaultSharedPreferences(context)
             .edit()
-            .putString(this.SETTINGS_SERVER_URL, serverURL)
+            .putString(this.SETTINGS_SERVER_URL, serverURL?.let { ServerUrl.normalize(it) }?.ifEmpty { null })
             .apply()
     }
 

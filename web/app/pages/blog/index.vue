@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { mdAndUp, smAndDown } = useVDisplay()
+const { assetUrl } = usePublicUrls()
 
 definePageMeta({
   layout: 'website',
@@ -12,7 +13,7 @@ useSeoMeta({
   description: computed(() => t('blog.meta_description')),
   ogTitle: computed(() => t('blog.meta_ogTitle')),
   ogDescription: computed(() => t('blog.meta_ogDescription')),
-  ogImage: 'https://httpsms.com/header.png',
+  ogImage: assetUrl('/header.png'),
   twitterCard: 'summary_large_image',
 })
 

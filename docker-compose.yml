@@ -91,6 +91,7 @@ services:
       APP_PORT: "8000"             # Internal port where Go listens. Do not change.
       APP_URL: ${APP_URL:-http://localhost:3000}
       APP_NAME: ${APP_NAME:-httpSMS}
+      JWT_ISSUER: ${JWT_ISSUER:-}  # Optional. "iss" of webhook/push JWTs; empty = slug of APP_NAME (e.g. httpsms)
       SWAGGER_HOST: ${SWAGGER_HOST:-localhost:8000}
 
       # ── Database & Cache ────────────────────────────────────────────────
@@ -135,6 +136,7 @@ services:
       AXIOM_TOKEN: ${AXIOM_TOKEN:-}
       AXIOM_DATASET_EVENTS: ${AXIOM_DATASET_EVENTS:-}
       AXIOM_DATASET_METRICS: ${AXIOM_DATASET_METRICS:-}
+      OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME:-}  # Optional. Empty = slug of APP_NAME (e.g. httpsms)
 
       # ── Optional: GCS for MMS attachments ───────────────────────────────
       GCS_BUCKET_NAME: ${GCS_BUCKET_NAME:-}
@@ -164,8 +166,8 @@ services:
         API_BASE_URL: ${API_BASE_URL:-http://localhost:8000}
         APP_URL: ${APP_URL:-http://localhost:3000}
         APP_NAME: ${APP_NAME:-httpSMS}
-        APP_GITHUB_URL: ${APP_GITHUB_URL:-https://github.com/NdoleStudio/httpsms}
-        APP_DOWNLOAD_URL: ${APP_DOWNLOAD_URL:-https://github.com/NdoleStudio/httpsms/releases/latest/download/HttpSms.apk}
+        APP_GITHUB_URL: ${APP_GITHUB_URL:-https://github.com/Ciudad-Valles-Open-Source/httpsms}
+        APP_DOWNLOAD_URL: ${APP_DOWNLOAD_URL:-https://github.com/Ciudad-Valles-Open-Source/httpsms/releases/latest/download/HttpSms.apk}
         APP_ENV: ${APP_ENV:-production}
         FIREBASE_API_KEY: ${FIREBASE_API_KEY:-}
         FIREBASE_AUTH_DOMAIN: ${FIREBASE_AUTH_DOMAIN:-}

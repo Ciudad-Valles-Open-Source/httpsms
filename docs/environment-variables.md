@@ -20,6 +20,7 @@ These variables are read by the Go API server at runtime. They must be supplied 
 | `APP_PORT`        | No       | `8000`                  | TCP port on which the API server listens.                                                                                                          |
 | `APP_URL`         | No       | `http://localhost:3000` | Public URL of the web frontend. Used to generate links in outbound emails.                                                                         |
 | `APP_NAME`        | No       | `httpSMS`               | Display name of the application. Used in emails and logs.                                                                                          |
+| `JWT_ISSUER`      | No       | Slug of `APP_NAME` (`httpsms`) | Value of the `iss` claim in the JWTs the API signs (the `Authorization` header of webhook requests and of HTTP push notifications to URL-backed phone gateways). When empty it defaults to a slug of `APP_NAME`: lowercase, spaces become `_`, accents are stripped to ASCII (`Ñandú` → `nandu`) and every character outside `[a-z0-9._-]` is removed, e.g. `Arquos SMS!` → `arquos_sms`. Falls back to `httpsms` if the slug is empty. |
 | `SWAGGER_HOST`    | No       | `localhost:8000`        | Host shown in the Swagger UI. Set to your API's public hostname in production.                                                                     |
 | `USE_HTTP_LOGGER` | No       | `true`                  | When `true`, logs incoming HTTP requests.                                                                                                          |
 
@@ -89,6 +90,7 @@ These variables configure the internal system user that drives the asynchronous 
 | `AXIOM_TOKEN`           | No       | —       | Axiom API token for centralized log and trace ingestion.                                                                       |
 | `AXIOM_DATASET_EVENTS`  | No       | —       | Axiom dataset name for logs and traces.                                                                                        |
 | `AXIOM_DATASET_METRICS` | No       | —       | Axiom dataset name for metrics.                                                                                                |
+| `OTEL_SERVICE_NAME`     | No       | Slug of `APP_NAME` (`httpsms`) | OpenTelemetry `service.name` reported with traces and metrics (and the `service.name` attribute sent with Plunk contacts). Defaults to the same `APP_NAME` slug as `JWT_ISSUER`. |
 | `GCS_BUCKET_NAME`       | No       | —       | Google Cloud Storage bucket name for MMS attachment storage. When empty, attachments are stored in memory and lost on restart. |
 
 ---

@@ -11,9 +11,9 @@ import (
 
 func TestHermesThemeRendersUnsafeDictionaryValueOnlyWhenProvided(t *testing.T) {
 	generator := (&HermesGeneratorConfig{
-		AppURL:     "https://httpsms.com",
+		AppURL:     "https://sms.example.com",
 		AppName:    "httpSMS",
-		AppLogoURL: "https://httpsms.com/logo.png",
+		AppLogoURL: "https://sms.example.com/logo.png",
 	}).Generator()
 
 	email := hermes.Email{

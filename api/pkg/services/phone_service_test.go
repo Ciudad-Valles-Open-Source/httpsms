@@ -8,6 +8,7 @@ import (
 	"github.com/NdoleStudio/httpsms/pkg/repositories"
 	"github.com/NdoleStudio/httpsms/pkg/telemetry"
 	"github.com/NdoleStudio/stacktrace"
+	"github.com/google/uuid"
 	"github.com/nyaruka/phonenumbers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -91,4 +92,83 @@ func TestPhoneUpdateArchiveNewOutgoingMessageThreads(t *testing.T) {
 			assert.Equal(t, test.want, updated.ArchiveNewOutgoingMessageThreads)
 		})
 	}
+}
+
+func TestPhoneUpdateKeepsOmittedFcmTokenAndSchedule(t *testing.T) {
+	token := "existing-token"
+	newToken := "new-token"
+	scheduleID := uuid.New()
+	newScheduleID := uuid.New()
+	reply := "Please text me"
+
+	tests := []struct {
+		name         string
+		params       PhoneUpsertParams
+		wantToken    *string
+		wantSchedule *uuid.UUID
+		wantReply    *string
+	}{
+		{
+			name:         "omitted fields keep current values",
+			params:       PhoneUpsertParams{SIM: entities.SIM1},
+			wantToken:    &token,
+			wantSchedule: &scheduleID,
+			wantReply:    &reply,
+		},
+		{
+			name:         "explicit fcm token updates it",
+			params:       PhoneUpsertParams{SIM: entities.SIM1, FcmToken: &newToken},
+			wantToken:    &newToken,
+			wantSchedule: &scheduleID,
+			wantReply:    &reply,
+		},
+		{
+			name:         "explicit schedule replaces it",
+			params:       PhoneUpsertParams{SIM: entities.SIM1, MessageSendScheduleID: &newScheduleID, UpdateMessageSendSchedule: true},
+			wantToken:    &token,
+			wantSchedule: &newScheduleID,
+			wantReply:    &reply,
+		},
+		{
+			name:      "explicit detach removes schedule",
+			params:    PhoneUpsertParams{SIM: entities.SIM1, UpdateMessageSendSchedule: true},
+			wantToken: &token,
+			wantReply: &reply,
+		},
+		{
+			name:         "empty auto reply removes it",
+			params:       PhoneUpsertParams{SIM: entities.SIM1, MissedCallAutoReply: new(string)},
+			wantToken:    &token,
+			wantSchedule: &scheduleID,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			currentToken := token
+			currentSchedule := scheduleID
+			currentReply := reply
+			phone := &entities.Phone{
+				FcmToken:              &currentToken,
+				MessageSendScheduleID: &currentSchedule,
+				MissedCallAutoReply:   &currentReply,
+			}
+
+			updated := (&PhoneService{}).update(phone, &test.params)
+
+			assert.Equal(t, test.wantToken, updated.FcmToken)
+			assert.Equal(t, test.wantSchedule, updated.MessageSendScheduleID)
+			assert.Equal(t, test.wantReply, updated.MissedCallAutoReply)
+		})
+	}
+}
+
+func TestPhoneUpdateSetsFcmTokenOnPhoneWithoutToken(t *testing.T) {
+	token := "first-token"
+	phone := &entities.Phone{}
+
+	updated := (&PhoneService{}).update(phone, &PhoneUpsertParams{SIM: entities.SIM1, FcmToken: &token})
+
+	require.NotNil(t, updated.FcmToken)
+	assert.Equal(t, token, *updated.FcmToken)
 }

@@ -92,21 +92,27 @@ func (service *PhoneService) Load(ctx context.Context, userID entities.UserID, o
 	return service.repository.Load(ctx, userID, owner)
 }
 
-// PhoneUpsertParams are parameters for creating a new entities.Phone
+// PhoneUpsertParams are parameters for creating a new entities.Phone.
+// When updating an existing phone, nil pointer fields keep the phone's current value.
 type PhoneUpsertParams struct {
-	PhoneNumber                      *phonenumbers.PhoneNumber
-	FcmToken                         *string
-	MessagesPerMinute                *uint
-	MaxSendAttempts                  *uint
-	WebhookURL                       *string
-	MessageExpirationDuration        *time.Duration
+	PhoneNumber *phonenumbers.PhoneNumber
+	// FcmToken replaces the phone's notification token when it is not nil.
+	FcmToken                  *string
+	MessagesPerMinute         *uint
+	MaxSendAttempts           *uint
+	WebhookURL                *string
+	MessageExpirationDuration *time.Duration
+	// MissedCallAutoReply replaces the auto reply when it is not nil; an empty string removes it.
 	MissedCallAutoReply              *string
 	UnarchiveThread                  *bool
 	ArchiveNewOutgoingMessageThreads *bool
 	SIM                              entities.SIM
-	MessageSendScheduleID            *uuid.UUID
-	Source                           string
-	UserID                           entities.UserID
+	// MessageSendScheduleID is the schedule to attach. On updates it is only applied when
+	// UpdateMessageSendSchedule is true, in which case a nil value detaches the schedule.
+	MessageSendScheduleID     *uuid.UUID
+	UpdateMessageSendSchedule bool
+	Source                    string
+	UserID                    entities.UserID
 }
 
 // Upsert a new entities.Phone
@@ -282,7 +288,7 @@ func (service *PhoneService) createPhoneDeletedEvent(source string, payload even
 }
 
 func (service *PhoneService) update(phone *entities.Phone, params *PhoneUpsertParams) *entities.Phone {
-	if phone.FcmToken != nil {
+	if params.FcmToken != nil {
 		phone.FcmToken = params.FcmToken
 	}
 	if params.MessagesPerMinute != nil && *params.MessagesPerMinute > 0 {
@@ -299,6 +305,9 @@ func (service *PhoneService) update(phone *entities.Phone, params *PhoneUpsertPa
 
 	if params.MissedCallAutoReply != nil {
 		phone.MissedCallAutoReply = params.MissedCallAutoReply
+		if *params.MissedCallAutoReply == "" {
+			phone.MissedCallAutoReply = nil
+		}
 	}
 
 	if params.UnarchiveThread != nil {
@@ -310,7 +319,9 @@ func (service *PhoneService) update(phone *entities.Phone, params *PhoneUpsertPa
 	}
 
 	phone.SIM = params.SIM
-	phone.MessageSendScheduleID = params.MessageSendScheduleID
+	if params.UpdateMessageSendSchedule {
+		phone.MessageSendScheduleID = params.MessageSendScheduleID
+	}
 
 	return phone
 }

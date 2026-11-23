@@ -92,26 +92,6 @@ func (repository *gormUserRepository) RotateAPIKey(ctx context.Context, userID e
 	return user, nil
 }
 
-func (repository *gormUserRepository) LoadBySubscriptionID(ctx context.Context, subscriptionID string) (*entities.User, error) {
-	ctx, span := repository.tracer.Start(ctx)
-	defer span.End()
-
-	user := new(entities.User)
-	err := repository.db.WithContext(ctx).
-		Where("subscription_id = ?", subscriptionID).
-		First(user).
-		Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, repository.tracer.WrapErrorSpan(span, stacktrace.PropagateWithCodef(err, ErrCodeNotFound, "user with subscriptionID [%s] does not exist", subscriptionID))
-	}
-
-	if err != nil {
-		return nil, repository.tracer.WrapErrorSpan(span, stacktrace.Propagatef(err, "cannot load user with subscription ID [%s]", subscriptionID))
-	}
-
-	return user, nil
-}
-
 func (repository *gormUserRepository) LoadByEmail(ctx context.Context, email string) (*entities.User, error) {
 	ctx, span := repository.tracer.Start(ctx)
 	defer span.End()

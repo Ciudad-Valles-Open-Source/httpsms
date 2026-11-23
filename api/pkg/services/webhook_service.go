@@ -17,6 +17,7 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 
+	"github.com/NdoleStudio/httpsms/pkg/config"
 	"github.com/NdoleStudio/httpsms/pkg/events"
 
 	"github.com/NdoleStudio/httpsms/pkg/entities"
@@ -331,7 +332,7 @@ func (service *WebhookService) getAuthToken(webhook *entities.Webhook) (string, 
 		Audience:  []string{webhook.URL},
 		ExpiresAt: jwt.NewNumericDate(time.Now().UTC().Add(10 * time.Minute)),
 		IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
-		Issuer:    "api.httpsms.com",
+		Issuer:    config.JWTIssuer(),
 		NotBefore: jwt.NewNumericDate(time.Now().UTC().Add(-10 * time.Minute)),
 		Subject:   string(webhook.UserID),
 	})

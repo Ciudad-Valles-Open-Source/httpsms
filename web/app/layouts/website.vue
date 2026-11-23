@@ -2,11 +2,8 @@
 import { useDisplay } from 'vuetify'
 import {
   mdiGithub,
-  mdiCircle,
-  mdiTwitter,
   mdiHeart,
   mdiLightbulbOn50,
-  mdiCreation,
   mdiEyeOffOutline,
   mdiPost,
   mdiScaleBalance,
@@ -17,6 +14,7 @@ import {
 const { lgAndUp, mdAndUp } = useDisplay()
 const authStore = useAuthStore()
 const appStore = useAppStore()
+const { githubIssuesUrl } = usePublicUrls()
 </script>
 
 <template>
@@ -128,65 +126,22 @@ const appStore = useAppStore()
               {{ $t('website.madeWith') }}
               <v-icon color="#cf1112" :icon="mdiHeart" />
               {{ $t('website.inTallinn') }}
-              <v-img
-                class="d-inline-block"
-                width="20"
-                src="https://upload.wikimedia.org/wikipedia/commons/8/8f/Flag_of_Estonia.svg"
-              />
             </div>
             <p class="mt-n3">
               <v-btn
-                href="https://twitter.com/httpsmsHQ"
-                color="#1DA1F2"
-                class="ml-n3"
-                variant="text"
-                :icon="mdiTwitter"
-              />
-              <v-btn
                 :href="appStore.appData.githubUrl"
                 color="#ffffff"
+                class="ml-n3"
                 variant="text"
                 :icon="mdiGithub"
               />
-              <v-btn
-                href="https://discord.gg/kGk8HVqeEZ"
-                icon
-                variant="text"
-                color="#5865f2"
-              >
-                <v-img
-                  contain
-                  height="24"
-                  width="24"
-                  src="/img/discord-logo-blue.svg"
-                />
-              </v-btn>
             </p>
-            <a
-              href="https://www.saashub.com/httpsms?utm_source=badge&utm_campaign=badge&utm_content=httpsms&badge_variant=color&badge_kind=approved"
-              target="_blank"
-            >
-              <img
-                src="https://cdn-b.saashub.com/img/badges/approved-color.png?v=1"
-                alt="httpSMS badge"
-                style="max-width: 150px"
-              />
-            </a>
           </v-col>
           <v-col cols="12" md="3">
             <h2 class="text-headline-small mb-2">
               {{ $t('website.resources') }}
             </h2>
             <ul style="list-style: none" class="pa-0">
-              <li class="mb-2">
-                <a
-                  href="https://status.httpsms.com"
-                  class="text-white text-decoration-none footer-link"
-                >
-                  {{ $t('website.siteStatus') }}
-                  <v-icon color="success" size="x-small" :icon="mdiCircle" />
-                </a>
-              </li>
               <li class="mb-2">
                 <NuxtLink
                   class="text-white text-decoration-none footer-link"
@@ -223,16 +178,7 @@ const appStore = useAppStore()
               </li>
               <li class="mb-2">
                 <a
-                  href="https://sandbox.httpsms.com"
-                  class="text-white text-decoration-none footer-link"
-                >
-                  {{ $t('website.sandbox') }}
-                  <v-icon size="small" color="pink" :icon="mdiCreation" />
-                </a>
-              </li>
-              <li class="mb-2">
-                <a
-                  href="https://httpsms.featurebase.app"
+                  :href="`${githubIssuesUrl}/new`"
                   class="text-white text-decoration-none footer-link"
                 >
                   {{ $t('website.requestFeature') }}
@@ -269,7 +215,7 @@ const appStore = useAppStore()
               <li class="mt-2">
                 <a
                   class="text-white text-decoration-none footer-link"
-                  href="mailto:support@httpsms.com"
+                  :href="githubIssuesUrl"
                 >
                   {{ $t('website.contactSupport') }}
                   <v-icon size="small" :icon="mdiEmailOutline" />

@@ -12,6 +12,45 @@ val gitHash = providers.exec {
     commandLine("git", "rev-parse", "--short", "HEAD")
 }.standardOutput.asText.map { it.trim() }
 
+// Optional build properties: `-PNAME=value`, gradle.properties / ~/.gradle/gradle.properties,
+// or an environment variable with the same name. All default to an empty string.
+fun optionalBuildProperty(name: String): String = providers.gradleProperty(name)
+    .orElse(providers.environmentVariable(name))
+    .getOrElse("")
+    .trim()
+
+fun String.asBuildConfigString(): String =
+    "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+
+// Optional server URL pre-filled on the login screen. Nothing is hard-coded: when it is
+// empty the user must type (or scan) the URL of their own httpSMS server.
+val defaultServerUrl: String = optionalBuildProperty("HTTPSMS_DEFAULT_SERVER_URL")
+    .trimEnd('/')
+    .let { if (it.endsWith("/v1", ignoreCase = true)) it.dropLast(3).trimEnd('/') else it }
+
+if (defaultServerUrl.isNotEmpty() &&
+    !defaultServerUrl.startsWith("https://", ignoreCase = true) &&
+    !defaultServerUrl.startsWith("http://", ignoreCase = true)
+) {
+    throw GradleException("HTTPSMS_DEFAULT_SERVER_URL must start with http:// or https:// (got [$defaultServerUrl])")
+}
+
+// Optional crash reporting and remote debug logs. Both are OFF unless the person building the
+// app provides their OWN credentials, so a default build sends nothing to any third party.
+//  - HTTPSMS_SENTRY_DSN: Sentry DSN; when empty the Sentry SDK is not initialised at all.
+//  - HTTPSMS_LOGS_URL + HTTPSMS_LOGS_TOKEN: endpoint receiving debug logs (JSON array, Bearer
+//    token, e.g. an Axiom ingest URL); when either is empty no logs leave the phone.
+val sentryDsn: String = optionalBuildProperty("HTTPSMS_SENTRY_DSN")
+val sentryEnabled: Boolean = sentryDsn.isNotEmpty()
+val logsUrl: String = optionalBuildProperty("HTTPSMS_LOGS_URL")
+val logsToken: String = optionalBuildProperty("HTTPSMS_LOGS_TOKEN")
+
+if (logsUrl.isNotEmpty() && !logsUrl.startsWith("https://", ignoreCase = true) &&
+    !logsUrl.startsWith("http://", ignoreCase = true)
+) {
+    throw GradleException("HTTPSMS_LOGS_URL must start with http:// or https:// (got [$logsUrl])")
+}
+
 android {
     compileSdk = 37
 
@@ -22,6 +61,11 @@ android {
         versionCode = 1
         versionName = gitHash.getOrElse("unknown")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "DEFAULT_SERVER_URL", defaultServerUrl.asBuildConfigString())
+        buildConfigField("String", "LOGS_URL", logsUrl.asBuildConfigString())
+        buildConfigField("String", "LOGS_TOKEN", logsToken.asBuildConfigString())
+        manifestPlaceholders["sentryDsn"] = sentryDsn
+        manifestPlaceholders["sentryEnabled"] = sentryEnabled.toString()
     }
 
     // Load keystore properties
@@ -63,6 +107,14 @@ android {
         buildConfig = true
         compose = true
     }
+}
+
+// The Sentry Gradle plugin must not report build telemetry or upload anything on its own.
+sentry {
+    telemetry.set(false)
+    autoUploadProguardMapping.set(false)
+    autoUploadNativeSymbols.set(false)
+    includeSourceContext.set(false)
 }
 
 dependencies {

@@ -29,12 +29,14 @@ const metaDescription = computed(
   () => doc.value?.description || t('docs.metaDescription'),
 )
 
+const { assetUrl } = usePublicUrls()
+
 useSeoMeta({
   title: metaTitle,
   description: metaDescription,
   ogTitle: metaTitle,
   ogDescription: metaDescription,
-  ogImage: 'https://httpsms.com/header.png',
+  ogImage: assetUrl('/header.png'),
   twitterCard: 'summary_large_image',
 })
 

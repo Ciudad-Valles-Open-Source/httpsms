@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The httpSMS server is chosen by the user at runtime (their own self-hosted API, possibly
+    on a LAN IP address without TLS), so per-domain cleartext rules cannot be declared here.
+    Cleartext (http://) is therefore permitted for all hosts; the app shows a warning whenever
+    the configured server URL uses http://. HTTPS connections keep using the system CAs.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

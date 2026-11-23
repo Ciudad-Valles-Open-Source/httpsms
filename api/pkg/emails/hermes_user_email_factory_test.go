@@ -10,9 +10,9 @@ import (
 
 func testUserEmailFactory() UserEmailFactory {
 	return NewHermesUserEmailFactory(&HermesGeneratorConfig{
-		AppURL:     "https://httpsms.com",
+		AppURL:     "https://sms.example.com",
 		AppName:    "httpSMS",
-		AppLogoURL: "https://httpsms.com/logo.png",
+		AppLogoURL: "https://sms.example.com/logo.png",
 	})
 }
 

@@ -10,7 +10,6 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.62.0
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.38.0
 	github.com/NdoleStudio/go-otelroundtripper v0.0.15
-	github.com/NdoleStudio/lemonsqueezy-go v1.3.2
 	github.com/NdoleStudio/plunk-go v0.0.2
 	github.com/NdoleStudio/stacktrace v1.1.0
 	github.com/avast/retry-go/v5 v5.0.0
@@ -21,7 +20,6 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/dgraph-io/ristretto/v2 v2.4.2
 	github.com/dustin/go-humanize v1.1.0
-	github.com/gertd/go-pluralize v0.2.1
 	github.com/go-hermes/hermes/v2 v2.6.2
 	github.com/gofiber/contrib/v3/otel v1.3.2
 	github.com/gofiber/contrib/v3/swaggo v1.0.15
@@ -57,6 +55,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.47.0
 	go.opentelemetry.io/otel/trace v1.47.0
 	golang.org/x/sync v0.24.0
+	golang.org/x/text v0.43.0
 	google.golang.org/api v0.310.0
 	google.golang.org/protobuf v1.36.12
 	gorm.io/driver/postgres v1.6.3
@@ -201,7 +200,6 @@ require (
 	golang.org/x/net v0.62.0 // indirect
 	golang.org/x/oauth2 v0.37.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
-	golang.org/x/text v0.43.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
 	golang.org/x/tools v0.52.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect

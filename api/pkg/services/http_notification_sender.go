@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"firebase.google.com/go/messaging"
+	"github.com/NdoleStudio/httpsms/pkg/config"
 	"github.com/NdoleStudio/httpsms/pkg/telemetry"
 	"github.com/NdoleStudio/stacktrace"
 	"github.com/avast/retry-go/v5"
@@ -24,7 +25,6 @@ const (
 	notificationHTTPAttempts            = 3
 	notificationHTTPTimeout             = 5 * time.Second
 	notificationHTTPRetryDelay          = 250 * time.Millisecond
-	notificationJWTIssuer               = "api.httpsms.com"
 	notificationJWTValidity             = 10 * time.Minute
 )
 
@@ -117,7 +117,7 @@ func (sender *HTTPNotificationSender) getAuthToken(endpoint *url.URL, phoneID uu
 		Audience:  []string{audience.String()},
 		ExpiresAt: jwt.NewNumericDate(now.Add(notificationJWTValidity)),
 		IssuedAt:  jwt.NewNumericDate(now),
-		Issuer:    notificationJWTIssuer,
+		Issuer:    config.JWTIssuer(),
 		NotBefore: jwt.NewNumericDate(now.Add(-notificationJWTValidity)),
 	})
 	return token.SignedString([]byte(phoneID.String()))

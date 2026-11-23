@@ -160,7 +160,7 @@ function generateQrCode() {
     if (qrCodeCanvas.value) {
       QRCode.toCanvas(
         qrCodeCanvas.value,
-        apiKey.value,
+        `httpsms://login?server=${encodeURIComponent(new URL(config.public.apiBaseUrl, window.location.origin).toString().replace(/\/+$/, ''))}&key=${encodeURIComponent(apiKey.value)}`,
         { errorCorrectionLevel: 'H', width: 300, margin: 2 },
         (err) => {
           if (err) {

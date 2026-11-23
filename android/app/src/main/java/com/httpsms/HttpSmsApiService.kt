@@ -21,7 +21,7 @@ import java.util.logging.Logger.getLogger
 
 class HttpSmsApiService(
     private val apiKey: String,
-    private val baseURL: URI,
+    private val baseURL: URI?,
     private val appContext: Context? = null
 ) {
     private val apiKeyHeader = "x-api-key"
@@ -37,7 +37,7 @@ class HttpSmsApiService(
         fun create(context: Context): HttpSmsApiService {
             return HttpSmsApiService(
                 Settings.getApiKeyOrDefault(context),
-                Settings.getServerUrlOrDefault(context),
+                Settings.getServerUri(context),
                 context.applicationContext
             )
         }
@@ -331,6 +331,8 @@ class HttpSmsApiService(
     }
 
     private fun resolveURL(path: String): URL {
-        return baseURL.resolve(baseURL.path + path).toURL()
+        // There is no default server: every request goes to the URL configured by the user.
+        val base = baseURL ?: throw IOException("the httpSMS server URL is not configured")
+        return URL(ServerUrl.normalize(base.toString()) + path)
     }
 }

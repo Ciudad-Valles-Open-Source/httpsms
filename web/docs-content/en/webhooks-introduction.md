@@ -122,20 +122,22 @@ Your webhook URL is public, so anyone could send it fake requests. To prevent th
 
 The token contains these claims:
 
-| Claim | Value                                                                                          |
-| ----- | ---------------------------------------------------------------------------------------------- |
-| `iss` | Always `api.httpsms.com`, even if your server uses a different domain.                         |
-| `aud` | The webhook URL exactly as stored (for example `https://my-app.example.com/webhooks/httpsms`). |
-| `sub` | Your httpSMS user ID.                                                                          |
-| `iat` | When the token was issued.                                                                     |
-| `nbf` | 10 minutes before issue time (leeway for clock drift).                                         |
-| `exp` | 10 minutes after issue time.                                                                   |
+| Claim | Value                                                                                                                              |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `iss` | The issuer configured on your server: the value of `JWT_ISSUER` or, if it is not set, a slug of `APP_NAME` (by default `httpsms`). |
+| `aud` | The webhook URL exactly as stored (for example `https://my-app.example.com/webhooks/httpsms`).                                     |
+| `sub` | Your httpSMS user ID.                                                                                                              |
+| `iat` | When the token was issued.                                                                                                         |
+| `nbf` | 10 minutes before issue time (leeway for clock drift).                                                                             |
+| `exp` | 10 minutes after issue time.                                                                                                       |
+
+> **About `iss`:** the issuer is whatever the server administrator sets in the `JWT_ISSUER` environment variable. When it is empty, the API derives it from `APP_NAME`: lowercase, spaces become `_`, accents are removed and only `a-z`, `0-9`, `.`, `_` and `-` are kept (for example `httpSMS` → `httpsms`, `Arquos SMS` → `arquos_sms`). If you check it, use the value configured on **your** server.
 
 To validate it:
 
 1. Read the `Authorization` header and strip the `Bearer ` prefix.
 2. Verify the token with a JWT library using your signing key, accepting **only** the `HS256` algorithm.
-3. Optionally check that `aud` is your URL and `iss` is `api.httpsms.com`.
+3. Optionally check that `aud` is your URL and that `iss` matches the issuer configured on your server.
 4. If anything fails, respond with `401` and drop the request.
 
 > **Important:** the token proves **who sent** the request; it does not sign the body. Always use HTTPS for your URL so nobody can read or tamper with the request in transit.
@@ -151,6 +153,8 @@ const app = express()
 app.use(express.json())
 
 const SIGNING_KEY = process.env.HTTPSMS_WEBHOOK_SIGNING_KEY
+// Must match JWT_ISSUER on your server (default: slug of APP_NAME, e.g. httpsms)
+const ISSUER = process.env.HTTPSMS_JWT_ISSUER || 'httpsms'
 
 app.post('/webhooks/httpsms', (req, res) => {
   const token = (req.get('Authorization') || '').replace(/^Bearer /, '')
@@ -158,7 +162,7 @@ app.post('/webhooks/httpsms', (req, res) => {
   try {
     jwt.verify(token, SIGNING_KEY, {
       algorithms: ['HS256'],
-      issuer: 'api.httpsms.com',
+      issuer: ISSUER,
     })
   } catch (error) {
     return res.status(401).send('invalid signature')
@@ -187,6 +191,8 @@ from flask import Flask, abort, request
 
 app = Flask(__name__)
 SIGNING_KEY = os.environ["HTTPSMS_WEBHOOK_SIGNING_KEY"]
+# Must match JWT_ISSUER on your server (default: slug of APP_NAME, e.g. httpsms)
+ISSUER = os.environ.get("HTTPSMS_JWT_ISSUER", "httpsms")
 
 
 @app.post("/webhooks/httpsms")
@@ -197,7 +203,7 @@ def httpsms_webhook():
             token,
             SIGNING_KEY,
             algorithms=["HS256"],
-            issuer="api.httpsms.com",
+            issuer=ISSUER,
             options={"verify_aud": False},
         )
     except jwt.InvalidTokenError:

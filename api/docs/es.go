@@ -87,7 +87,7 @@ var spanishOperations = map[string]translation{
 	"DELETE /phone-api-keys/{phoneAPIKeyID}/phones/{phoneID}": {"Desvincular un teléfono de una clave API de teléfono", "Quita la asociación entre el teléfono y la clave API. Tendrás que volver a iniciar sesión en la app httpSMS de tu teléfono Android con una nueva clave API de teléfono."},
 
 	"GET /phones":              {"Listar teléfonos", "Obtiene la lista de teléfonos que el usuario ha registrado en httpSMS."},
-	"PUT /phones":              {"Crear o actualizar un teléfono", "Actualiza las propiedades del teléfono de un usuario. Si no existe un teléfono con ese número, se crea uno nuevo (funciona como un \"upsert\"). Las pasarelas de teléfono basadas en URL reciben activaciones HTTP compatibles con FCM."},
+	"PUT /phones":              {"Crear o actualizar un teléfono", "Actualiza las propiedades del teléfono de un usuario. Si no existe un teléfono con ese número, se crea uno nuevo (funciona como un \"upsert\"). Los campos que se omiten en el cuerpo conservan su valor actual. Las pasarelas de teléfono basadas en URL reciben activaciones HTTP compatibles con FCM."},
 	"PUT /phones/fcm-token":    {"Crear o actualizar el token FCM de un teléfono", "Actualiza el token FCM o la URL de callback del adaptador de un teléfono. Si no existe un teléfono con ese número, se crea uno nuevo (funciona como un \"upsert\"). Las pasarelas de teléfono basadas en URL reciben activaciones HTTP compatibles con FCM."},
 	"DELETE /phones/{phoneID}": {"Eliminar un teléfono", "Elimina un teléfono guardado en la base de datos."},
 

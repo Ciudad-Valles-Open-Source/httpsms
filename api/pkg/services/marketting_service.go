@@ -8,6 +8,7 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.10.0"
 
 	"firebase.google.com/go/auth"
+	"github.com/NdoleStudio/httpsms/pkg/config"
 	"github.com/NdoleStudio/httpsms/pkg/entities"
 	"github.com/NdoleStudio/httpsms/pkg/telemetry"
 	plunk "github.com/NdoleStudio/plunk-go"
@@ -73,7 +74,7 @@ func (service *MarketingService) CreateContact(ctx context.Context, userID entit
 	}
 
 	data := service.attributes(userRecord)
-	data[string(semconv.ServiceNameKey)] = "httpsms.com"
+	data[string(semconv.ServiceNameKey)] = config.OTelServiceName()
 	data[string(semconv.EnduserIDKey)] = userRecord.UID
 
 	event, _, err := service.plunkClient.Tracker.TrackEvent(ctx, &plunk.TrackEventRequest{

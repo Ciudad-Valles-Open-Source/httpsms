@@ -13,9 +13,9 @@ import (
 
 func testNotificationEmailFactory() NotificationEmailFactory {
 	return NewHermesNotificationEmailFactory(&HermesGeneratorConfig{
-		AppURL:     "https://httpsms.com",
+		AppURL:     "https://sms.example.com",
 		AppName:    "httpSMS",
-		AppLogoURL: "https://httpsms.com/logo.png",
+		AppLogoURL: "https://sms.example.com/logo.png",
 	})
 }
 

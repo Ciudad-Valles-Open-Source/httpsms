@@ -18,6 +18,7 @@ const { t } = useI18n()
 const threadsStore = useThreadsStore()
 const phonesStore = usePhonesStore()
 const appStore = useAppStore()
+const { githubIssuesUrl } = usePublicUrls()
 const notificationsStore = useNotificationsStore()
 const { formatPhoneNumber, startsWithLetter } = useFilters()
 
@@ -133,7 +134,7 @@ function threadAvatarInitial(thread: EntitiesMessageThread): string {
       <p>
         {{ $t('components.messageThread.installAppPrompt') }}
         <a
-          href="https://discord.gg/kGk8HVqeEZ"
+          :href="githubIssuesUrl"
           target="_blank"
           class="text-decoration-none hover:text-decoration-underline"
           >{{ $t('components.messageThread.messageDiscord') }}</a

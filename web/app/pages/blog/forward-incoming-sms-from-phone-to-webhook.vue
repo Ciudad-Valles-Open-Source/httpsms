@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { mdAndUp } = useVDisplay()
-const docsUrl = `${useAppStore().appData.url}/docs`
+const { docsUrl, settingsUrl, downloadUrl, assetUrl } = usePublicUrls()
 
 definePageMeta({ layout: 'website' })
 
@@ -13,8 +13,9 @@ useSeoMeta({
     'How to forward a text message (SMS) from an android phone into your webhook',
   ogDescription:
     'You can now program your android phone to forward messages received on your phone to your server and trigger powerful automations with tools like Zapier and IFTTT.',
-  ogImage:
-    'https://httpsms.com/img/blog/forward-incoming-sms-from-phone-to-webhook/header.png',
+  ogImage: assetUrl(
+    '/img/blog/forward-incoming-sms-from-phone-to-webhook/header.png',
+  ),
   twitterCard: 'summary_large_image',
 })
 </script>
@@ -49,15 +50,15 @@ useSeoMeta({
 
         <h3 class="text-headline-large mt-2">Step 1: Get your API_KEY</h3>
         <p>
-          Create an account on the httpSMS web application and copy your API key
-          from the settings page.
-          <NuxtLink class="text-decoration-none" to="/settings"
-            >https://httpsms.com/settings</NuxtLink
-          >
+          Sign in to your httpSMS dashboard and copy your API key from the
+          settings page.
+          <NuxtLink class="text-decoration-none" to="/settings">{{
+            settingsUrl
+          }}</NuxtLink>
         </p>
         <VImg
           style="border-radius: 4px"
-          alt="httpsms.com settings page"
+          alt="httpSMS settings page"
           src="/img/blog/forward-incoming-sms-from-phone-to-webhook/settings.png"
         />
 
@@ -65,9 +66,7 @@ useSeoMeta({
           Step 2: Install the httpSMS android app
         </h3>
         <p>
-          <a
-            class="text-decoration-none"
-            href="https://github.com/NdoleStudio/httpsms/releases/latest/download/HttpSms.apk"
+          <a class="text-decoration-none" :href="downloadUrl"
             >⬇️ Download and install</a
           >
           the httpSMS android app on your phone and sign in using your API KEY
@@ -87,10 +86,10 @@ useSeoMeta({
           messages received on the android phone. You can configure the
           application to sent this SMS message to your server URL using a
           webhook. You can configure this URL under the settings page in the
-          httpSMS application
-          <NuxtLink class="text-decoration-none" to="/settings"
-            >https://httpsms.com/settings</NuxtLink
-          >
+          httpSMS dashboard
+          <NuxtLink class="text-decoration-none" to="/settings">{{
+            settingsUrl
+          }}</NuxtLink>
         </p>
         <VImg
           style="border-radius: 4px"

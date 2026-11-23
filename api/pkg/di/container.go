@@ -24,13 +24,13 @@ import (
 	otelfiber "github.com/gofiber/contrib/v3/otel"
 	"gorm.io/plugin/opentelemetry/tracing"
 
+	"github.com/NdoleStudio/httpsms/pkg/config"
 	"github.com/NdoleStudio/httpsms/pkg/discord"
 
 	"cloud.google.com/go/storage"
 	mexporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric"
 	cloudtrace "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"github.com/NdoleStudio/httpsms/pkg/cache"
-	"github.com/NdoleStudio/lemonsqueezy-go"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
@@ -1075,11 +1075,12 @@ func (container *Container) HTTPRoundTripperWithoutRetry(name string) http.Round
 	)
 }
 
-// OtelResources generates default open telemetry resources
-func (container *Container) OtelResources(version string, namespace string) *resource.Resource {
+// OtelResources generates default open telemetry resources.
+// serviceName is usually config.OTelServiceName() (OTEL_SERVICE_NAME, or the APP_NAME slug).
+func (container *Container) OtelResources(version string, serviceName string) *resource.Resource {
 	return resource.NewWithAttributes(
 		semconv.SchemaURL,
-		semconv.ServiceNameKey.String(namespace),
+		semconv.ServiceNameKey.String(serviceName),
 		semconv.ServiceVersionKey.String(version),
 		semconv.ServiceInstanceIDKey.String(instanceID()),
 		semconv.DeploymentEnvironmentKey.String(os.Getenv("ENV")),
@@ -1126,10 +1127,8 @@ func (container *Container) UserService() (service *services.UserService) {
 		container.UserRepository(),
 		container.Mailer(),
 		container.UserEmailFactory(),
-		container.LemonsqueezyClient(),
 		container.EventDispatcher(),
 		container.FirebaseAuthClient(),
-		container.HTTPClient("lemonsqueezy"),
 	)
 }
 
@@ -1296,29 +1295,6 @@ func (container *Container) RegisterMessageSendScheduleListeners() {
 	}
 }
 
-// LemonsqueezyService creates a new instance of services.LemonsqueezyService
-func (container *Container) LemonsqueezyService() (service *services.LemonsqueezyService) {
-	container.logger.Debug(fmt.Sprintf("creating %T", service))
-	return services.NewLemonsqueezyService(
-		container.Logger(),
-		container.Tracer(),
-		container.UserRepository(),
-		container.EventDispatcher(),
-	)
-}
-
-// LemonsqueezyHandler creates a new instance of handlers.LemonsqueezyHandler
-func (container *Container) LemonsqueezyHandler() (handler *handlers.LemonsqueezyHandler) {
-	container.logger.Debug(fmt.Sprintf("creating %T", handler))
-
-	return handlers.NewLemonsqueezyHandler(
-		container.Logger(),
-		container.Tracer(),
-		container.LemonsqueezyService(),
-		container.LemonsqueezyHandlerValidator(),
-	)
-}
-
 // Integration3CXHandler creates a new instance of handlers.Integration3CXHandler
 func (container *Container) Integration3CXHandler() (handler *handlers.Integration3CXHandler) {
 	container.logger.Debug(fmt.Sprintf("creating %T", handler))
@@ -1359,32 +1335,12 @@ func (container *Container) DiscordHandler() (handler *handlers.DiscordHandler) 
 	)
 }
 
-// LemonsqueezyHandlerValidator creates a new instance of validators.LemonsqueezyHandlerValidator
-func (container *Container) LemonsqueezyHandlerValidator() (validator *validators.LemonsqueezyHandlerValidator) {
-	container.logger.Debug(fmt.Sprintf("creating %T", validator))
-	return validators.NewLemonsqueezyHandlerValidator(
-		container.Logger(),
-		container.Tracer(),
-		container.LemonsqueezyClient(),
-	)
-}
-
 // PhoneAPIKeyHandlerValidator creates a new instance of validators.PhoneAPIKeyHandlerValidator
 func (container *Container) PhoneAPIKeyHandlerValidator() (validator *validators.PhoneAPIKeyHandlerValidator) {
 	container.logger.Debug(fmt.Sprintf("creating %T", validator))
 	return validators.NewPhoneAPIKeyHandlerValidator(
 		container.Logger(),
 		container.Tracer(),
-	)
-}
-
-// LemonsqueezyClient creates a new instance of lemonsqueezy.Client
-func (container *Container) LemonsqueezyClient() (client *lemonsqueezy.Client) {
-	container.logger.Debug(fmt.Sprintf("creating %T", client))
-	return lemonsqueezy.New(
-		lemonsqueezy.WithHTTPClient(container.HTTPClient("lemonsqueezy")),
-		lemonsqueezy.WithAPIKey(os.Getenv("LEMONSQUEEZY_API_KEY")),
-		lemonsqueezy.WithSigningSecret(os.Getenv("LEMONSQUEEZY_SIGNING_SECRET")),
 	)
 }
 
@@ -1420,12 +1376,6 @@ func (container *Container) PlunkClient() (client *plunk.Client) {
 		plunk.WithSecretKey(os.Getenv("PLUNK_SECRET_KEY")),
 		plunk.WithPublicKey(os.Getenv("PLUNK_PUBLIC_KEY")),
 	)
-}
-
-// RegisterLemonsqueezyRoutes registers routes for the /lemonsqueezy prefix
-func (container *Container) RegisterLemonsqueezyRoutes() {
-	container.logger.Debug(fmt.Sprintf("registering %T routes", &handlers.LemonsqueezyHandler{}))
-	container.LemonsqueezyHandler().RegisterRoutes(container.App())
 }
 
 // RegisterIntegration3CXRoutes registers routes for the /integration/3cx prefix
@@ -1824,7 +1774,8 @@ func (container *Container) RegisterSwaggerRoutes() {
 	languageSwitcher := `
 		document.addEventListener("DOMContentLoaded", function(event) {
 			var box = document.createElement("div");
-			box.style.cssText = "position:fixed;top:10px;right:10px;z-index:9999;font:600 13px sans-serif;background:#fff;border:1px solid #ccc;border-radius:6px;padding:6px 10px;box-shadow:0 2px 6px rgba(0,0,0,.15)";
+			box.className = "hs-lang-switcher";
+			box.style.cssText = "position:fixed;top:10px;right:10px;z-index:9999;font:600 13px sans-serif;border-radius:6px;padding:6px 10px";
 			var inEs = window.location.pathname.indexOf("/es") === 0;
 			box.innerHTML = inEs
 				? '<a href="/">English</a> | <b>Español</b>'
@@ -1861,12 +1812,14 @@ func (container *Container) RegisterSwaggerRoutes() {
 	container.App().Get("/es/*", swagger.New(swagger.Config{
 		Title:        docs.SwaggerInfo.Title + " (ES)",
 		URL:          "/es/doc.json",
-		CustomScript: template.JS(baseScript),
+		CustomStyle:  template.CSS(docs.SwaggerThemeCSS),
+		CustomScript: template.JS(docs.SwaggerThemeScript + baseScript),
 	}))
 
 	container.App().Get("/*", swagger.New(swagger.Config{
 		Title:        docs.SwaggerInfo.Title,
-		CustomScript: template.JS(baseScript),
+		CustomStyle:  template.CSS(docs.SwaggerThemeCSS),
+		CustomScript: template.JS(docs.SwaggerThemeScript + baseScript),
 	}))
 }
 
@@ -1960,10 +1913,10 @@ func (container *Container) InitializeTraceProvider() func() {
 	if os.Getenv("AXIOM_TOKEN") == "" {
 		return func() {}
 	}
-	return container.initializeAxiomTraceProvider(container.version, container.projectID)
+	return container.initializeAxiomTraceProvider(container.version, config.OTelServiceName())
 }
 
-func (container *Container) initializeGoogleTraceProvider(version string, namespace string) func() {
+func (container *Container) initializeGoogleTraceProvider(version string, serviceName string) func() {
 	container.logger.Debug("initializing google trace meterProvider")
 
 	traceExporter, err := cloudtrace.New(cloudtrace.WithProjectID(os.Getenv("GCP_PROJECT_ID")))
@@ -1974,7 +1927,7 @@ func (container *Container) initializeGoogleTraceProvider(version string, namesp
 	tp := trace.NewTracerProvider(
 		trace.WithSpanProcessor(telemetry.NewSamplingSpanProcessor(traceExporter)),
 		trace.WithSampler(trace.AlwaysSample()),
-		trace.WithResource(container.OtelResources(version, namespace)),
+		trace.WithResource(container.OtelResources(version, serviceName)),
 	)
 	otel.SetTracerProvider(tp)
 
@@ -1986,7 +1939,7 @@ func (container *Container) initializeGoogleTraceProvider(version string, namesp
 	meterProvider := metric.NewMeterProvider(
 		metric.WithReader(metric.NewPeriodicReader(metricExporter)),
 		metric.WithExemplarFilter(telemetry.SampledTraceExemplarFilter),
-		metric.WithResource(container.OtelResources(version, namespace)),
+		metric.WithResource(container.OtelResources(version, serviceName)),
 	)
 	otel.SetMeterProvider(meterProvider)
 
@@ -2000,7 +1953,7 @@ func (container *Container) initializeGoogleTraceProvider(version string, namesp
 	}
 }
 
-func (container *Container) initializeAxiomTraceProvider(version string, namespace string) func() {
+func (container *Container) initializeAxiomTraceProvider(version string, serviceName string) func() {
 	container.logger.Debug("initializing axiom trace provider")
 
 	traceHeaders := map[string]string{
@@ -2020,7 +1973,7 @@ func (container *Container) initializeAxiomTraceProvider(version string, namespa
 	tp := trace.NewTracerProvider(
 		trace.WithSpanProcessor(telemetry.NewSamplingSpanProcessor(traceExporter)),
 		trace.WithSampler(trace.AlwaysSample()),
-		trace.WithResource(container.OtelResources(version, namespace)),
+		trace.WithResource(container.OtelResources(version, serviceName)),
 	)
 	otel.SetTracerProvider(tp)
 
@@ -2046,7 +1999,7 @@ func (container *Container) initializeAxiomTraceProvider(version string, namespa
 	meterProvider := metric.NewMeterProvider(
 		metric.WithReader(metric.NewPeriodicReader(metricExporter)),
 		metric.WithExemplarFilter(telemetry.SampledTraceExemplarFilter),
-		metric.WithResource(container.OtelResources(version, namespace)),
+		metric.WithResource(container.OtelResources(version, serviceName)),
 	)
 	otel.SetMeterProvider(meterProvider)
 
@@ -2060,12 +2013,12 @@ func (container *Container) initializeAxiomTraceProvider(version string, namespa
 	}
 }
 
-func (container *Container) initializeUptraceProvider(version string, namespace string) (flush func()) {
+func (container *Container) initializeUptraceProvider(version string, serviceName string) (flush func()) {
 	container.logger.Debug("initializing uptrace provider")
 	// Configure OpenTelemetry with sensible defaults.
 	uptrace.ConfigureOpentelemetry(
 		uptrace.WithDSN(os.Getenv("UPTRACE_DSN")),
-		uptrace.WithServiceName(namespace),
+		uptrace.WithServiceName(serviceName),
 		uptrace.WithServiceVersion(version),
 		uptrace.WithDeploymentEnvironment(os.Getenv("ENV")),
 	)

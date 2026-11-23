@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const { mdAndUp } = useVDisplay()
+const { assetUrl, settingsUrl, sendMessageUrl, githubIssuesUrl } =
+  usePublicUrls()
 
 definePageMeta({ layout: 'website' })
 
@@ -12,7 +14,7 @@ useSeoMeta({
     'Send an SMS message when a new row is added to Google Sheets using Zapier',
   ogDescription:
     "Automate sending personalized SMS messages each time a new row is added to your Google Sheets document using Zapier. You don't need to write any code to make this happen and you can personalize the SMS messages which are sent out.",
-  ogImage: 'https://httpsms.com/header.png',
+  ogImage: assetUrl('/header.png'),
   twitterCard: 'summary_large_image',
 })
 </script>
@@ -43,9 +45,9 @@ useSeoMeta({
           <li>Basic understanding of Google Sheets.</li>
           <li>Basic understanding of Zapier.</li>
           <li>
-            An account on
+            An account on your httpSMS
             <NuxtLink class="text-decoration-none" to="/login"
-              >httpsms.com</NuxtLink
+              >dashboard</NuxtLink
             >
           </li>
         </ul>
@@ -98,7 +100,8 @@ useSeoMeta({
         <p class="mt-8">
           On the <b>Action</b> section in Zapier, set the Method to
           <code>Post</code>. Set the URL to
-          <code>https://api.httpsms.com/v1/messages/send</code>. Set the
+          <code>{{ sendMessageUrl }}</code> (your httpSMS API must be reachable
+          from the internet so that Zapier can call it). Set the
           <code>Data Pass-Through</code> to <code>false</code>. In the Data
           field, add the following JSON payload.
         </p>
@@ -117,18 +120,15 @@ useSeoMeta({
           number of the customer who made the purchase. You can use your own
           custom message with your own set of variables according to your
           spreadsheet. Change the <code>from</code> field to the phone number
-          which you registered on httpsms.com.
+          which you registered on httpSMS.
         </VAlert>
         <p class="mt-8">
           On the headers section add a new header called
           <code>x-api-key</code> and the value of this header should be your API
-          key on
-          <NuxtLink class="text-decoration-none" to="/settings"
-            >httpsms.com</NuxtLink
-          >
-          and you can copy your API key from the settings page
-          <NuxtLink class="text-decoration-none" to="/settings"
-            >https://httpsms.com/settings</NuxtLink
+          key, which you can copy from the settings page
+          <NuxtLink class="text-decoration-none" to="/settings">{{
+            settingsUrl
+          }}</NuxtLink
           >.
         </p>
         <p>
@@ -150,8 +150,8 @@ useSeoMeta({
           Publish your zap and you will automatically trigger httpsms to send an
           SMS to your customer when ever you add a new row in the google sheet.
           Don't hesitate to
-          <a class="text-decoration-none" href="mailto:arnold@httpsms.com"
-            >contact us</a
+          <a class="text-decoration-none" :href="githubIssuesUrl"
+            >open an issue on GitHub</a
           >
           if you face any issues configuring your zap to send SMS messages from
           your Google Sheets by following this tutorial.

@@ -2,7 +2,6 @@
 import {
   mdiCheckCircle,
   mdiSend,
-  mdiCreation,
   mdiLockOutline,
   mdiLanguagePython,
   mdiCellphoneKey,
@@ -31,18 +30,27 @@ definePageMeta({
 
 const { t } = useI18n()
 
+const {
+  apiBaseUrl,
+  assetUrl,
+  docsUrl,
+  githubRepo,
+  githubUrl,
+  sendMessageUrl,
+  settingsUrl,
+} = usePublicUrls()
+
 useSeoMeta({
   title: () => t('pages.index.metaTitle'),
   description: () => t('pages.index.metaDescription'),
   ogTitle: () => t('pages.index.metaOgTitle'),
   ogDescription: () => t('pages.index.metaOgDescription'),
-  ogImage: 'https://httpsms.com/header.png',
+  ogImage: assetUrl('/header.png'),
   twitterCard: 'summary_large_image',
 })
 
 const config = useRuntimeConfig()
-const docsUrl = `${useAppStore().appData.url}/docs`
-const { lgAndUp, mdAndUp, mdAndDown, md, smAndDown, xl } = useVDisplay()
+const { lgAndUp, mdAndUp, mdAndDown, md, smAndDown } = useVDisplay()
 
 const selectedTab = ref('javascript')
 const faqPanel = ref<number | undefined>(undefined)
@@ -79,15 +87,6 @@ const faqPanel = ref<number | undefined>(undefined)
               <VIcon v-if="lgAndUp" start :icon="mdiSend" />
               {{ $t('pages.index.getStartedBtn') }}
             </VBtn>
-            <VBtn
-              size="large"
-              variant="tonal"
-              class="mt-4 mb-4 ml-4"
-              href="https://sandbox.httpsms.com"
-            >
-              <VIcon v-if="lgAndUp" start :icon="mdiCreation" color="#ffe500" />
-              {{ $t('pages.index.liveDemoBtn') }}
-            </VBtn>
           </div>
           <p
             class="text-body-medium mt-2"
@@ -98,15 +97,6 @@ const faqPanel = ref<number | undefined>(undefined)
             {{ $t('pages.index.freeToUse') }}
             <VIcon class="ml-4" color="success" :icon="mdiCheckCircle" />
             {{ $t('pages.index.openSourceBadge') }}
-          </div>
-          <div v-if="xl" class="mt-4">
-            <a href="https://www.uneed.best/tool/httpsmscom">
-              <img
-                src="https://www.uneed.best/POTD1A.png"
-                style="width: 250px"
-                alt="Uneed POTD1 Badge"
-              />
-            </a>
           </div>
           <VDivider
             v-if="mdAndDown"
@@ -119,23 +109,13 @@ const faqPanel = ref<number | undefined>(undefined)
             class="mx-auto"
             style="max-width: 98%; width: 100%; aspect-ratio: 16/9"
           >
-            <iframe
-              src="https://www.youtube-nocookie.com/embed/XTj17RA5txQ?rel=0&modestbranding=1"
-              title="httpSMS demo video"
+            <img
+              src="/header.png"
+              alt="httpSMS"
               width="100%"
               height="100%"
               loading="lazy"
-              style="border: none; border-radius: 8px"
-              allow="
-                accelerometer;
-                autoplay;
-                clipboard-write;
-                encrypted-media;
-                gyroscope;
-                picture-in-picture;
-                web-share;
-              "
-              allowfullscreen
+              style="object-fit: contain; border-radius: 8px"
             />
           </div>
         </VCol>
@@ -282,14 +262,12 @@ const faqPanel = ref<number | undefined>(undefined)
               <h5 class="text-title-large mb-3 font-weight-light my-2">
                 {{ $t('pages.index.openSourceDesc') }}
               </h5>
-              <a
-                class="text-decoration-none"
-                :href="config.public.appGithubUrl"
-              >
+              <a class="text-decoration-none" :href="githubUrl">
                 <img
+                  v-if="githubRepo"
                   alt="GitHub Repo stars"
                   height="32"
-                  src="https://img.shields.io/github/stars/NdoleStudio/httpsms?style=social"
+                  :src="`https://img.shields.io/github/stars/${githubRepo}?style=social`"
                 />
               </a>
             </div>
@@ -507,7 +485,7 @@ const faqPanel = ref<number | undefined>(undefined)
                       class="pa-4 bg-surface rounded mt-2"
                     ><code class="language-javascript">import HttpSms from 'httpsms'
 
-const client = new HttpSms('' /* Get the API Key from https://httpsms.com/settings */);
+const client = new HttpSms('' /* Get the API Key from {{ settingsUrl }} */, '{{ apiBaseUrl }}');
 
 client.messages.postSend({
     content:   'This is a sample text message',
@@ -522,7 +500,7 @@ client.messages.postSend({
                     <pre
                       class="pa-4 bg-surface rounded mt-2"
                     ><code class="language-php">&lt;?php
-$apiKey = "Get API Key from https://httpsms.com/settings";
+$apiKey = "Get API Key from {{ settingsUrl }}";
 
 $options = array(
   'http' => array(
@@ -539,7 +517,7 @@ $options = array(
 );
 
 $context  = stream_context_create( $options );
-$result = file_get_contents( "https://api.httpsms.com/v1/messages/send", false, $context );
+$result = file_get_contents( "{{ sendMessageUrl }}", false, $context );
 
 echo $result;</code></pre>
                   </VTabsWindowItem>
@@ -549,9 +527,9 @@ echo $result;</code></pre>
                     ><code class="language-python">import requests
 import json
 
-api_key = "Get API Key from https://httpsms.com/settings"
+api_key = "Get API Key from {{ settingsUrl }}"
 
-url = 'https://api.httpsms.com/v1/messages/send'
+url = '{{ sendMessageUrl }}'
 
 headers = {
     'x-api-key': api_key,
@@ -574,7 +552,10 @@ print(json.dumps(response.json(), indent=4))</code></pre>
                       class="pa-4 bg-surface rounded mt-2"
                     ><code class="language-go">import "github.com/NdoleStudio/httpsms-go"
 
-client := htpsms.New(htpsms.WithAPIKey(/* API Key from https://httpsms.com/settings */))
+client := httpsms.New(
+    httpsms.WithAPIKey(""/* API Key from {{ settingsUrl }} */),
+    httpsms.WithBaseURL("{{ apiBaseUrl }}"),
+)
 
 client.Messages.Send(context.Background(), &amp;httpsms.MessageSendParams{
     Content: "This is a sample text message",
@@ -586,7 +567,7 @@ client.Messages.Send(context.Background(), &amp;httpsms.MessageSendParams{
                     <pre
                       class="pa-4 bg-surface rounded mt-2"
                     ><code class="language-java">var client = HttpClient.newHttpClient();
-var apiKey = "Get API Key from https://httpsms.com/settings";
+var apiKey = "Get API Key from {{ settingsUrl }}";
 
 var payload = """
         {
@@ -597,7 +578,7 @@ var payload = """
         """;
 
 var request = HttpRequest.newBuilder()
-        .uri(URI.create("https://api.httpsms.com/v1/messages/send"))
+        .uri(URI.create("{{ sendMessageUrl }}"))
         .header("accept", "application/json")
         .header("Content-Type", "application/json")
         .header("x-api-key", apiKey)
@@ -610,8 +591,8 @@ System.out.println(response.body());</code></pre>
                   <VTabsWindowItem value="curl">
                     <pre
                       class="pa-4 bg-surface rounded mt-2"
-                    ><code class="language-bash">curl --location --request POST 'https://api.httpsms.com/v1/messages/send' \
---header 'x-api-key: Get API Key from https://httpsms.com/settings' \
+                    ><code class="language-bash">curl --location --request POST '{{ sendMessageUrl }}' \
+--header 'x-api-key: Get API Key from {{ settingsUrl }}' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "from": "+18005550199",
@@ -623,10 +604,10 @@ System.out.println(response.body());</code></pre>
                     <pre
                       class="pa-4 bg-surface rounded mt-2"
                     ><code class="language-csharp">var client = new HttpClient();
-client.DefaultRequestHeaders.Add("x-api-key", ""/* Get API Key from https://httpsms.com/settings */);
+client.DefaultRequestHeaders.Add("x-api-key", ""/* Get API Key from {{ settingsUrl }} */);
 
 var response = await client.PostAsync(
-    "https://api.httpsms.com/v1/messages/send",
+    "{{ sendMessageUrl }}",
     new StringContent(
         JsonSerializer.Serialize(new {
             from = "+18005550199",
@@ -644,81 +625,6 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
               </div>
             </VCol>
           </VRow>
-        </VCol>
-      </VRow>
-    </VContainer>
-
-    <!-- Testimonials Section -->
-    <VContainer class="mt-16">
-      <VRow>
-        <VCol cols="12" md="6">
-          <VCard
-            href="https://www.g2.com/products/httpsms/reviews/httpsms-review-8589834"
-          >
-            <VCardText class="pt-0 pb-0">
-              <div class="d-flex">
-                <VAvatar class="mt-6">
-                  <VImg
-                    alt="Joysankar M."
-                    src="https://images.g2crowd.com/uploads/avatar/image/1662077/thumb_square_d5706804d1b343744a8feb693827fe34.jpeg"
-                  />
-                </VAvatar>
-                <div>
-                  <p class="text-title-medium ml-3">Joysankar M.</p>
-                  <VRating
-                    class="mt-n7"
-                    color="yellow-darken-3"
-                    :model-value="4.5"
-                    half-increments
-                    readonly
-                  />
-                </div>
-                <VSpacer />
-                <div style="width: 30px" class="mt-4">
-                  <VImg
-                    max-height="30"
-                    src="https://company.g2.com/hs-fs/hubfs/brand-guide/reversed-g2@2x.png"
-                  />
-                </div>
-              </div>
-              <p
-                class="text-title-large font-weight-light mt-0"
-                v-html="$t('pages.index.testimonial1')"
-              ></p>
-            </VCardText>
-          </VCard>
-        </VCol>
-        <VCol cols="12" md="6">
-          <VCard href="https://www.uneed.best/tool/httpsmscom?tab=comments">
-            <VCardText class="pb-0">
-              <div class="d-flex">
-                <VAvatar class="mt-2">
-                  <VImg
-                    alt="Edmund Ciego Profile Picture"
-                    src="https://lh3.googleusercontent.com/a/ACg8ocJktUViyMcJvzkPNpza7SZ3ql_nwOAzYk0uJ27TF5L_z0bRoPKE=s96-c"
-                  />
-                </VAvatar>
-                <div>
-                  <p class="text-title-medium mt-0 ml-3">Edmund Ciego</p>
-                  <VRating
-                    class="mt-n7"
-                    color="yellow-darken-3"
-                    :model-value="5"
-                    half-increments
-                    readonly
-                  />
-                </div>
-                <VSpacer />
-                <div>
-                  <v-img width="64" src="/img/logos/uneed.svg" />
-                </div>
-              </div>
-              <p
-                class="text-title-large font-weight-light mt-0"
-                v-html="$t('pages.index.testimonial2')"
-              ></p>
-            </VCardText>
-          </VCard>
         </VCol>
       </VRow>
     </VContainer>

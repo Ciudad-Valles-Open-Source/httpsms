@@ -41,6 +41,8 @@ type httpNotificationPayload struct {
 }
 
 func TestHTTPNotificationSenderSendsFCMCompatiblePayload(t *testing.T) {
+	t.Setenv("JWT_ISSUER", "")
+	t.Setenv("APP_NAME", "Arquos SMS")
 	ttl := 10 * time.Minute
 	message := &messaging.Message{
 		Token: "https://adapter.example.com/notify",
@@ -70,7 +72,7 @@ func TestHTTPNotificationSenderSendsFCMCompatiblePayload(t *testing.T) {
 		claims, ok := token.Claims.(jwt.MapClaims)
 		require.True(t, ok)
 		assert.Empty(t, claims["sub"], "phone ID must not be embedded in a claim since it is also the signing secret")
-		assert.Equal(t, "api.httpsms.com", claims["iss"])
+		assert.Equal(t, "arquos_sms", claims["iss"])
 
 		return response(http.StatusNoContent, http.NoBody), nil
 	}))

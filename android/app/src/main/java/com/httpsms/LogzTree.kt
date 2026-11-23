@@ -14,10 +14,27 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import io.sentry.Sentry
 
+/**
+ * Ships debug logs to a remote log endpoint (for example an Axiom dataset ingest URL) that
+ * accepts a JSON array of log entries with a "Bearer" token.
+ *
+ * Nothing is hard-coded: the endpoint and token come from the optional HTTPSMS_LOGS_URL and
+ * HTTPSMS_LOGS_TOKEN build properties. When either is empty (the default) this tree is never
+ * planted and [log] does nothing, so no logs leave the phone.
+ */
 class LogzTree(val context: Context) : Timber.DebugTree() {
     private val client = OkHttpClient()
 
+    companion object {
+        fun isConfigured(): Boolean =
+            BuildConfig.LOGS_URL.isNotBlank() && BuildConfig.LOGS_TOKEN.isNotBlank()
+    }
+
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+        if (!isConfigured()) {
+            return
+        }
+
         val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
         val logEntry = LogEntry(
             BuildConfig.APPLICATION_ID,
@@ -37,16 +54,16 @@ class LogzTree(val context: Context) : Timber.DebugTree() {
 
         val body = Klaxon().toJsonString(listOf(logEntry)).toRequestBody("application/json".toMediaType())
         val request: Request = Request.Builder()
-            .url("https://api.axiom.co/v1/datasets/production/ingest")
+            .url(BuildConfig.LOGS_URL)
             .post(body)
             .header("Content-Type", "application/json")
-            .header("Authorization", "Bearer xaat-2a2e0b73-3702-4971-a80f-be3956934950")
+            .header("Authorization", "Bearer ${BuildConfig.LOGS_TOKEN}")
             .build()
 
         Thread {
             try {
                 val response = client.newCall(request).execute()
-                response.body?.close()
+                response.close()
             } catch (ex: Exception) {
                 Sentry.captureException(ex)
             }

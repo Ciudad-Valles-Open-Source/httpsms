@@ -94,7 +94,7 @@ func (h *PhoneHandler) Index(c fiber.Ctx) error {
 
 // Upsert a phone
 // @Summary      Upsert Phone
-// @Description  Updates properties of a user's phone. If the phone with this number does not exist, a new one will be created. Think of this method like an 'upsert'. URL-backed phone gateways receive FCM-compatible HTTP wake-ups.
+// @Description  Updates properties of a user's phone. If the phone with this number does not exist, a new one will be created. Think of this method like an 'upsert'. Fields omitted from the payload keep their current value. URL-backed phone gateways receive FCM-compatible HTTP wake-ups.
 // @Security	 ApiKeyAuth
 // @Tags         Phones
 // @Accept       json

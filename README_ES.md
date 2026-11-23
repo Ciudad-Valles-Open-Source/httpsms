@@ -1,10 +1,8 @@
-[![Greptile: The War on Bugs](https://www.greptile.com/badge.svg)](https://www.greptile.com/?utm_source=oss_badge&utm_medium=readme&utm_campaign=greptile_for_open_source)
-[![Sponsors](https://img.shields.io/github/sponsors/ndolestudio?logo=github)](https://github.com/sponsors/ndolestudio)
 [![Discord](https://img.shields.io/discord/1095778291488653372?label=Discord)](https://discord.gg/kGk8HVqeEZ)
 
 *🌎 [Read in English](README.md)*
 
-[httpSMS](https://httpsms.com) es un servicio que te permite usar tu teléfono Android como un Gateway de SMS para enviar y recibir mensajes SMS.
+httpSMS es un servicio gratuito, de código abierto y autoalojado que te permite usar tu teléfono Android como un Gateway de SMS para enviar y recibir mensajes SMS. Este repositorio es un fork 100 % gratuito de [NdoleStudio/httpsms](https://github.com/NdoleStudio/httpsms): sin planes de pago, sin límites y sin depender del servicio alojado.
 Realizas una solicitud a una API HTTP simple y esto activa tu teléfono Android para enviar un SMS. Los mensajes SMS recibidos en tu teléfono android también pueden ser reenviados a tu endpoint de webhook.
 
 Guía de Inicio Rápido: abre la sección **/docs** de tu panel web (por ejemplo `https://tu-dominio/docs`). El contenido está en [`web/docs-content/`](./web/docs-content), y la referencia de la API (Swagger) la sirve la propia API en `/index.html` (en español: `/es/index.html`).
@@ -37,17 +35,20 @@ Desafortunadamente, muchos países no soportan la capacidad de comprar números 
 
 ## Interfaz Web
 
-La interfaz web https://httpsms.com está construida utilizando [Nuxt](https://nuxtjs.org/) y [Vuetify](https://vuetifyjs.com/en/).
+La interfaz web (servida en tu `APP_URL`) está construida utilizando [Nuxt](https://nuxtjs.org/) y [Vuetify](https://vuetifyjs.com/en/).
 Está alojada como una aplicación de una sola página (SPA) en firebase. El código fuente está en el directorio [web](./web).
 
 ## API
 
-La API https://api.httpsms.com está construida utilizando [Fiber](https://gofiber.io/), Go y [CockroachDB](https://www.cockroachlabs.com/) para la base de datos.
-Se ejecuta como una aplicación serverless en Google Cloud Run. La documentación de la API se puede encontrar aquí https://api.httpsms.com/index.html
+La API (servida en tu `API_BASE_URL`) está construida utilizando [Fiber](https://gofiber.io/), Go y [CockroachDB](https://www.cockroachlabs.com/) para la base de datos.
+Se ejecuta en Docker junto a la interfaz web. La referencia interactiva de la API (Swagger) la sirve la propia API en `/index.html` (en español: `/es/index.html`).
 
 ```go
 // Enviando un Mensaje SMS usando Go
-client := htpsms.New(htpsms.WithAPIKey(/* Clave API de https://httpsms.com/settings */))
+client := httpsms.New(
+    httpsms.WithAPIKey(/* Clave API de la página de Configuración de tu panel */),
+    httpsms.WithBaseURL("https://api.tu-dominio.com"),
+)
 
 client.Messages.Send(context.Background(), &httpsms.MessageSendParams{
     Content: "Este es un mensaje de texto de prueba",
@@ -58,17 +59,17 @@ client.Messages.Send(context.Background(), &httpsms.MessageSendParams{
 
 ## Aplicación Android
 
-[La Aplicación Android](https://apk.httpsms.com/HttpSms.apk) es una aplicación nativa construida utilizando Kotlin con principios de material design.
+[La Aplicación Android](https://github.com/Ciudad-Valles-Open-Source/httpsms/releases/latest/download/HttpSms.apk) es una aplicación nativa construida utilizando Kotlin con principios de material design.
 Esta aplicación debe estar instalada en un teléfono Android antes de que puedas comenzar a enviar y recibir mensajes SMS.
 
-[<img src=".github/ghbadge.png" alt="Consíguelo en GitHub" height="80">](https://github.com/NdoleStudio/httpsms/releases/)
+[<img src=".github/ghbadge.png" alt="Consíguelo en GitHub" height="80">](https://github.com/Ciudad-Valles-Open-Source/httpsms/releases/)
 
 ## Chat/foro
 
 Hay varias formas de ponerte en contacto conmigo y/o con el resto de la comunidad. Siéntete libre de usar cualquiera de estos métodos. El que mejor funcione para ti:
 
 - [Servidor de Discord](https://discord.gg/kGk8HVqeEZ) - chat directo con la comunidad
-- [Problemas en GitHub (Issues)](https://github.com/NdoleStudio/httpsms/issues) - preguntas, características, errores
+- [Problemas en GitHub (Issues)](https://github.com/Ciudad-Valles-Open-Source/httpsms/issues) - preguntas, características, errores
 
 ## Características
 
@@ -122,12 +123,13 @@ La documentación completa de auto-alojamiento está organizada en el directorio
 | [docs/environment-variables_ES.md](./docs/environment-variables_ES.md) | Referencia para todas las variables de entorno |
 | [docs/deployment-platforms_ES.md](./docs/deployment-platforms_ES.md) | Instrucciones específicas de plataforma (Coolify, Portainer, CapRover, Swarm) |
 | [docs/docker-configuration_ES.md](./docs/docker-configuration_ES.md) | Referencia técnica de Dockerfile y docker-compose.yml |
+| [docs/secrets_ES.md](./docs/secrets_ES.md) | Manejo de secretos: qué nunca subir, Coolify, GitHub Secrets y el escáner de pre-commit |
 | [docs/realtime_ES.md](./docs/realtime_ES.md) | Tiempo real con Soketi: configuración, `SOKETI_KEY` alfanumérica y diagnóstico |
 
 ### Inicio Rápido (desarrollo local)
 
 ```bash
-git clone https://github.com/NdoleStudio/httpsms.git
+git clone https://github.com/Ciudad-Valles-Open-Source/httpsms.git
 cd httpsms
 cp .env.example .env
 # Edita .env con tus credenciales de Firebase, SMTP y Cloudflare Turnstile

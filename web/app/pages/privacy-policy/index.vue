@@ -3,123 +3,192 @@ definePageMeta({
   layout: 'website',
 })
 
+const { t } = useI18n()
+
 useSeoMeta({
-  title: computed(() => $t('pages.privacy.title')),
-  description: computed(() => $t('pages.privacy.descriptionMeta')),
+  title: computed(() => t('legal.privacy.metaTitle')),
+  description: computed(() => t('legal.privacy.metaDescription')),
+  ogTitle: computed(() => t('legal.privacy.metaTitle')),
+  ogDescription: computed(() => t('legal.privacy.metaDescription')),
 })
+
+const ISSUES_URL = 'https://github.com/Ciudad-Valles-Open-Source/httpsms/issues'
+
+interface LegalSection {
+  id: string
+  /** Number of paragraphs (p1..pN) shown before the list. */
+  paragraphs: number
+  /** Keys of a list rendered as "label: text" (items.<key>.label/text). */
+  labeledItems?: string[]
+  /** Number of plain list items (items.i1..iN). */
+  items?: number
+  /** Third-party providers rendered as links (items.<key>). */
+  providers?: { key: string; name?: string; nameKey?: string; url?: string }[]
+  /** Whether a "closing" paragraph follows the list. */
+  closing?: boolean
+}
+
+const sections: LegalSection[] = [
+  { id: 'controller', paragraphs: 2 },
+  {
+    id: 'data',
+    paragraphs: 1,
+    labeledItems: [
+      'account',
+      'phones',
+      'messages',
+      'contacts',
+      'heartbeats',
+      'apiKeys',
+      'integrations',
+      'logs',
+    ],
+  },
+  { id: 'encryption', paragraphs: 2 },
+  { id: 'uses', paragraphs: 1, items: 5, closing: true },
+  {
+    id: 'providers',
+    paragraphs: 1,
+    closing: true,
+    providers: [
+      {
+        key: 'firebaseAuth',
+        name: 'Google Firebase Authentication',
+        url: 'https://firebase.google.com/support/privacy',
+      },
+      {
+        key: 'fcm',
+        name: 'Firebase Cloud Messaging (FCM)',
+        url: 'https://firebase.google.com/support/privacy',
+      },
+      {
+        key: 'googleCloud',
+        name: 'Google Cloud',
+        url: 'https://cloud.google.com/terms/cloud-privacy-notice',
+      },
+      { key: 'smtp', nameKey: 'smtpName' },
+      {
+        key: 'turnstile',
+        name: 'Cloudflare Turnstile',
+        url: 'https://www.cloudflare.com/privacypolicy/',
+      },
+      { key: 'axiom', name: 'Axiom', url: 'https://axiom.co/privacy' },
+      { key: 'soketi', name: 'Soketi / WebSockets' },
+      { key: 'discord', name: 'Discord', url: 'https://discord.com/privacy' },
+      { key: 'androidApp', nameKey: 'androidAppName' },
+    ],
+  },
+  {
+    id: 'cookies',
+    paragraphs: 1,
+    labeledItems: ['language', 'session', 'preferences', 'turnstile'],
+    closing: true,
+  },
+  { id: 'retention', paragraphs: 3 },
+  { id: 'security', paragraphs: 2 },
+  { id: 'rights', paragraphs: 2 },
+  { id: 'children', paragraphs: 1 },
+  { id: 'changes', paragraphs: 1 },
+  { id: 'contact', paragraphs: 2 },
+]
+
+const sectionKey = (id: string) => `legal.privacy.sections.${id}`
 </script>
 
 <template>
   <VContainer>
     <VRow>
       <VCol cols="12" md="8" offset-md="2">
-        <h1 class="text-display-medium mb-2">{{ $t('pages.privacy.titlePrivacy') }}</h1>
-        <p class="text-body-large mb-4">
-          {{ $t('pages.privacy.p1') }}
+        <h1 class="text-display-medium mb-2">
+          {{ $t('legal.privacy.title') }}
+        </h1>
+        <p class="text-body-medium text-medium-emphasis mb-6">
+          {{ $t('legal.lastUpdated') }}
         </p>
+        <VAlert
+          type="info"
+          variant="tonal"
+          class="mb-6"
+          :title="$t('legal.noticeTitle')"
+          :text="$t('legal.notice')"
+        />
+        <p class="text-body-large mb-4">{{ $t('legal.privacy.intro.p1') }}</p>
+        <p class="text-body-large mb-4">{{ $t('legal.privacy.intro.p2') }}</p>
 
-        <h2 class="text-headline-medium mt-8 mb-4">
-          {{ $t('pages.privacy.titleInfo') }}
-        </h2>
-        <p class="text-body-large mb-4">
-          {{ $t('pages.privacy.p2') }}
-        </p>
-        <p class="text-body-large mb-4">
-          {{ $t('pages.privacy.p3') }}
-        </p>
-        <ul class="text-body-large pl-6 mb-6">
-          <li>
-            <a
-              href="https://www.google.com/policies/privacy/"
-              target="_blank"
-              rel="noopener"
-              >Google Play Services</a
+        <section
+          v-for="(section, index) in sections"
+          :id="section.id"
+          :key="section.id"
+        >
+          <h2 class="text-headline-medium mt-8 mb-4">
+            {{ index + 1 }}. {{ $t(`${sectionKey(section.id)}.title`) }}
+          </h2>
+          <i18n-t
+            v-for="n in section.paragraphs"
+            :key="`p${n}`"
+            :keypath="`${sectionKey(section.id)}.p${n}`"
+            tag="p"
+            scope="global"
+            class="text-body-large mb-4"
+          >
+            <template #settings>
+              <NuxtLink to="/settings">{{
+                $t('legal.links.settings')
+              }}</NuxtLink>
+            </template>
+            <template #issues>
+              <a :href="ISSUES_URL" target="_blank" rel="noopener">{{
+                $t('legal.links.issues')
+              }}</a>
+            </template>
+          </i18n-t>
+
+          <ul v-if="section.labeledItems" class="text-body-large pl-6 mb-6">
+            <li v-for="item in section.labeledItems" :key="item" class="mb-2">
+              <strong>{{
+                $t(`${sectionKey(section.id)}.items.${item}.label`)
+              }}</strong>
+              {{ $t(`${sectionKey(section.id)}.items.${item}.text`) }}
+            </li>
+          </ul>
+
+          <ul v-if="section.items" class="text-body-large pl-6 mb-6">
+            <li v-for="n in section.items" :key="n" class="mb-2">
+              {{ $t(`${sectionKey(section.id)}.items.i${n}`) }}
+            </li>
+          </ul>
+
+          <ul v-if="section.providers" class="text-body-large pl-6 mb-6">
+            <li
+              v-for="provider in section.providers"
+              :key="provider.key"
+              class="mb-2"
             >
-          </li>
-          <li>
-            <a
-              href="https://firebase.google.com/policies/analytics"
-              target="_blank"
-              rel="noopener"
-              >Google Analytics for Firebase</a
-            >
-          </li>
-          <li>
-            <a href="https://sentry.io/privacy/" target="_blank" rel="noopener"
-              >Sentry</a
-            >
-          </li>
-          <li>
-            <a
-              href="https://segment.com/legal/privacy/"
-              target="_blank"
-              rel="noopener"
-              >Segment</a
-            >
-          </li>
-          <li>
-            <a
-              href="https://privacy.microsoft.com/en-GB/privacystatement"
-              target="_blank"
-              rel="noopener"
-              >Microsoft Clarity</a
-            >
-          </li>
-        </ul>
+              <strong>
+                <a
+                  v-if="provider.url"
+                  :href="provider.url"
+                  target="_blank"
+                  rel="noopener"
+                  >{{ provider.name }}</a
+                >
+                <template v-else>{{
+                  provider.nameKey
+                    ? $t(`${sectionKey(section.id)}.${provider.nameKey}`)
+                    : provider.name
+                }}</template
+                >:
+              </strong>
+              {{ $t(`${sectionKey(section.id)}.items.${provider.key}`) }}
+            </li>
+          </ul>
 
-        <h2 class="text-headline-medium mt-8 mb-4">{{ $t('pages.privacy.titleLogData') }}</h2>
-        <p class="text-body-large mb-4">
-          {{ $t('pages.privacy.pLogData') }}
-        </p>
+          <p v-if="section.closing" class="text-body-large mb-4">
+            {{ $t(`${sectionKey(section.id)}.closing`) }}
+          </p>
+        </section>
 
-        <h2 class="text-headline-medium mt-8 mb-4">{{ $t('pages.privacy.titleCookies') }}</h2>
-        <p class="text-body-large mb-4">
-          {{ $t('pages.privacy.pCookies') }}
-        </p>
-
-        <h2 class="text-headline-medium mt-8 mb-4">{{ $t('pages.privacy.titleProviders') }}</h2>
-        <p class="text-body-large mb-4">
-          {{ $t('pages.privacy.pProviders1') }}
-        </p>
-        <ul class="text-body-large pl-6 mb-6">
-          <li>{{ $t('pages.privacy.liProv1') }}</li>
-          <li>{{ $t('pages.privacy.liProv2') }}</li>
-          <li>{{ $t('pages.privacy.liProv3') }}</li>
-          <li>{{ $t('pages.privacy.liProv4') }}</li>
-        </ul>
-        <p class="text-body-large mb-4">
-          {{ $t('pages.privacy.pProviders2') }}
-        </p>
-
-        <h2 class="text-headline-medium mt-8 mb-4">{{ $t('pages.privacy.titleSecurity') }}</h2>
-        <p class="text-body-large mb-4">
-          {{ $t('pages.privacy.pSecurity') }}
-        </p>
-
-        <h2 class="text-headline-medium mt-8 mb-4">{{ $t('pages.privacy.titleLinks') }}</h2>
-        <p class="text-body-large mb-4">
-          {{ $t('pages.privacy.pLinks') }}
-        </p>
-
-        <h2 class="text-headline-medium mt-8 mb-4">{{ $t('pages.privacy.titleChildren') }}</h2>
-        <p class="text-body-large mb-4">
-          {{ $t('pages.privacy.pChildren') }}
-        </p>
-
-        <h2 class="text-headline-medium mt-8 mb-4">
-          {{ $t('pages.privacy.titleChanges') }}
-        </h2>
-        <p class="text-body-large mb-4">
-          {{ $t('pages.privacy.pChanges1') }}
-        </p>
-        <p class="text-body-large mb-4">
-          {{ $t('pages.privacy.pChanges2') }}
-        </p>
-
-        <h2 class="text-headline-medium mt-8 mb-4">{{ $t('pages.privacy.titleContact') }}</h2>
-        <p class="text-body-large mb-10" v-html="$t('pages.privacy.pContact')">
-        </p>
-        <VDivider class="mx-16" />
+        <VDivider class="mx-16 mt-10" />
         <div class="text-center mt-8 mb-4">
           <BackButton />
         </div>

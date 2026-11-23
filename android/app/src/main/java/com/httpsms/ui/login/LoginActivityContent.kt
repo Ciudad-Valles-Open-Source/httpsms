@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -29,19 +28,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nerus.httpsms.R
+import com.nerus.httpsms.ui.ServerUrlField
 import com.nerus.httpsms.ui.theme.Blue500
 import com.nerus.httpsms.ui.theme.Pink500
 
@@ -52,7 +47,6 @@ fun LoginScreen(
     onLoginClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val uriHandler = LocalUriHandler.current
 
     Column(
         modifier = Modifier
@@ -71,34 +65,8 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        val annotatedString = buildAnnotatedString {
-            val text = stringResource(id = R.string.get_your_api_key)
-            val linkText = "httpsms.com/settings"
-            val startIndex = text.indexOf(linkText)
-
-            if (startIndex >= 0) {
-                append(text.substring(0, startIndex))
-
-                pushStringAnnotation(tag = "URL", annotation = "https://httpsms.com/settings")
-                withStyle(style = SpanStyle(color = Blue500, fontWeight = FontWeight.Bold)) {
-                    append(linkText)
-                }
-                pop()
-
-                append(text.substring(startIndex + linkText.length))
-            } else {
-                append(text)
-            }
-        }
-
-        ClickableText(
-            text = annotatedString,
-            onClick = { offset ->
-                annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
-                    .firstOrNull()?.let { annotation ->
-                        uriHandler.openUri(annotation.item)
-                    }
-            },
+        Text(
+            text = stringResource(id = R.string.get_your_api_key),
             style = MaterialTheme.typography.bodyLarge.copy(
                 textAlign = TextAlign.Center,
                 fontSize = 20.sp,
@@ -169,18 +137,11 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
+        ServerUrlField(
             value = uiState.serverUrl,
             onValueChange = { viewModel.onServerUrlChange(it) },
-            label = { Text(stringResource(id = R.string.server_url)) },
-            placeholder = { Text(stringResource(id = R.string.login_server_url_hint)) },
+            error = uiState.serverUrlError,
             modifier = Modifier.fillMaxWidth(),
-            isError = uiState.serverUrlError != null,
-            supportingText = uiState.serverUrlError?.let { { Text(it) } },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Uri,
-                imeAction = ImeAction.Done
-            ),
             enabled = !uiState.isLoading
         )
 

@@ -1,6 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { docRoutes } from './app/utils/docs-manifest'
 
+// Public URL of this self-hosted dashboard (used for SEO / og:image).
+const appUrl = (process.env.APP_URL || 'http://localhost:3000').replace(
+  /\/+$/,
+  '',
+)
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
 
@@ -45,7 +51,7 @@ export default defineNuxtConfig({
   },
 
   site: {
-    url: process.env.APP_URL || 'https://httpsms.com',
+    url: appUrl,
     name: process.env.APP_NAME || 'httpSMS',
     description:
       'Turn your Android phone into an SMS gateway. Send and receive text messages worldwide with a simple HTTP API — no SMS provider or short code required.',
@@ -137,12 +143,14 @@ export default defineNuxtConfig({
     public: {
       apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8000',
       clientVersion: process.env.GITHUB_RUN_ID || 'dev',
-      appUrl: process.env.APP_URL || 'https://httpsms.com',
+      appUrl,
       appName: process.env.APP_NAME || 'HTTP SMS',
       appGithubUrl:
-        process.env.APP_GITHUB_URL || 'https://github.com/NdoleStudio/httpsms',
+        process.env.APP_GITHUB_URL ||
+        'https://github.com/Ciudad-Valles-Open-Source/httpsms',
       appDownloadUrl:
-        process.env.APP_DOWNLOAD_URL || 'https://apk.httpsms.com/HttpSms.apk',
+        process.env.APP_DOWNLOAD_URL ||
+        'https://github.com/Ciudad-Valles-Open-Source/httpsms/releases/latest/download/HttpSms.apk',
       appEnv: process.env.APP_ENV || 'production',
       checkoutUrl: process.env.CHECKOUT_URL || '',
       enterpriseCheckoutUrl: process.env.ENTERPRISE_CHECKOUT_URL || '',
@@ -187,12 +195,6 @@ export default defineNuxtConfig({
       title: 'Convert your android phone into an SMS gateway - httpSMS',
       htmlAttrs: { lang: 'en' },
       script: [
-        { src: '/integrations.js', async: true, defer: true },
-        {
-          src: 'https://lmsqueezy.com/affiliate.js',
-          async: true,
-          defer: true,
-        },
         {
           src: 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit',
         },
@@ -206,7 +208,6 @@ export default defineNuxtConfig({
             'Use your android phone to send and receive SMS messages using a simple HTTP API.',
         },
         { name: 'format-detection', content: 'telephone=no' },
-        { name: 'twitter:site', content: '@NdoleStudio' },
         { name: 'twitter:card', content: 'summary_large_image' },
         {
           property: 'og:title',
@@ -219,7 +220,7 @@ export default defineNuxtConfig({
         },
         {
           property: 'og:image',
-          content: 'https://httpsms.com/header.png',
+          content: `${appUrl}/header.png`,
         },
       ],
       link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],

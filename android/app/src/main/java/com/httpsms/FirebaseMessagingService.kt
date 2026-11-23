@@ -123,14 +123,17 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun initTimber() {
-        if (Timber.treeCount > 1) {
+        if (Timber.treeCount > 0) {
             Timber.d("timber is already initialized with count [${Timber.treeCount}]")
             return
         }
 
         if (Settings.isDebugLogEnabled(this)) {
             Timber.plant(Timber.DebugTree())
-            Timber.plant(LogzTree(this.applicationContext))
+            // Remote log shipping only when HTTPSMS_LOGS_URL and HTTPSMS_LOGS_TOKEN were set at build time.
+            if (LogzTree.isConfigured()) {
+                Timber.plant(LogzTree(this.applicationContext))
+            }
         }
     }
 

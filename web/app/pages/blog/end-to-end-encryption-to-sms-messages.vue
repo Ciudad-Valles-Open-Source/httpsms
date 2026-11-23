@@ -3,6 +3,7 @@ import { mdiLanguageGo, mdiLanguageJavascript } from '@mdi/js'
 import { ref } from 'vue'
 
 const { mdAndUp } = useVDisplay()
+const { assetUrl, settingsUrl, apiBaseUrl, downloadUrl } = usePublicUrls()
 
 const encryptTab = ref('javascript')
 const sendTab = ref('javascript')
@@ -19,7 +20,7 @@ useSeoMeta({
     'Secure your conversations with end-to-end encryption for SMS messages',
   ogDescription:
     'We have added support for end-to-end encryption for SMS messages so that no one can see the content of the messages you send using httpSMS except you.',
-  ogImage: 'https://httpsms.com/header.png',
+  ogImage: assetUrl('/header.png'),
   twitterCard: 'summary_large_image',
 })
 </script>
@@ -61,9 +62,7 @@ useSeoMeta({
 
         <h3 class="text-headline-large mt-8 mb-2">Setup your encryption key</h3>
         <p>
-          <a
-            class="text-decoration-none"
-            href="https://github.com/NdoleStudio/httpsms/releases/latest/download/HttpSms.apk"
+          <a class="text-decoration-none" :href="downloadUrl"
             >⬇️ Download and install</a
           >
           the httpSMS Android app on your phone and set you encryption key under
@@ -112,7 +111,7 @@ useSeoMeta({
               class="pa-4 mb-6 rounded bg-surface overflow-x-auto"
             ><code class="language-javascript text-body-medium">import HttpSms from "httpsms"
 
-const client = new HttpSms("" /* API Key from https://httpsms.com/settings */);
+const client = new HttpSms("" /* API Key from {{ settingsUrl }} */, "{{ apiBaseUrl }}");
 
 const key = "Password123";
 
@@ -126,7 +125,10 @@ const encryptedMessage = client.cipher.encrypt(key, "This is a sample text messa
               class="pa-4 mb-6 rounded bg-surface overflow-x-auto"
             ><code class="language-go text-body-medium">import "github.com/NdoleStudio/httpsms-go"
 
-client := htpsms.New(htpsms.WithAPIKey(""/* API Key from https://httpsms.com/settings */))
+client := httpsms.New(
+    httpsms.WithAPIKey(""/* API Key from {{ settingsUrl }} */),
+    httpsms.WithBaseURL("{{ apiBaseUrl }}"),
+)
 
 key := "Password123" // use the same key on the Android app
 encryptedMessage := client.Cipher.Encrypt(key, "This is a test text message")
@@ -228,7 +230,7 @@ client.Messages.Send(context.Background(), &amp;httpsms.MessageSendParams{
               class="pa-4 mb-6 rounded bg-surface overflow-x-auto"
             ><code class="language-javascript text-body-medium">import HttpSms from "httpsms"
 
-const client = new HttpSms("" /* API Key from https://httpsms.com/settings */);
+const client = new HttpSms("" /* API Key from {{ settingsUrl }} */, "{{ apiBaseUrl }}");
 
 // The payload in the webhook HTTP request looks like this
 /*
@@ -263,7 +265,10 @@ const decryptedMessage = client.cipher.decrypt(encryptionkey, encryptedMessage)
               class="pa-4 mb-6 rounded bg-surface overflow-x-auto"
             ><code class="language-go text-body-medium">import "github.com/NdoleStudio/httpsms-go"
 
-client := htpsms.New(htpsms.WithAPIKey(/* API Key from https://httpsms.com/settings */))
+client := httpsms.New(
+    httpsms.WithAPIKey(""/* API Key from {{ settingsUrl }} */),
+    httpsms.WithBaseURL("{{ apiBaseUrl }}"),
+)
 
 // The payload in the webhook HTTP request looks like this
 /*

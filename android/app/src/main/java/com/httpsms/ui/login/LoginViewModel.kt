@@ -6,12 +6,13 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
-import android.webkit.URLUtil
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nerus.httpsms.Constants
 import com.nerus.httpsms.HttpSmsApiService
+import com.nerus.httpsms.R
+import com.nerus.httpsms.ServerUrl
 import com.nerus.httpsms.Settings
 import com.nerus.httpsms.SmsManagerService
 import com.nerus.httpsms.validators.PhoneNumberValidator
@@ -51,7 +52,7 @@ class LoginViewModel : ViewModel() {
             isDualSim = isDualSim,
             phoneNumberSIM1 = phoneNumberSIM1,
             phoneNumberSIM2 = phoneNumberSIM2,
-            serverUrl = defaultServerUrl
+            serverUrl = ServerUrl.normalize(defaultServerUrl)
         )
 
         // Try to auto-detect if fields are empty
@@ -134,6 +135,31 @@ class LoginViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(serverUrl = value, serverUrlError = null)
     }
 
+    /**
+     * Applies the contents of a scanned login QR code. The new format
+     * (`httpsms://login?server=...&key=...`) fills both the server URL and the API key,
+     * the old format (a bare API key) only fills the API key.
+     */
+    fun onQrCodeScanned(context: Context, contents: String?): ServerUrl.QrLogin? {
+        val qrLogin = ServerUrl.parseLoginQr(contents) ?: return null
+        _uiState.value = _uiState.value.copy(apiKey = qrLogin.apiKey, apiKeyError = null)
+        if (qrLogin.serverUrl != null) {
+            _uiState.value = _uiState.value.copy(
+                serverUrl = qrLogin.serverUrl,
+                serverUrlError = serverUrlError(context, qrLogin.serverUrl)
+            )
+        }
+        return qrLogin
+    }
+
+    private fun serverUrlError(context: Context, serverUrl: String): String? {
+        return when (ServerUrl.validate(serverUrl)) {
+            ServerUrl.Validation.VALID -> null
+            ServerUrl.Validation.EMPTY -> context.getString(R.string.server_url_error_empty)
+            ServerUrl.Validation.INVALID -> context.getString(R.string.server_url_error_invalid, serverUrl)
+        }
+    }
+
     fun login(
         context: Context,
         countryCode: String,
@@ -152,7 +178,7 @@ class LoginViewModel : ViewModel() {
 
         viewModelScope.launch {
             val apiKey = currentState.apiKey.trim()
-            val serverUrl = currentState.serverUrl.trim()
+            val serverUrl = ServerUrl.normalize(currentState.serverUrl)
             val phone1 = currentState.phoneNumberSIM1.trim()
             val phone2 = currentState.phoneNumberSIM2.trim()
 
@@ -172,18 +198,12 @@ class LoginViewModel : ViewModel() {
                 return@launch
             }
 
-            if (!URLUtil.isValidUrl(serverUrl)) {
+            val serverUrlError = serverUrlError(context, serverUrl)
+            if (serverUrlError != null) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    serverUrlError = "Server URL [$serverUrl] is invalid"
-                )
-                return@launch
-            }
-
-            if (!URLUtil.isHttpsUrl(serverUrl)) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    serverUrlError = "Server URL [$serverUrl] must be HTTPS"
+                    serverUrl = serverUrl,
+                    serverUrlError = serverUrlError
                 )
                 return@launch
             }
@@ -210,7 +230,7 @@ class LoginViewModel : ViewModel() {
                 }
             } catch (e: URISyntaxException) {
                 Timber.e(e, "Invalid URI: $serverUrl")
-                Pair(null, "Server URL [$serverUrl] is invalid")
+                Pair(null, context.getString(R.string.server_url_error_invalid, serverUrl))
             } catch (e: Exception) {
                 Timber.e(e, "Login error")
                 Pair(null, "An unexpected error occurred: ${e.message}")
@@ -234,7 +254,7 @@ class LoginViewModel : ViewModel() {
                 Settings.setSIM2PhoneNumber(context, PhoneNumberValidator.formatE164(phone2, countryCode))
             }
 
-            _uiState.value = _uiState.value.copy(isLoading = false, loginSuccess = true)
+            _uiState.value = _uiState.value.copy(isLoading = false, serverUrl = serverUrl, loginSuccess = true)
         }
     }
 }

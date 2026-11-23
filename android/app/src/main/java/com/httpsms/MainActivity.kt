@@ -48,10 +48,9 @@ class MainActivity : AppCompatActivity() {
                     viewModel = viewModel,
                     onSettingsClick = { onSettingsClick() },
                     onSmsPermissionClick = {
-                        val intent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("https://httpsms.com/blog/grant-send-and-read-sms-permissions-on-android")
-                        )
+                        // Open this app's system settings page so the user can grant the SMS permission.
+                        val intent = Intent(ProviderSettings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        intent.data = Uri.parse("package:$packageName")
                         startActivity(intent)
                     },
                     onBatteryOptimizationClick = {
@@ -214,14 +213,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initTimber() {
-        if (Timber.treeCount > 1) {
+        if (Timber.treeCount > 0) {
             Timber.d("timber is already initialized with count [${Timber.treeCount}]")
             return
         }
 
         if (Settings.isDebugLogEnabled(this)) {
             Timber.plant(Timber.DebugTree())
-            Timber.plant(LogzTree(this.applicationContext))
+            // Remote log shipping only when HTTPSMS_LOGS_URL and HTTPSMS_LOGS_TOKEN were set at build time.
+            if (LogzTree.isConfigured()) {
+                Timber.plant(LogzTree(this.applicationContext))
+            }
         }
     }
 

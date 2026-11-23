@@ -20,3 +20,21 @@ SECURITY_AUDIT_REPORT.md
 skills-lock.json
 .worktrees/
 docs/superpowers
+
+# ── Secrets: never commit these ────────────────────────────────────────────
+# Real values live in .env (ignored), in Coolify's environment variables or
+# in GitHub Actions secrets. See docs/secrets.md / docs/secrets_ES.md.
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+key.properties
+google-services.json
+GoogleService-Info.plist
+*firebase-adminsdk*.json
+*service-account*.json
+*credentials*.json
+.env.local
+.env.*.local

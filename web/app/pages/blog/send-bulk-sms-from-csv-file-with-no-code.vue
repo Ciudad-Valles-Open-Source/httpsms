@@ -2,6 +2,7 @@
 import { mdiCommentTextMultipleOutline } from '@mdi/js'
 
 const { mdAndUp } = useVDisplay()
+const { assetUrl, settingsUrl, downloadUrl, githubIssuesUrl } = usePublicUrls()
 
 definePageMeta({ layout: 'website' })
 
@@ -12,7 +13,7 @@ useSeoMeta({
   ogTitle: 'Send bulk SMS messages from a CSV file with no code',
   ogDescription:
     'Send personalized SMS messages from your CSV file instantly using your Android phone as the SMS gateway.',
-  ogImage: 'https://httpsms.com/header.png',
+  ogImage: assetUrl('/header.png'),
   twitterCard: 'summary_large_image',
 })
 </script>
@@ -55,16 +56,15 @@ useSeoMeta({
 
         <h3 class="text-headline-large mt-8 mb-2">Step 1: Get your API Key</h3>
         <p>
-          Create an account on
-          <NuxtLink class="text-decoration-none" to="/">httpsms.com</NuxtLink>
-          and copy your API key from the settings page
-          <NuxtLink class="text-decoration-none" to="/settings"
-            >https://httpsms.com/settings</NuxtLink
-          >
+          Sign in to your httpSMS dashboard and copy your API key from the
+          settings page
+          <NuxtLink class="text-decoration-none" to="/settings">{{
+            settingsUrl
+          }}</NuxtLink>
         </p>
         <VImg
           style="border-radius: 4px"
-          alt="httpsms.com settings page"
+          alt="httpSMS settings page"
           src="/img/blog/forward-incoming-sms-from-phone-to-webhook/settings.png"
         />
 
@@ -72,9 +72,7 @@ useSeoMeta({
           Step 2: Install the httpSMS android app
         </h3>
         <p>
-          <a
-            class="text-decoration-none"
-            href="https://github.com/NdoleStudio/httpsms/releases/latest/download/HttpSms.apk"
+          <a class="text-decoration-none" :href="downloadUrl"
             >⬇️ Download and install</a
           >
           the httpSMS android app on your phone and sign in using your API KEY
@@ -144,8 +142,8 @@ useSeoMeta({
 
         <p class="mt-12">
           Don't hesitate to
-          <a class="text-decoration-none" href="mailto:arnold@httpsms.com"
-            >contact us</a
+          <a class="text-decoration-none" :href="githubIssuesUrl"
+            >open an issue on GitHub</a
           >
           if you face any issues sending bulk SMS messages from your CSV files
           by following this tutorial.
