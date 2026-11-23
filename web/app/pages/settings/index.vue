@@ -949,12 +949,9 @@ onMounted(async () => {
                   </VCardActions>
                 </VCard>
               </VDialog>
-              <VBtn
-                v-if="lgAndUp"
-                class="ml-4"
-                :href="config.public.appDocumentationUrl"
-                >{{ $t('settings.documentation') }}</VBtn
-              >
+              <VBtn v-if="lgAndUp" class="ml-4" to="/docs">{{
+                $t('settings.documentation')
+              }}</VBtn>
               <VSpacer />
               <VDialog v-model="showRotateApiKey" max-width="550">
                 <template #activator="{ props }">
@@ -1067,7 +1064,7 @@ onMounted(async () => {
               <VBtn
                 v-if="lgAndUp"
                 class="ml-4"
-                href="https://docs.httpsms.com/webhooks/introduction"
+                to="/docs/webhooks-introduction"
                 >{{ $t('settings.documentation') }}</VBtn
               >
             </div>
@@ -1186,7 +1183,7 @@ onMounted(async () => {
 
             <!-- Send Schedules -->
             <h5 id="send-schedules" class="text-headline-large mb-3 mt-12">
-              Send Schedules
+              {{ $t('settings.send_schedules') }}
             </h5>
             <p
               class="text-medium-emphasis"
@@ -1253,7 +1250,7 @@ onMounted(async () => {
               <VBtn
                 v-if="lgAndUp"
                 class="ml-4"
-                href="https://docs.httpsms.com/features/outgoing-message-queue"
+                to="/docs/outgoing-message-queue"
                 >{{ $t('settings.documentation') }}</VBtn
               >
             </div>

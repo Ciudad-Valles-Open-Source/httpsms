@@ -44,7 +44,7 @@ func (h *Integration3CXHandler) RegisterRoutes(app *fiber.App, middlewares ...fi
 
 // Messages consumes a 3cx event
 // @Summary      Sends a 3CX SMS message
-// @Description  Sends an SMS message from the 3CX platform
+// @Description  Sends an SMS message from the 3CX platform. This endpoint is served at `/integration/3cx/messages` on the API host, outside the `/v1` base path, and is authenticated with your API key as a bearer token.
 // @Tags         3CXIntegration
 // @Accept       json
 // @Produce      json

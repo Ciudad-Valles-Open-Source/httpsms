@@ -1832,12 +1832,23 @@ func (container *Container) RegisterSwaggerRoutes() {
 			document.body.appendChild(box);
 		});`
 
+	// Usa el favicon del panel web propio (APP_URL); si no está definido se
+	// conserva el favicon por defecto de Swagger UI.
+	faviconURL := ""
+	if appURL := strings.TrimSuffix(strings.TrimSpace(os.Getenv("APP_URL")), "/"); appURL != "" {
+		faviconURL = appURL + "/favicon.ico"
+	}
+
 	baseScript := `
 		document.addEventListener("DOMContentLoaded", function(event) {
 			document.body.style.margin = '0';
+			var favicon = "` + template.JSEscapeString(faviconURL) + `";
+			if (!favicon) {
+				return;
+			}
 			var links = document.querySelectorAll("link[rel~='icon']");
 			links.forEach(function (link) {
-				link.href = 'https://httpsms.com/favicon.ico';
+				link.href = favicon;
 			});
 		});` + languageSwitcher
 

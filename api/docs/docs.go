@@ -10,18 +10,80 @@ const docTemplate = `{
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
         "contact": {
-            "name": "support@httpsms.com",
-            "email": "support@httpsms.com"
+            "name": "httpSMS self-hosted (GitHub)",
+            "url": "https://github.com/Ciudad-Valles-Open-Source/httpsms"
         },
         "license": {
             "name": "AGPL-3.0",
-            "url": "https://raw.githubusercontent.com/NdoleStudio/http-sms-manager/main/LICENSE"
+            "url": "https://github.com/Ciudad-Valles-Open-Source/httpsms/blob/main/LICENSE"
         },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/attachments/{userID}/{messageID}/{attachmentIndex}/{filename}": {
+            "get": {
+                "description": "Download an MMS attachment by its path components",
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "Attachments"
+                ],
+                "summary": "Download a message attachment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Message ID",
+                        "name": "messageID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Attachment index",
+                        "name": "attachmentIndex",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filename with extension",
+                        "name": "filename",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.NotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.InternalServerError"
+                        }
+                    }
+                }
+            }
+        },
         "/billing/usage": {
             "get": {
                 "security": [
@@ -29,7 +91,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get the summary of sent and received messages for a user in the current month",
+                "description": "Get the summary of sent and received messages for a user in the current month. Usage is tracked for statistics only; there are no limits.",
                 "consumes": [
                     "application/json"
                 ],
@@ -39,7 +101,7 @@ const docTemplate = `{
                 "tags": [
                     "Billing"
                 ],
-                "summary": "Get Billing Usage.",
+                "summary": "Get current message usage.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -81,7 +143,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get billing usage records of sent and received messages for a user in the past. It will be sorted by timestamp in descending order.",
+                "description": "Get the monthly usage records of sent and received messages for a user in the past. It will be sorted by timestamp in descending order. Usage is tracked for statistics only; there are no limits.",
                 "consumes": [
                     "application/json"
                 ],
@@ -91,12 +153,12 @@ const docTemplate = `{
                 "tags": [
                     "Billing"
                 ],
-                "summary": "Get billing usage history.",
+                "summary": "Get message usage history.",
                 "parameters": [
                     {
                         "minimum": 0,
                         "type": "integer",
-                        "description": "number of heartbeats to skip",
+                        "description": "number of usage records to skip",
                         "name": "skip",
                         "in": "query"
                     },
@@ -104,7 +166,7 @@ const docTemplate = `{
                         "maximum": 100,
                         "minimum": 1,
                         "type": "integer",
-                        "description": "number of heartbeats to return",
+                        "description": "number of usage records to return",
                         "name": "limit",
                         "in": "query"
                     }
@@ -188,7 +250,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Sends bulk SMS messages to multiple users based on our [CSV template](https://httpsms.com/templates/httpsms-bulk.csv) or our [Excel template](https://httpsms.com/templates/httpsms-bulk.xlsx).",
+                "description": "Sends bulk SMS messages to multiple users based on the CSV template (` + "`" + `/templates/httpsms-bulk.csv` + "`" + `) or the Excel template (` + "`" + `/templates/httpsms-bulk.xlsx` + "`" + `) served by your web dashboard.",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -379,12 +441,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.Unauthorized"
                         }
                     },
-                    "402": {
-                        "description": "Payment Required",
-                        "schema": {
-                            "$ref": "#/definitions/responses.PaymentRequired"
-                        }
-                    },
                     "422": {
                         "description": "Unprocessable Entity",
                         "schema": {
@@ -444,12 +500,6 @@ const docTemplate = `{
                         "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/responses.Unauthorized"
-                        }
-                    },
-                    "402": {
-                        "description": "Payment Required",
-                        "schema": {
-                            "$ref": "#/definitions/responses.PaymentRequired"
                         }
                     },
                     "422": {
@@ -828,7 +878,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Webhooks"
+                    "DiscordIntegration"
                 ],
                 "summary": "Delete discord integration",
                 "parameters": [
@@ -877,7 +927,7 @@ const docTemplate = `{
         },
         "/discord/event": {
             "post": {
-                "description": "Publish a discord event to the registered listeners",
+                "description": "Publish a discord event to the registered listeners. This is the Discord interactions endpoint: it is served at ` + "`" + `/discord/event` + "`" + ` on the API host, outside the ` + "`" + `/v1` + "`" + ` base path.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1010,7 +1060,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Store the heartbeat to make notify that a phone number is still active",
+                "description": "Store the heartbeat to notify that a phone number is still active",
                 "consumes": [
                     "application/json"
                 ],
@@ -1068,7 +1118,7 @@ const docTemplate = `{
         },
         "/integration/3cx/messages": {
             "post": {
-                "description": "Sends an SMS message from the 3CX platform",
+                "description": "Sends an SMS message from the 3CX platform. This endpoint is served at ` + "`" + `/integration/3cx/messages` + "`" + ` on the API host, outside the ` + "`" + `/v1` + "`" + ` base path, and is authenticated with your API key as a bearer token.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2238,12 +2288,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.Unauthorized"
                         }
                     },
-                    "402": {
-                        "description": "Payment Required",
-                        "schema": {
-                            "$ref": "#/definitions/responses.PaymentRequired"
-                        }
-                    },
                     "422": {
                         "description": "Unprocessable Entity",
                         "schema": {
@@ -2410,7 +2454,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get list of phones which a user has registered on the http sms application",
+                "description": "Get list of phones which a user has registered on the httpSMS application",
                 "consumes": [
                     "application/json"
                 ],
@@ -2609,7 +2653,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Delete a phone that has been sored in the database",
+                "description": "Delete a phone that has been stored in the database",
                 "consumes": [
                     "application/json"
                 ],
@@ -2745,12 +2789,6 @@ const docTemplate = `{
                         "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/responses.Unauthorized"
-                        }
-                    },
-                    "402": {
-                        "description": "Payment Required",
-                        "schema": {
-                            "$ref": "#/definitions/responses.PaymentRequired"
                         }
                     },
                     "422": {
@@ -3048,226 +3086,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/subscription": {
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Cancel the subscription of the authenticated user.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Cancel the user's subscription",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/responses.NoContent"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/responses.BadRequest"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/responses.Unauthorized"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/responses.UnprocessableEntity"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/responses.InternalServerError"
-                        }
-                    }
-                }
-            }
-        },
-        "/users/subscription-update-url": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Fetches the subscription URL of the authenticated user.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Currently authenticated user subscription update URL",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/responses.OkString"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/responses.BadRequest"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/responses.Unauthorized"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/responses.UnprocessableEntity"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/responses.InternalServerError"
-                        }
-                    }
-                }
-            }
-        },
-        "/users/subscription/invoices/{subscriptionInvoiceID}": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Generates a new invoice PDF file for the given subscription payment with given parameters.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/pdf"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Generate a subscription payment invoice",
-                "parameters": [
-                    {
-                        "description": "Generate subscription payment invoice parameters",
-                        "name": "payload",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.UserPaymentInvoice"
-                        }
-                    },
-                    {
-                        "type": "string",
-                        "description": "ID of the subscription invoice to generate the PDF for",
-                        "name": "subscriptionInvoiceID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "file"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/responses.BadRequest"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/responses.Unauthorized"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/responses.UnprocessableEntity"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/responses.InternalServerError"
-                        }
-                    }
-                }
-            }
-        },
-        "/users/subscription/payments": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Subscription payments are generated throughout the lifecycle of a subscription, typically there is one at the time of purchase and then one for each renewal.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Get the last 10 subscription payments.",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/responses.UserSubscriptionPaymentsResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/responses.BadRequest"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/responses.Unauthorized"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/responses.UnprocessableEntity"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/responses.InternalServerError"
-                        }
-                    }
-                }
-            }
-        },
         "/users/{userID}/api-keys": {
             "delete": {
                 "security": [
@@ -3390,68 +3208,6 @@ const docTemplate = `{
                         "description": "Unprocessable Entity",
                         "schema": {
                             "$ref": "#/definitions/responses.UnprocessableEntity"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/responses.InternalServerError"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/attachments/{userID}/{messageID}/{attachmentIndex}/{filename}": {
-            "get": {
-                "description": "Download an MMS attachment by its path components",
-                "produces": [
-                    "application/octet-stream"
-                ],
-                "tags": [
-                    "Attachments"
-                ],
-                "summary": "Download a message attachment",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Message ID",
-                        "name": "messageID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Attachment index",
-                        "name": "attachmentIndex",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filename with extension",
-                        "name": "filename",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "file"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/responses.NotFound"
                         }
                     },
                     "500": {
@@ -5119,48 +4875,6 @@ const docTemplate = `{
                 }
             }
         },
-        "requests.UserPaymentInvoice": {
-            "type": "object",
-            "required": [
-                "address",
-                "city",
-                "country",
-                "name",
-                "notes",
-                "state",
-                "zip_code"
-            ],
-            "properties": {
-                "address": {
-                    "type": "string",
-                    "example": "221B Baker Street, London"
-                },
-                "city": {
-                    "type": "string",
-                    "example": "Los Angeles"
-                },
-                "country": {
-                    "type": "string",
-                    "example": "US"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "Acme Corp"
-                },
-                "notes": {
-                    "type": "string",
-                    "example": "Thank you for your business!"
-                },
-                "state": {
-                    "type": "string",
-                    "example": "CA"
-                },
-                "zip_code": {
-                    "type": "string",
-                    "example": "9800"
-                }
-            }
-        },
         "requests.UserUpdate": {
             "type": "object",
             "required": [
@@ -5686,44 +5400,6 @@ const docTemplate = `{
                 }
             }
         },
-        "responses.OkString": {
-            "type": "object",
-            "required": [
-                "data",
-                "message",
-                "status"
-            ],
-            "properties": {
-                "data": {
-                    "type": "string"
-                },
-                "message": {
-                    "type": "string",
-                    "example": "Request handled successfully"
-                },
-                "status": {
-                    "type": "string",
-                    "example": "success"
-                }
-            }
-        },
-        "responses.PaymentRequired": {
-            "type": "object",
-            "required": [
-                "message",
-                "status"
-            ],
-            "properties": {
-                "message": {
-                    "type": "string",
-                    "example": "You have reached the maximum number of allowed resources. Please upgrade your plan."
-                },
-                "status": {
-                    "type": "string",
-                    "example": "error"
-                }
-            }
-        },
         "responses.PhoneAPIKeyResponse": {
             "type": "object",
             "required": [
@@ -5884,156 +5560,6 @@ const docTemplate = `{
                 }
             }
         },
-        "responses.UserSubscriptionPaymentsResponse": {
-            "type": "object",
-            "required": [
-                "data",
-                "message",
-                "status"
-            ],
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "required": [
-                            "attributes",
-                            "id",
-                            "type"
-                        ],
-                        "properties": {
-                            "attributes": {
-                                "type": "object",
-                                "required": [
-                                    "billing_reason",
-                                    "card_brand",
-                                    "card_last_four",
-                                    "created_at",
-                                    "currency",
-                                    "currency_rate",
-                                    "discount_total",
-                                    "discount_total_formatted",
-                                    "discount_total_usd",
-                                    "refunded",
-                                    "refunded_amount",
-                                    "refunded_amount_formatted",
-                                    "refunded_amount_usd",
-                                    "refunded_at",
-                                    "status",
-                                    "status_formatted",
-                                    "subtotal",
-                                    "subtotal_formatted",
-                                    "subtotal_usd",
-                                    "tax",
-                                    "tax_formatted",
-                                    "tax_inclusive",
-                                    "tax_usd",
-                                    "total",
-                                    "total_formatted",
-                                    "total_usd",
-                                    "updated_at"
-                                ],
-                                "properties": {
-                                    "billing_reason": {
-                                        "type": "string"
-                                    },
-                                    "card_brand": {
-                                        "type": "string"
-                                    },
-                                    "card_last_four": {
-                                        "type": "string"
-                                    },
-                                    "created_at": {
-                                        "type": "string"
-                                    },
-                                    "currency": {
-                                        "type": "string"
-                                    },
-                                    "currency_rate": {
-                                        "type": "string"
-                                    },
-                                    "discount_total": {
-                                        "type": "integer"
-                                    },
-                                    "discount_total_formatted": {
-                                        "type": "string"
-                                    },
-                                    "discount_total_usd": {
-                                        "type": "integer"
-                                    },
-                                    "refunded": {
-                                        "type": "boolean"
-                                    },
-                                    "refunded_amount": {
-                                        "type": "integer"
-                                    },
-                                    "refunded_amount_formatted": {
-                                        "type": "string"
-                                    },
-                                    "refunded_amount_usd": {
-                                        "type": "integer"
-                                    },
-                                    "refunded_at": {},
-                                    "status": {
-                                        "type": "string"
-                                    },
-                                    "status_formatted": {
-                                        "type": "string"
-                                    },
-                                    "subtotal": {
-                                        "type": "integer"
-                                    },
-                                    "subtotal_formatted": {
-                                        "type": "string"
-                                    },
-                                    "subtotal_usd": {
-                                        "type": "integer"
-                                    },
-                                    "tax": {
-                                        "type": "integer"
-                                    },
-                                    "tax_formatted": {
-                                        "type": "string"
-                                    },
-                                    "tax_inclusive": {
-                                        "type": "boolean"
-                                    },
-                                    "tax_usd": {
-                                        "type": "integer"
-                                    },
-                                    "total": {
-                                        "type": "integer"
-                                    },
-                                    "total_formatted": {
-                                        "type": "string"
-                                    },
-                                    "total_usd": {
-                                        "type": "integer"
-                                    },
-                                    "updated_at": {
-                                        "type": "string"
-                                    }
-                                }
-                            },
-                            "id": {
-                                "type": "string"
-                            },
-                            "type": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                },
-                "message": {
-                    "type": "string",
-                    "example": "Request handled successfully"
-                },
-                "status": {
-                    "type": "string",
-                    "example": "success"
-                }
-            }
-        },
         "responses.WebhookResponse": {
             "type": "object",
             "required": [
@@ -6092,11 +5618,11 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "api.httpsms.com",
+	Host:             "",
 	BasePath:         "/v1",
-	Schemes:          []string{"https"},
+	Schemes:          []string{},
 	Title:            "httpSMS API Reference",
-	Description:      "Use your Android phone to send and receive SMS messages via a simple programmable API with end-to-end encryption.",
+	Description:      "Use your Android phone to send and receive SMS messages via a simple programmable API with end-to-end encryption. This is a free, self-hosted installation: there are no paid plans, message limits or payments. For guides and examples, see the /docs section of your web dashboard.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

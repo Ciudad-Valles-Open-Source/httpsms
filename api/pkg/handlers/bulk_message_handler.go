@@ -76,7 +76,7 @@ func (h *BulkMessageHandler) Index(c fiber.Ctx) error {
 
 // Store sends bulk SMS messages from a CSV or Excel file.
 // @Summary      Store bulk SMS file
-// @Description  Sends bulk SMS messages to multiple users based on our [CSV template](https://httpsms.com/templates/httpsms-bulk.csv) or our [Excel template](https://httpsms.com/templates/httpsms-bulk.xlsx).
+// @Description  Sends bulk SMS messages to multiple users based on the CSV template (`/templates/httpsms-bulk.csv`) or the Excel template (`/templates/httpsms-bulk.xlsx`) served by your web dashboard.
 // @Security	 ApiKeyAuth
 // @Tags         BulkSMS
 // @Accept       multipart/form-data

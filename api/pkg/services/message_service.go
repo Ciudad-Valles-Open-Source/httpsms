@@ -1060,7 +1060,7 @@ func (service *MessageService) storeMissedCallMessage(ctx context.Context, paylo
 
 func (service *MessageService) enrichErrorMessage(message string) string {
 	if strings.Contains(message, "android.permission.SEND_SMS") {
-		return message + " You need to grant the SMS permission to the httpSMS Android app https://httpsms.com/blog/grant-send-and-read-sms-permissions-on-android"
+		return message + " You need to grant the SMS permission to the httpSMS Android app " + appURL("/blog/grant-send-and-read-sms-permissions-on-android")
 	}
 	return message
 }

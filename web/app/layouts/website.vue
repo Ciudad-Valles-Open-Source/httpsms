@@ -48,6 +48,16 @@ const appStore = useAppStore()
               variant="text"
               color="primary"
               class="my-5 mr-2"
+              to="/docs"
+            >
+              {{ $t('website.docs') }}
+            </v-btn>
+            <v-btn
+              v-show="lgAndUp"
+              size="large"
+              variant="text"
+              color="primary"
+              class="my-5 mr-2"
               :to="{ name: 'blog' }"
             >
               {{ $t('website.blog') }}
@@ -194,13 +204,13 @@ const appStore = useAppStore()
             </h2>
             <ul style="list-style: none" class="pa-0">
               <li class="mb-2">
-                <a
-                  :href="appStore.appData.documentationUrl"
+                <NuxtLink
+                  to="/docs"
                   class="text-white text-decoration-none footer-link"
                 >
                   {{ $t('website.documentation') }}
                   <v-icon size="small" :icon="mdiBookOpenVariant" />
-                </a>
+                </NuxtLink>
               </li>
               <li class="mb-2">
                 <a

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { mdAndUp } = useVDisplay()
+const docsUrl = `${useAppStore().appData.url}/docs`
 
 definePageMeta({ layout: 'website' })
 
@@ -106,9 +107,9 @@ useSeoMeta({
         <p>
           You can also trigger the httpSMS application to send an SMS a simple
           API. You can find more information on the documentation page at
-          <a class="text-decoration-none" href="https://docs.httpsms.com"
-            >https://docs.httpsms.com</a
-          >
+          <NuxtLink class="text-decoration-none" to="/docs">{{
+            docsUrl
+          }}</NuxtLink>
         </p>
         <p>Until the next time✌️</p>
 

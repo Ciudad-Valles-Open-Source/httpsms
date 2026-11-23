@@ -41,6 +41,7 @@ useSeoMeta({
 })
 
 const config = useRuntimeConfig()
+const docsUrl = `${useAppStore().appData.url}/docs`
 const { lgAndUp, mdAndUp, mdAndDown, md, smAndDown, xl } = useVDisplay()
 
 const selectedTab = ref('javascript')
@@ -222,11 +223,7 @@ const faqPanel = ref<number | undefined>(undefined)
               <h5 class="text-title-large font-weight-light my-2">
                 {{ $t('pages.index.webhooksDesc') }}
               </h5>
-              <VBtn
-                target="_blank"
-                href="https://docs.httpsms.com/webhooks/introduction"
-                color="primary"
-              >
+              <VBtn to="/docs/webhooks-introduction" color="primary">
                 <VIcon start :icon="mdiWebhook" />
                 {{ $t('pages.index.documentationBtn') }}
               </VBtn>
@@ -247,10 +244,7 @@ const faqPanel = ref<number | undefined>(undefined)
               <h5 class="text-title-large font-weight-light my-2">
                 {{ $t('pages.index.controlSendingDesc') }}
               </h5>
-              <VBtn
-                href="https://docs.httpsms.com/features/control-sms-send-rate"
-                color="primary"
-              >
+              <VBtn to="/docs/control-sms-send-rate" color="primary">
                 <VIcon start :icon="mdiArrowRightThin" />
                 {{ $t('pages.index.documentationBtn') }}
               </VBtn>
@@ -348,10 +342,7 @@ const faqPanel = ref<number | undefined>(undefined)
               <h5 class="text-title-large mb-3 font-weight-light my-2">
                 {{ $t('pages.index.multiplePhonesDesc') }}
               </h5>
-              <VBtn
-                href="https://docs.httpsms.com/features/phone-api-keys"
-                color="primary"
-              >
+              <VBtn to="/docs/phone-api-keys" color="primary">
                 <VIcon start :icon="mdiCellphoneKey" />
                 {{ $t('pages.index.documentationBtn') }}
               </VBtn>
@@ -376,10 +367,7 @@ const faqPanel = ref<number | undefined>(undefined)
               <h5 class="text-headline-small my-2 font-weight-light">
                 {{ $t('pages.index.scheduleTextMessagesDesc') }}
               </h5>
-              <VBtn
-                href="https://docs.httpsms.com/features/scheduling-sms-messages"
-                color="primary"
-              >
+              <VBtn to="/docs/scheduling-sms-messages" color="primary">
                 <VIcon start :icon="mdiClockOutline" />
                 {{ $t('pages.index.documentationBtn') }}
               </VBtn>
@@ -448,12 +436,9 @@ const faqPanel = ref<number | undefined>(undefined)
                     }}</VCardTitle>
                     <VCardText class="text-body-large">
                       {{ $t('pages.index.step3Desc') }}
-                      <a
-                        class="text-decoration-none"
-                        :href="config.public.appDocumentationUrl"
-                      >
-                        {{ config.public.appDocumentationUrl }}
-                      </a>
+                      <NuxtLink class="text-decoration-none" to="/docs">
+                        {{ docsUrl }}
+                      </NuxtLink>
                     </VCardText>
                   </VCard>
                 </VTimelineItem>

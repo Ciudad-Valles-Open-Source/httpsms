@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { docRoutes } from './app/utils/docs-manifest'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
 
@@ -66,6 +68,7 @@ export default defineNuxtConfig({
   },
 
   sitemap: {
+    urls: docRoutes(),
     exclude: [
       '/messages',
       '/threads',
@@ -138,8 +141,6 @@ export default defineNuxtConfig({
       appName: process.env.APP_NAME || 'HTTP SMS',
       appGithubUrl:
         process.env.APP_GITHUB_URL || 'https://github.com/NdoleStudio/httpsms',
-      appDocumentationUrl:
-        process.env.APP_DOCUMENTATION_URL || 'https://docs.httpsms.com',
       appDownloadUrl:
         process.env.APP_DOWNLOAD_URL || 'https://apk.httpsms.com/HttpSms.apk',
       appEnv: process.env.APP_ENV || 'production',
@@ -162,7 +163,8 @@ export default defineNuxtConfig({
 
   nitro: {
     prerender: {
-      routes: [],
+      // The /docs/[[slug]] pages are dynamic routes, so list them explicitly.
+      routes: docRoutes(),
       failOnError: false,
     },
   },

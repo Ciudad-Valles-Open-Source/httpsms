@@ -46,10 +46,10 @@ useSeoMeta({
           You setup an encryption key which you use to encrypt your messages
           before making an API request to httpSMS and you also use the same key
           to decrypt the messages you receive from httpSMS via our
-          <a
+          <NuxtLink
             class="text-decoration-none"
-            href="https://docs.httpsms.com/webhooks/introduction"
-            >webhook events</a
+            to="/docs/webhooks-introduction"
+            >webhook events</NuxtLink
           >. We are using the
           <a
             class="text-decoration-none"

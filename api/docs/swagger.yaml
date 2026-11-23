@@ -1068,38 +1068,6 @@ definitions:
     - newsletter_enabled
     - webhook_enabled
     type: object
-  requests.UserPaymentInvoice:
-    properties:
-      address:
-        example: 221B Baker Street, London
-        type: string
-      city:
-        example: Los Angeles
-        type: string
-      country:
-        example: US
-        type: string
-      name:
-        example: Acme Corp
-        type: string
-      notes:
-        example: Thank you for your business!
-        type: string
-      state:
-        example: CA
-        type: string
-      zip_code:
-        example: "9800"
-        type: string
-    required:
-    - address
-    - city
-    - country
-    - name
-    - notes
-    - state
-    - zip_code
-    type: object
   requests.UserUpdate:
     properties:
       active_phone_id:
@@ -1475,34 +1443,6 @@ definitions:
     - message
     - status
     type: object
-  responses.OkString:
-    properties:
-      data:
-        type: string
-      message:
-        example: Request handled successfully
-        type: string
-      status:
-        example: success
-        type: string
-    required:
-    - data
-    - message
-    - status
-    type: object
-  responses.PaymentRequired:
-    properties:
-      message:
-        example: You have reached the maximum number of allowed resources. Please
-          upgrade your plan.
-        type: string
-      status:
-        example: error
-        type: string
-    required:
-    - message
-    - status
-    type: object
   responses.PhoneAPIKeyResponse:
     properties:
       data:
@@ -1617,116 +1557,6 @@ definitions:
     - message
     - status
     type: object
-  responses.UserSubscriptionPaymentsResponse:
-    properties:
-      data:
-        items:
-          properties:
-            attributes:
-              properties:
-                billing_reason:
-                  type: string
-                card_brand:
-                  type: string
-                card_last_four:
-                  type: string
-                created_at:
-                  type: string
-                currency:
-                  type: string
-                currency_rate:
-                  type: string
-                discount_total:
-                  type: integer
-                discount_total_formatted:
-                  type: string
-                discount_total_usd:
-                  type: integer
-                refunded:
-                  type: boolean
-                refunded_amount:
-                  type: integer
-                refunded_amount_formatted:
-                  type: string
-                refunded_amount_usd:
-                  type: integer
-                refunded_at: {}
-                status:
-                  type: string
-                status_formatted:
-                  type: string
-                subtotal:
-                  type: integer
-                subtotal_formatted:
-                  type: string
-                subtotal_usd:
-                  type: integer
-                tax:
-                  type: integer
-                tax_formatted:
-                  type: string
-                tax_inclusive:
-                  type: boolean
-                tax_usd:
-                  type: integer
-                total:
-                  type: integer
-                total_formatted:
-                  type: string
-                total_usd:
-                  type: integer
-                updated_at:
-                  type: string
-              required:
-              - billing_reason
-              - card_brand
-              - card_last_four
-              - created_at
-              - currency
-              - currency_rate
-              - discount_total
-              - discount_total_formatted
-              - discount_total_usd
-              - refunded
-              - refunded_amount
-              - refunded_amount_formatted
-              - refunded_amount_usd
-              - refunded_at
-              - status
-              - status_formatted
-              - subtotal
-              - subtotal_formatted
-              - subtotal_usd
-              - tax
-              - tax_formatted
-              - tax_inclusive
-              - tax_usd
-              - total
-              - total_formatted
-              - total_usd
-              - updated_at
-              type: object
-            id:
-              type: string
-            type:
-              type: string
-          required:
-          - attributes
-          - id
-          - type
-          type: object
-        type: array
-      message:
-        example: Request handled successfully
-        type: string
-      status:
-        example: success
-        type: string
-    required:
-    - data
-    - message
-    - status
-    type: object
   responses.WebhookResponse:
     properties:
       data:
@@ -1759,25 +1589,68 @@ definitions:
     - message
     - status
     type: object
-host: api.httpsms.com
 info:
   contact:
-    email: support@httpsms.com
-    name: support@httpsms.com
-  description: Use your Android phone to send and receive SMS messages via a simple
-    programmable API with end-to-end encryption.
+    name: httpSMS self-hosted (GitHub)
+    url: https://github.com/Ciudad-Valles-Open-Source/httpsms
+  description: 'Use your Android phone to send and receive SMS messages via a simple
+    programmable API with end-to-end encryption. This is a free, self-hosted installation:
+    there are no paid plans, message limits or payments. For guides and examples,
+    see the /docs section of your web dashboard.'
   license:
     name: AGPL-3.0
-    url: https://raw.githubusercontent.com/NdoleStudio/http-sms-manager/main/LICENSE
+    url: https://github.com/Ciudad-Valles-Open-Source/httpsms/blob/main/LICENSE
   title: httpSMS API Reference
   version: "1.0"
 paths:
+  /attachments/{userID}/{messageID}/{attachmentIndex}/{filename}:
+    get:
+      description: Download an MMS attachment by its path components
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: Message ID
+        in: path
+        name: messageID
+        required: true
+        type: string
+      - description: Attachment index
+        in: path
+        name: attachmentIndex
+        required: true
+        type: string
+      - description: Filename with extension
+        in: path
+        name: filename
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.NotFound'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.InternalServerError'
+      summary: Download a message attachment
+      tags:
+      - Attachments
   /billing/usage:
     get:
       consumes:
       - application/json
       description: Get the summary of sent and received messages for a user in the
-        current month
+        current month. Usage is tracked for statistics only; there are no limits.
       produces:
       - application/json
       responses:
@@ -1803,22 +1676,23 @@ paths:
             $ref: '#/definitions/responses.InternalServerError'
       security:
       - ApiKeyAuth: []
-      summary: Get Billing Usage.
+      summary: Get current message usage.
       tags:
       - Billing
   /billing/usage-history:
     get:
       consumes:
       - application/json
-      description: Get billing usage records of sent and received messages for a user
-        in the past. It will be sorted by timestamp in descending order.
+      description: Get the monthly usage records of sent and received messages for
+        a user in the past. It will be sorted by timestamp in descending order. Usage
+        is tracked for statistics only; there are no limits.
       parameters:
-      - description: number of heartbeats to skip
+      - description: number of usage records to skip
         in: query
         minimum: 0
         name: skip
         type: integer
-      - description: number of heartbeats to return
+      - description: number of usage records to return
         in: query
         maximum: 100
         minimum: 1
@@ -1849,7 +1723,7 @@ paths:
             $ref: '#/definitions/responses.InternalServerError'
       security:
       - ApiKeyAuth: []
-      summary: Get billing usage history.
+      summary: Get message usage history.
       tags:
       - Billing
   /bulk-messages:
@@ -1881,8 +1755,9 @@ paths:
     post:
       consumes:
       - multipart/form-data
-      description: Sends bulk SMS messages to multiple users based on our [CSV template](https://httpsms.com/templates/httpsms-bulk.csv)
-        or our [Excel template](https://httpsms.com/templates/httpsms-bulk.xlsx).
+      description: Sends bulk SMS messages to multiple users based on the CSV template
+        (`/templates/httpsms-bulk.csv`) or the Excel template (`/templates/httpsms-bulk.xlsx`)
+        served by your web dashboard.
       parameters:
       - description: The Excel or CSV file containing the messages to be sent.
         in: formData
@@ -2006,10 +1881,6 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/responses.Unauthorized'
-        "402":
-          description: Payment Required
-          schema:
-            $ref: '#/definitions/responses.PaymentRequired'
         "422":
           description: Unprocessable Entity
           schema:
@@ -2141,10 +2012,6 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/responses.Unauthorized'
-        "402":
-          description: Payment Required
-          schema:
-            $ref: '#/definitions/responses.PaymentRequired'
         "422":
           description: Unprocessable Entity
           schema:
@@ -2285,7 +2152,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete discord integration
       tags:
-      - Webhooks
+      - DiscordIntegration
     put:
       consumes:
       - application/json
@@ -2335,7 +2202,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: Publish a discord event to the registered listeners
+      description: 'Publish a discord event to the registered listeners. This is the
+        Discord interactions endpoint: it is served at `/discord/event` on the API
+        host, outside the `/v1` base path.'
       produces:
       - application/json
       responses:
@@ -2421,8 +2290,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Store the heartbeat to make notify that a phone number is still
-        active
+      description: Store the heartbeat to notify that a phone number is still active
       parameters:
       - description: Payload of the heartbeat request
         in: body
@@ -2462,7 +2330,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: Sends an SMS message from the 3CX platform
+      description: Sends an SMS message from the 3CX platform. This endpoint is served
+        at `/integration/3cx/messages` on the API host, outside the `/v1` base path,
+        and is authenticated with your API key as a bearer token.
       produces:
       - application/json
       responses:
@@ -3227,10 +3097,6 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/responses.Unauthorized'
-        "402":
-          description: Payment Required
-          schema:
-            $ref: '#/definitions/responses.PaymentRequired'
         "422":
           description: Unprocessable Entity
           schema:
@@ -3344,8 +3210,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get list of phones which a user has registered on the http sms
-        application
+      description: Get list of phones which a user has registered on the httpSMS application
       parameters:
       - description: number of heartbeats to skip
         in: query
@@ -3435,7 +3300,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: Delete a phone that has been sored in the database
+      description: Delete a phone that has been stored in the database
       parameters:
       - default: 32343a19-da5e-4b1b-a767-3298a73703ca
         description: ID of the phone
@@ -3563,10 +3428,6 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/responses.Unauthorized'
-        "402":
-          description: Payment Required
-          schema:
-            $ref: '#/definitions/responses.PaymentRequired'
         "422":
           description: Unprocessable Entity
           schema:
@@ -3846,191 +3707,6 @@ paths:
       summary: Update a user
       tags:
       - Users
-  /users/subscription:
-    delete:
-      description: Cancel the subscription of the authenticated user.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/responses.NoContent'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/responses.BadRequest'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/responses.Unauthorized'
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/responses.UnprocessableEntity'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/responses.InternalServerError'
-      security:
-      - ApiKeyAuth: []
-      summary: Cancel the user's subscription
-      tags:
-      - Users
-  /users/subscription-update-url:
-    get:
-      description: Fetches the subscription URL of the authenticated user.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/responses.OkString'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/responses.BadRequest'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/responses.Unauthorized'
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/responses.UnprocessableEntity'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/responses.InternalServerError'
-      security:
-      - ApiKeyAuth: []
-      summary: Currently authenticated user subscription update URL
-      tags:
-      - Users
-  /users/subscription/invoices/{subscriptionInvoiceID}:
-    post:
-      consumes:
-      - application/json
-      description: Generates a new invoice PDF file for the given subscription payment
-        with given parameters.
-      parameters:
-      - description: Generate subscription payment invoice parameters
-        in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/requests.UserPaymentInvoice'
-      - description: ID of the subscription invoice to generate the PDF for
-        in: path
-        name: subscriptionInvoiceID
-        required: true
-        type: string
-      produces:
-      - application/pdf
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: file
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/responses.BadRequest'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/responses.Unauthorized'
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/responses.UnprocessableEntity'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/responses.InternalServerError'
-      security:
-      - ApiKeyAuth: []
-      summary: Generate a subscription payment invoice
-      tags:
-      - Users
-  /users/subscription/payments:
-    get:
-      consumes:
-      - application/json
-      description: Subscription payments are generated throughout the lifecycle of
-        a subscription, typically there is one at the time of purchase and then one
-        for each renewal.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/responses.UserSubscriptionPaymentsResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/responses.BadRequest'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/responses.Unauthorized'
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/responses.UnprocessableEntity'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/responses.InternalServerError'
-      security:
-      - ApiKeyAuth: []
-      summary: Get the last 10 subscription payments.
-      tags:
-      - Users
-  /v1/attachments/{userID}/{messageID}/{attachmentIndex}/{filename}:
-    get:
-      description: Download an MMS attachment by its path components
-      parameters:
-      - description: User ID
-        in: path
-        name: userID
-        required: true
-        type: string
-      - description: Message ID
-        in: path
-        name: messageID
-        required: true
-        type: string
-      - description: Attachment index
-        in: path
-        name: attachmentIndex
-        required: true
-        type: string
-      - description: Filename with extension
-        in: path
-        name: filename
-        required: true
-        type: string
-      produces:
-      - application/octet-stream
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: file
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/responses.NotFound'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/responses.InternalServerError'
-      summary: Download a message attachment
-      tags:
-      - Attachments
   /webhooks:
     get:
       consumes:
@@ -4204,8 +3880,6 @@ paths:
       summary: Update a webhook
       tags:
       - Webhooks
-schemes:
-- https
 securityDefinitions:
   ApiKeyAuth:
     in: header

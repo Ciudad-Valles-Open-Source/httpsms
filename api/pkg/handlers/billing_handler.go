@@ -43,14 +43,14 @@ func (h *BillingHandler) RegisterRoutes(router fiber.Router, middlewares ...fibe
 }
 
 // UsageHistory returns the usage history of a user
-// @Summary      Get billing usage history.
-// @Description  Get billing usage records of sent and received messages for a user in the past. It will be sorted by timestamp in descending order.
+// @Summary      Get message usage history.
+// @Description  Get the monthly usage records of sent and received messages for a user in the past. It will be sorted by timestamp in descending order. Usage is tracked for statistics only; there are no limits.
 // @Security	 ApiKeyAuth
 // @Tags         Billing
 // @Accept       json
 // @Produce      json
-// @Param        skip		query  int  	false	"number of heartbeats to skip"		minimum(0)
-// @Param        limit		query  int  	false	"number of heartbeats to return"	minimum(1)	maximum(100)
+// @Param        skip		query  int  	false	"number of usage records to skip"		minimum(0)
+// @Param        limit		query  int  	false	"number of usage records to return"	minimum(1)	maximum(100)
 // @Success      200 		{object}	responses.BillingUsagesResponse
 // @Failure      400		{object}	responses.BadRequest
 // @Failure 	 401	    {object}	responses.Unauthorized
@@ -84,8 +84,8 @@ func (h *BillingHandler) UsageHistory(c fiber.Ctx) error {
 }
 
 // Usage returns the current usage history of a user
-// @Summary      Get Billing Usage.
-// @Description  Get the summary of sent and received messages for a user in the current month
+// @Summary      Get current message usage.
+// @Description  Get the summary of sent and received messages for a user in the current month. Usage is tracked for statistics only; there are no limits.
 // @Security	 ApiKeyAuth
 // @Tags         Billing
 // @Accept       json

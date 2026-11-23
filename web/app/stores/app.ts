@@ -5,7 +5,6 @@ export interface AppData {
   name: string
   env: string
   appDownloadUrl: string
-  documentationUrl: string
   githubUrl: string
 }
 
@@ -23,7 +22,6 @@ export const useAppStore = defineStore('app', () => {
       url,
       env: publicConfig.appEnv,
       appDownloadUrl: publicConfig.appDownloadUrl,
-      documentationUrl: publicConfig.appDocumentationUrl,
       githubUrl: publicConfig.appGithubUrl,
       name: publicConfig.appName,
     }

@@ -52,7 +52,7 @@ func (h *PhoneHandler) RegisterPhoneAPIKeyRoutes(router fiber.Router, middleware
 
 // Index returns the phones of a user
 // @Summary      Get phones of a user
-// @Description  Get list of phones which a user has registered on the http sms application
+// @Description  Get list of phones which a user has registered on the httpSMS application
 // @Security	 ApiKeyAuth
 // @Tags         Phones
 // @Accept       json
@@ -134,7 +134,7 @@ func (h *PhoneHandler) Upsert(c fiber.Ctx) error {
 
 // Delete a phone
 // @Summary      Delete Phone
-// @Description  Delete a phone that has been sored in the database
+// @Description  Delete a phone that has been stored in the database
 // @Security	 ApiKeyAuth
 // @Tags         Phones
 // @Accept       json

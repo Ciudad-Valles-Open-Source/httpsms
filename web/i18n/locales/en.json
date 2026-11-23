@@ -22,7 +22,8 @@
     "legal": "Legal",
     "termsAndConditions": "Terms & Conditions",
     "privacyPolicy": "Privacy Policy",
-    "contactSupport": "Contact Support"
+    "contactSupport": "Contact Support",
+    "docs": "Docs"
   },
   "components": {
     "contactDialog": {
@@ -94,7 +95,8 @@
       "filtersLabel": "Message thread filters",
       "filterAll": "All",
       "filterUnread": "Unread",
-      "filterError": "The message thread filter could not be updated"
+      "filterError": "The message thread filter could not be updated",
+      "documentation": "Documentation"
     },
     "redirectPromptPopover": {
       "skipNextTime": "Skip this page next time?",
@@ -258,7 +260,7 @@
       "titlePhoneApiKeys": "Phone API Keys",
       "btnCreateApiKey": "Create API Key",
       "btnDocumentation": "Documentation",
-      "description": "If you have multiple phones, you can create unique phone API keys for your different Android phones. These API keys can only be used on the specific mobile phone when it calls the httpSMS server for specific actions like sending heartbeats, registering received messages, delivery reports etc. If you want to interact with the full httpSMS API, use the API key under your account settings page instead https://httpsms.com/settings.",
+      "description": "If you have multiple phones, you can create a unique phone API key for each one. These keys only let that phone talk to your httpSMS server for specific actions, such as sending heartbeats, registering received messages or reporting deliveries. To use the full API, use your account API key from the Settings page instead.",
       "thName": "Name",
       "thCreatedAt": "Created At",
       "thPhoneNumbers": "Phone Numbers",
@@ -486,7 +488,7 @@
       "scheduleTextMessagesDesc": "Control when your SMS will reach your recipients, allowing you to perfectly time promotions, critical alerts etc by scheduling your messages in advance.",
       "getStartedSectionTitle": "Get Started",
       "step1Title": "Step 1",
-      "step1Desc": "Create an account on httpsms.com and obtain your API key on the settings page.",
+      "step1Desc": "Create your account on this dashboard and copy your API key from the Settings page.",
       "step2Title": "Step 2",
       "step2Desc": "Download and install the companion android application on your phone and sign in using your API Key.",
       "step3Title": "Step 3",
@@ -551,7 +553,7 @@
     "verify_email": "Verify Email",
     "timezone": "Timezone",
     "api_key": "API Key",
-    "api_key_desc": "Use your API Key in the x-api-key HTTP Header when sending requests to https://api.httpsms.com endpoints.",
+    "api_key_desc": "Use your API key in the x-api-key HTTP header when sending requests to your httpSMS server API.",
     "copy_api_key": "Copy API Key",
     "api_key_copied": "API Key copied successfully",
     "show_qr_code": "Show QR Code",
@@ -709,5 +711,32 @@
     "meta_description": "Guides and tutorials for sending and receiving SMS with your Android phone — bulk messaging, webhooks, end-to-end encryption, Zapier, Excel, and Python.",
     "meta_ogTitle": "httpSMS Blog - SMS automation guides & tutorials",
     "meta_ogDescription": "Learn how to send and receive SMS from your Android phone: bulk messaging, webhooks, encryption, Zapier, Excel, and Python tutorials."
+  },
+  "docs": {
+    "title": "Docs",
+    "metaTitleSuffix": "httpSMS Docs",
+    "metaDescription": "Learn how to send and receive SMS messages with your Android phone using the httpSMS API, webhooks and features.",
+    "toggleNavigation": "Toggle documentation navigation",
+    "groups": {
+      "introduction": "Introduction",
+      "webhooks": "Webhooks",
+      "features": "Features"
+    },
+    "pages": {
+      "gettingStarted": "Getting started",
+      "webhooksIntroduction": "Introduction",
+      "webhooksEvents": "Events",
+      "phoneApiKeys": "Phone API keys",
+      "controlSmsSendRate": "Control SMS send rate",
+      "schedulingSmsMessages": "Scheduling SMS messages",
+      "outgoingMessageQueue": "Outgoing message queue"
+    },
+    "apiReference": "API Reference (Swagger)",
+    "previous": "Previous",
+    "next": "Next",
+    "fallbackNotice": "This page is not available in your language yet, so the English version is shown.",
+    "notFoundTitle": "Page not found",
+    "notFoundText": "The documentation page you are looking for doesn't exist.",
+    "backToDocs": "Back to the documentation"
   }
 }

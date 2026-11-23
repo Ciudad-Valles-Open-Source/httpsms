@@ -165,7 +165,6 @@ services:
         APP_URL: ${APP_URL:-http://localhost:3000}
         APP_NAME: ${APP_NAME:-httpSMS}
         APP_GITHUB_URL: ${APP_GITHUB_URL:-https://github.com/NdoleStudio/httpsms}
-        APP_DOCUMENTATION_URL: ${APP_DOCUMENTATION_URL:-https://docs.httpsms.com}
         APP_DOWNLOAD_URL: ${APP_DOWNLOAD_URL:-https://github.com/NdoleStudio/httpsms/releases/latest/download/HttpSms.apk}
         APP_ENV: ${APP_ENV:-production}
         FIREBASE_API_KEY: ${FIREBASE_API_KEY:-}

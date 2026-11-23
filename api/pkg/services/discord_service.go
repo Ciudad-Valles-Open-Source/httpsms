@@ -143,7 +143,7 @@ func (service *DiscordService) createSlashCommand(ctx context.Context, serverID 
 	command, _, err := service.client.Application.CreateCommand(ctx, serverID, &discord.CommandCreateRequest{
 		Name:        "httpsms",
 		Type:        1,
-		Description: "Send an SMS via httpsms.com",
+		Description: "Send an SMS via " + appName(),
 		Options: []discord.CommandCreateRequestOption{
 			{
 				Name:        "from",

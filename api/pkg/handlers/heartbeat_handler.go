@@ -94,7 +94,7 @@ func (h *HeartbeatHandler) Index(c fiber.Ctx) error {
 
 // Store the heartbeat of a phone number
 // @Summary      Register heartbeat of an owner phone number
-// @Description  Store the heartbeat to make notify that a phone number is still active
+// @Description  Store the heartbeat to notify that a phone number is still active
 // @Security	 ApiKeyAuth
 // @Tags         Heartbeats
 // @Accept       json

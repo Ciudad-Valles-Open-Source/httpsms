@@ -48,7 +48,7 @@ func (h *AttachmentHandler) RegisterRoutes(router fiber.Router) {
 // @Success      200  {file}  binary
 // @Failure      404  {object}  responses.NotFound
 // @Failure      500  {object}  responses.InternalServerError
-// @Router       /v1/attachments/{userID}/{messageID}/{attachmentIndex}/{filename} [get]
+// @Router       /attachments/{userID}/{messageID}/{attachmentIndex}/{filename} [get]
 func (h *AttachmentHandler) GetAttachment(c fiber.Ctx) error {
 	ctx, span := h.tracer.StartFromFiberCtx(c)
 	defer span.End()

@@ -88,7 +88,6 @@ func (h *MessageSendScheduleHandler) Index(c fiber.Ctx) error {
 // @Success 201 {object} responses.MessageSendScheduleResponse
 // @Failure 400 {object} responses.BadRequest
 // @Failure 401 {object} responses.Unauthorized
-// @Failure 402 {object} responses.PaymentRequired
 // @Failure 422 {object} responses.UnprocessableEntity
 // @Failure 500 {object} responses.InternalServerError
 // @Router /send-schedules [post]

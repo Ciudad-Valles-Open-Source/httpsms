@@ -15,7 +15,7 @@
 [httpSMS](https://httpsms.com) is a service that lets you use your Android phone as an SMS Gateway to send and receive SMS messages.
 You make a request to a simple HTTP API and it triggers your Android phone to send an SMS. SMS messages received on your android phone can also be forwarded to your webhook endpoint.
 
-Quick Start Guide: [https://docs.httpsms.com](https://docs.httpsms.com)
+Quick Start Guide: open the **/docs** section of your web dashboard (e.g. `https://your-domain/docs`). The content lives in [`web/docs-content/`](./web/docs-content), and the API reference (Swagger) is served by the API at `/index.html`.
 
 <img width="1115" alt="header" src="https://user-images.githubusercontent.com/4196457/194767449-f12d84a0-22f1-4787-afb2-17398fb459f6.png">
 

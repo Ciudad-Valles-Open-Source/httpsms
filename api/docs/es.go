@@ -17,92 +17,95 @@ type translation struct {
 	Description string
 }
 
-var spanishInfoDescription = "Usa tu teléfono Android para enviar y recibir mensajes SMS mediante una API programable simple, con cifrado de extremo a extremo."
+var spanishInfoTitle = "Referencia de la API de httpSMS"
+
+var spanishInfoDescription = "Usa tu teléfono Android para enviar y recibir mensajes SMS mediante una API programable sencilla, con cifrado de extremo a extremo. Esta es una instalación gratuita y autoalojada: no hay planes de pago, límites de mensajes ni cobros. Para guías y ejemplos, consulta la sección /docs de tu panel web."
 
 var spanishTags = map[string]string{
-	"Contacts":           "Contactos",
-	"DiscordIntegration": "Integración de Discord",
-	"Discord":            "Discord",
-	"Heartbeats":         "Latidos (Heartbeats)",
 	"3CXIntegration":     "Integración 3CX",
-	"MessageThreads":     "Hilos de mensajes",
+	"Attachments":        "Adjuntos",
+	"Billing":            "Uso de mensajes",
+	"BulkSMS":            "SMS masivos",
+	"Contacts":           "Contactos",
+	"Discord":            "Discord",
+	"DiscordIntegration": "Integración de Discord",
+	"Heartbeats":         "Latidos (heartbeats)",
+	"MessageThreads":     "Conversaciones",
 	"Messages":           "Mensajes",
 	"PhoneAPIKeys":       "Claves API de teléfono",
 	"Phones":             "Teléfonos",
 	"SendSchedules":      "Horarios de envío",
 	"Users":              "Usuarios",
-	"Attachments":        "Adjuntos",
 	"Webhooks":           "Webhooks",
-	"BulkMessages":       "Mensajes masivos",
 }
 
 var spanishOperations = map[string]translation{
-	"GET /bulk-messages":  {"Listar órdenes de mensajes masivos", "Obtiene los resúmenes de las últimas 10 órdenes de mensajes masivos del usuario autenticado, con el conteo por estado."},
-	"POST /bulk-messages": {"Guardar archivo de SMS masivos", "Envía mensajes SMS masivos a varios destinatarios con base en nuestra [plantilla CSV](https://httpsms.com/templates/httpsms-bulk.csv) o nuestra [plantilla Excel](https://httpsms.com/templates/httpsms-bulk.xlsx)."},
+	"GET /attachments/{userID}/{messageID}/{attachmentIndex}/{filename}": {"Descargar un adjunto de mensaje", "Descarga un adjunto MMS a partir de los componentes de su ruta."},
 
-	"GET /contacts":                {"Listar contactos", "Devuelve la lista paginada de contactos del usuario autenticado. El campo \"total\" de nivel superior es el número de contactos que coinciden con el filtro de búsqueda, independientemente de skip/limit, para que los clientes puedan paginar desde el servidor."},
+	"GET /billing/usage":         {"Obtener el uso de mensajes del mes actual", "Obtiene el resumen de mensajes enviados y recibidos por el usuario en el mes actual. El uso se registra solo con fines estadísticos; no hay límites."},
+	"GET /billing/usage-history": {"Obtener el historial de uso de mensajes", "Obtiene los registros mensuales de mensajes enviados y recibidos por el usuario en meses anteriores, ordenados por fecha de forma descendente. El uso se registra solo con fines estadísticos; no hay límites."},
+
+	"GET /bulk-messages":  {"Listar envíos masivos", "Obtiene el resumen de los últimos 10 envíos masivos del usuario autenticado, con el número de mensajes en cada estado."},
+	"POST /bulk-messages": {"Subir archivo de SMS masivos", "Envía mensajes SMS a varios destinatarios a partir de la plantilla CSV (`/templates/httpsms-bulk.csv`) o la plantilla de Excel (`/templates/httpsms-bulk.xlsx`) que ofrece tu panel web."},
+
+	"GET /contacts":                {"Listar contactos", "Devuelve la lista paginada de contactos del usuario autenticado. El campo \"total\" de nivel superior indica cuántos contactos coinciden con el filtro de búsqueda, sin importar skip/limit, para que los clientes puedan paginar desde el servidor."},
 	"POST /contacts":               {"Crear uno o varios contactos", "Crea un solo contacto o un lote de contactos. Acepta un arreglo JSON o un objeto con un arreglo \"contacts\"."},
-	"POST /contacts/upload":        {"Importar contactos desde CSV", "Sube un archivo CSV (campo multipart \"document\") con contactos. Columnas: Name, Emails, PhoneNumbers (los valores múltiples se separan con \";\")."},
-	"PUT /contacts/{contactID}":    {"Actualizar un contacto", "Actualiza los detalles de un solo contacto."},
+	"POST /contacts/upload":        {"Importar contactos desde CSV", "Sube un archivo CSV con contactos en el campo multipart \"document\". Columnas: Name, Emails, PhoneNumbers (los valores múltiples se separan con \";\")."},
+	"PUT /contacts/{contactID}":    {"Actualizar un contacto", "Actualiza los datos de un solo contacto."},
 	"DELETE /contacts/{contactID}": {"Eliminar un contacto", "Elimina un solo contacto de la base de datos."},
 
-	"GET /discord-integrations":                {"Obtener las integraciones de Discord de un usuario", "Obtiene las integraciones de Discord de un usuario."},
-	"POST /discord-integrations":               {"Guardar integración de Discord", "Guarda una integración de Discord para el usuario autenticado."},
-	"PUT /discord-integrations/{discordID}":    {"Actualizar una integración de Discord", "Actualiza una integración de Discord para el usuario actualmente autenticado."},
-	"DELETE /discord-integrations/{discordID}": {"Eliminar integración de Discord", "Elimina una integración de Discord de un usuario."},
-	"POST /discord/event":                      {"Consumir un evento de Discord", "Publica un evento de Discord a los oyentes registrados."},
+	"GET /discord-integrations":                {"Listar integraciones de Discord", "Obtiene las integraciones de Discord del usuario autenticado."},
+	"POST /discord-integrations":               {"Crear una integración de Discord", "Guarda una nueva integración de Discord para el usuario autenticado."},
+	"PUT /discord-integrations/{discordID}":    {"Actualizar una integración de Discord", "Actualiza una integración de Discord del usuario autenticado."},
+	"DELETE /discord-integrations/{discordID}": {"Eliminar una integración de Discord", "Elimina una integración de Discord del usuario autenticado."},
+	"POST /discord/event":                      {"Recibir un evento de Discord", "Publica un evento de Discord para los oyentes registrados. Es el endpoint de interacciones de Discord: se sirve en `/discord/event` del host de la API, fuera de la ruta base `/v1`."},
 
-	"GET /heartbeats":  {"Obtener los latidos de un número de teléfono propietario", "Obtiene la última vez que un número de teléfono solicitó mensajes pendientes. Se ordena por marca de tiempo en orden descendente."},
-	"POST /heartbeats": {"Registrar el latido de un número de teléfono propietario", "Guarda el latido para notificar que un número de teléfono sigue activo."},
+	"GET /heartbeats":  {"Listar latidos de un número de teléfono", "Obtiene las últimas veces que un número de teléfono consultó mensajes pendientes, ordenadas por fecha de forma descendente."},
+	"POST /heartbeats": {"Registrar un latido de un número de teléfono", "Guarda un latido para indicar que el número de teléfono sigue activo."},
 
-	"POST /integration/3cx/messages": {"Enviar un mensaje SMS de 3CX", "Envía un mensaje SMS desde la plataforma 3CX."},
+	"POST /integration/3cx/messages": {"Enviar un SMS desde 3CX", "Envía un mensaje SMS desde la plataforma 3CX. Este endpoint se sirve en `/integration/3cx/messages` del host de la API, fuera de la ruta base `/v1`, y se autentica con tu clave API como token bearer."},
 
-	"GET /message-threads":                      {"Obtener los hilos de mensajes de un número de teléfono", "Obtiene la lista de contactos con los que se ha comunicado un número de teléfono (hilos). Se ordena por marca de tiempo en orden descendente."},
-	"PUT /message-threads/{messageThreadID}":    {"Actualizar un hilo de mensajes", "Actualiza los detalles de un hilo de mensajes."},
-	"DELETE /message-threads/{messageThreadID}": {"Eliminar un hilo de mensajes de la base de datos.", "Elimina un hilo de mensajes de la base de datos y también todos los mensajes del hilo."},
+	"GET /message-threads":                      {"Listar conversaciones de un número de teléfono", "Obtiene la lista de contactos con los que se ha comunicado un número de teléfono (conversaciones), ordenada por fecha de forma descendente."},
+	"GET /message-threads/{messageThreadID}":    {"Obtener una conversación", "Devuelve una conversación del usuario autenticado, incluidos los datos del contacto correspondiente cuando existen."},
+	"PUT /message-threads/{messageThreadID}":    {"Actualizar una conversación", "Actualiza los datos de una conversación."},
+	"DELETE /message-threads/{messageThreadID}": {"Eliminar una conversación", "Elimina una conversación de la base de datos junto con todos sus mensajes."},
 
-	"GET /messages":                     {"Obtener los mensajes enviados entre 2 números de teléfono", "Obtiene la lista de mensajes enviados entre 2 números de teléfono. Se ordena por marca de tiempo en orden descendente."},
-	"POST /messages/bulk-send":          {"Enviar mensajes SMS masivos", "Agrega mensajes SMS masivos para que sean enviados por el teléfono Android."},
-	"POST /messages/calls/missed":       {"Registrar una llamada perdida en el teléfono móvil", "Este endpoint es llamado por la app Android de httpSMS para registrar una llamada perdida en el teléfono móvil."},
-	"GET /messages/outstanding":         {"Obtener un mensaje pendiente", "Obtiene un mensaje pendiente que debe ser enviado por un teléfono Android."},
-	"POST /messages/receive":            {"Recibir un nuevo mensaje SMS desde un teléfono móvil", "Agrega un nuevo mensaje recibido desde un teléfono móvil."},
-	"GET /messages/search":              {"Buscar en todos los mensajes de un usuario", "Devuelve la lista de todos los mensajes según los criterios de filtro, incluyendo llamadas perdidas."},
-	"POST /messages/send":               {"Enviar un mensaje SMS", "Agrega un nuevo mensaje SMS para que sea enviado por tu teléfono Android."},
-	"GET /messages/{messageID}":         {"Obtener un mensaje de la base de datos.", "Obtiene un mensaje de la base de datos por su ID."},
-	"DELETE /messages/{messageID}":      {"Eliminar un mensaje de la base de datos.", "Elimina un mensaje de la base de datos y quita su contenido de la lista de hilos."},
-	"POST /messages/{messageID}/events": {"Registrar (upsert) un evento de un mensaje en el teléfono móvil", "Usa este endpoint para enviar eventos de un mensaje cuando el teléfono móvil lo marca como fallido, enviado o entregado."},
+	"GET /messages":                     {"Listar mensajes entre 2 números de teléfono", "Obtiene la lista de mensajes intercambiados entre 2 números de teléfono, ordenada por fecha de forma descendente."},
+	"POST /messages/bulk-send":          {"Enviar varios SMS a la vez", "Agrega varios mensajes SMS a la cola para que los envíe el teléfono Android."},
+	"POST /messages/calls/missed":       {"Registrar una llamada perdida", "La app Android de httpSMS llama a este endpoint para registrar una llamada perdida en el teléfono."},
+	"GET /messages/outstanding":         {"Obtener un mensaje pendiente", "Obtiene un mensaje pendiente que debe enviar un teléfono Android."},
+	"POST /messages/receive":            {"Recibir un SMS desde un teléfono", "Registra un nuevo mensaje recibido en un teléfono móvil."},
+	"GET /messages/search":              {"Buscar mensajes del usuario", "Devuelve todos los mensajes que cumplen los criterios de búsqueda, incluidas las llamadas perdidas."},
+	"POST /messages/send":               {"Enviar un SMS", "Agrega un nuevo mensaje SMS a la cola para que lo envíe tu teléfono Android."},
+	"GET /messages/{messageID}":         {"Obtener un mensaje", "Obtiene un mensaje de la base de datos a partir de su ID."},
+	"DELETE /messages/{messageID}":      {"Eliminar un mensaje", "Elimina un mensaje de la base de datos y quita su contenido de la lista de conversaciones."},
+	"POST /messages/{messageID}/events": {"Registrar un evento de un mensaje", "Usa este endpoint para informar los eventos de un mensaje cuando el teléfono lo marca como fallido, enviado o entregado."},
 
-	"GET /phone-api-keys":                                     {"Obtener las claves API de teléfono de un usuario", "Obtiene la lista de claves API de teléfono que un usuario ha registrado en la aplicación httpSMS."},
-	"POST /phone-api-keys":                                    {"Guardar clave API de teléfono", "Crea una nueva clave API de teléfono que puede usarse para iniciar sesión en la app httpSMS de tu teléfono Android."},
-	"DELETE /phone-api-keys/{phoneAPIKeyID}":                  {"Eliminar una clave API de teléfono de la base de datos.", "Elimina una clave API de teléfono de la base de datos; ya no podrá usarse para autenticación."},
-	"DELETE /phone-api-keys/{phoneAPIKeyID}/phones/{phoneID}": {"Quitar la asociación de un teléfono con la clave API de teléfono.", "Deberás iniciar sesión de nuevo en la app httpSMS de tu teléfono Android con una nueva clave API de teléfono."},
+	"GET /phone-api-keys":                                     {"Listar claves API de teléfono", "Obtiene la lista de claves API de teléfono que el usuario ha creado en httpSMS."},
+	"POST /phone-api-keys":                                    {"Crear una clave API de teléfono", "Crea una nueva clave API de teléfono para iniciar sesión en la app httpSMS de tu teléfono Android."},
+	"DELETE /phone-api-keys/{phoneAPIKeyID}":                  {"Eliminar una clave API de teléfono", "Elimina una clave API de teléfono de la base de datos; ya no podrá usarse para autenticarse."},
+	"DELETE /phone-api-keys/{phoneAPIKeyID}/phones/{phoneID}": {"Desvincular un teléfono de una clave API de teléfono", "Quita la asociación entre el teléfono y la clave API. Tendrás que volver a iniciar sesión en la app httpSMS de tu teléfono Android con una nueva clave API de teléfono."},
 
-	"GET /phones":              {"Obtener los teléfonos de un usuario", "Obtiene la lista de teléfonos que un usuario ha registrado en la aplicación httpSMS."},
-	"PUT /phones":              {"Crear o actualizar teléfono (upsert)", "Actualiza las propiedades del teléfono de un usuario. Si no existe un teléfono con este número, se creará uno nuevo. Piensa en este método como un 'upsert'. Las pasarelas de teléfono basadas en URL reciben activaciones HTTP compatibles con FCM."},
-	"PUT /phones/fcm-token":    {"Crear o actualizar el token FCM de un teléfono", "Actualiza el token FCM o la URL de callback del adaptador de un teléfono. Si no existe un teléfono con este número, se creará uno nuevo. Piensa en este método como un 'upsert'. Las pasarelas de teléfono basadas en URL reciben activaciones HTTP compatibles con FCM."},
-	"DELETE /phones/{phoneID}": {"Eliminar teléfono", "Elimina un teléfono almacenado en la base de datos."},
+	"GET /phones":              {"Listar teléfonos", "Obtiene la lista de teléfonos que el usuario ha registrado en httpSMS."},
+	"PUT /phones":              {"Crear o actualizar un teléfono", "Actualiza las propiedades del teléfono de un usuario. Si no existe un teléfono con ese número, se crea uno nuevo (funciona como un \"upsert\"). Las pasarelas de teléfono basadas en URL reciben activaciones HTTP compatibles con FCM."},
+	"PUT /phones/fcm-token":    {"Crear o actualizar el token FCM de un teléfono", "Actualiza el token FCM o la URL de callback del adaptador de un teléfono. Si no existe un teléfono con ese número, se crea uno nuevo (funciona como un \"upsert\"). Las pasarelas de teléfono basadas en URL reciben activaciones HTTP compatibles con FCM."},
+	"DELETE /phones/{phoneID}": {"Eliminar un teléfono", "Elimina un teléfono guardado en la base de datos."},
 
 	"GET /send-schedules":                 {"Listar horarios de envío", "Lista todos los horarios de envío del usuario autenticado."},
-	"POST /send-schedules":                {"Crear horario de envío", "Crea un nuevo horario de envío para el usuario autenticado."},
-	"PUT /send-schedules/{scheduleID}":    {"Actualizar horario de envío", "Actualiza un horario de envío del usuario autenticado."},
-	"DELETE /send-schedules/{scheduleID}": {"Eliminar horario de envío", "Elimina un horario de envío del usuario autenticado."},
+	"POST /send-schedules":                {"Crear un horario de envío", "Crea un nuevo horario de envío para el usuario autenticado."},
+	"PUT /send-schedules/{scheduleID}":    {"Actualizar un horario de envío", "Actualiza un horario de envío del usuario autenticado."},
+	"DELETE /send-schedules/{scheduleID}": {"Eliminar un horario de envío", "Elimina un horario de envío del usuario autenticado."},
 
-	"GET /users/me":                      {"Obtener el usuario actual", "Obtiene los detalles del usuario actualmente autenticado."},
-	"PUT /users/me":                      {"Actualizar un usuario", "Actualiza los detalles del usuario actualmente autenticado."},
-	"DELETE /users/me":                   {"Eliminar un usuario", "Elimina al usuario actualmente autenticado junto con todos sus datos."},
-	"DELETE /users/subscription":         {"Cancelar la suscripción del usuario", "Cancela la suscripción del usuario autenticado."},
-	"GET /users/subscription-update-url": {"URL de actualización de suscripción del usuario autenticado", "Obtiene la URL de suscripción del usuario autenticado."},
-	"POST /users/subscription/invoices/{subscriptionInvoiceID}": {"Generar una factura de pago de suscripción", "Genera un nuevo archivo PDF de factura para el pago de suscripción indicado, con los parámetros dados."},
-	"GET /users/subscription/payments":                          {"Obtener los últimos 10 pagos de suscripción.", "Los pagos de suscripción se generan durante todo el ciclo de vida de una suscripción; normalmente hay uno al momento de la compra y uno por cada renovación."},
-	"DELETE /users/{userID}/api-keys":                           {"Rotar la clave API del usuario", "Rota la clave API del usuario en caso de que la clave actual esté comprometida."},
-	"PUT /users/{userID}/notifications":                         {"Actualizar la configuración de notificaciones", "Actualiza la configuración de notificaciones por correo electrónico de un usuario."},
+	"GET /users/me":                     {"Obtener el usuario actual", "Obtiene los datos del usuario autenticado."},
+	"PUT /users/me":                     {"Actualizar el usuario actual", "Actualiza los datos del usuario autenticado."},
+	"DELETE /users/me":                  {"Eliminar el usuario actual", "Elimina al usuario autenticado junto con todos sus datos."},
+	"DELETE /users/{userID}/api-keys":   {"Rotar la clave API del usuario", "Genera una nueva clave API para el usuario e invalida la actual, por ejemplo si se ha visto comprometida."},
+	"PUT /users/{userID}/notifications": {"Actualizar la configuración de notificaciones", "Actualiza la configuración de notificaciones por correo electrónico del usuario."},
 
-	"GET /v1/attachments/{userID}/{messageID}/{attachmentIndex}/{filename}": {"Descargar un adjunto de mensaje", "Descarga un adjunto MMS usando los componentes de su ruta."},
-
-	"GET /webhooks":                {"Obtener los webhooks de un usuario", "Obtiene los webhooks de un usuario."},
-	"POST /webhooks":               {"Guardar un webhook", "Guarda un webhook para el usuario autenticado."},
-	"PUT /webhooks/{webhookID}":    {"Actualizar un webhook", "Actualiza un webhook para el usuario actualmente autenticado."},
-	"DELETE /webhooks/{webhookID}": {"Eliminar webhook", "Elimina un webhook de un usuario."},
+	"GET /webhooks":                {"Listar webhooks", "Obtiene los webhooks del usuario autenticado."},
+	"POST /webhooks":               {"Crear un webhook", "Guarda un nuevo webhook para el usuario autenticado."},
+	"PUT /webhooks/{webhookID}":    {"Actualizar un webhook", "Actualiza un webhook del usuario autenticado."},
+	"DELETE /webhooks/{webhookID}": {"Eliminar un webhook", "Elimina un webhook del usuario autenticado."},
 }
 
 var (
@@ -124,6 +127,7 @@ func SpanishDoc() string {
 		}
 
 		if info, ok := spec["info"].(map[string]any); ok {
+			info["title"] = spanishInfoTitle
 			info["description"] = spanishInfoDescription
 		}
 

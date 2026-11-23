@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -295,8 +296,8 @@ func (service *WebhookService) getPayload(ctxLogger telemetry.Logger, event clou
 	}
 
 	return map[string]any{
-		"avatar_url": "https://httpsms.com/avatar.png",
-		"username":   "httpsms.com",
+		"avatar_url": appURL("/avatar.png"),
+		"username":   appName(),
 		"content":    "✉ new message received",
 		"embeds": []fiber.Map{
 			{
@@ -379,4 +380,17 @@ func (service *WebhookService) handleWebhookSendFailed(ctx context.Context, even
 	}
 
 	ctxLogger.Info(fmt.Sprintf("dispatched [%s] event with ID [%s] for user with id [%s]", event.Type(), event.ID(), payload.UserID))
+}
+
+// appURL returns an absolute link to a page of this installation's web app.
+func appURL(path string) string {
+	return strings.TrimSuffix(os.Getenv("APP_URL"), "/") + path
+}
+
+// appName returns the name of this installation (APP_NAME), "httpSMS" by default.
+func appName() string {
+	if name := os.Getenv("APP_NAME"); name != "" {
+		return name
+	}
+	return "httpSMS"
 }

@@ -172,17 +172,7 @@ func (h *UserHandler) UpdateNotifications(c fiber.Ctx) error {
 }
 
 // subscriptionUpdateURL returns the subscription update URL for the authenticated entities.User
-// @Summary      Currently authenticated user subscription update URL
-// @Description  Fetches the subscription URL of the authenticated user.
-// @Security	 ApiKeyAuth
-// @Tags         Users
-// @Produce      json
-// @Success      200 		{object}	responses.OkString
-// @Failure      400		{object}	responses.BadRequest
-// @Failure 	 401    	{object}	responses.Unauthorized
-// @Failure      422		{object}	responses.UnprocessableEntity
-// @Failure      500		{object}	responses.InternalServerError
-// @Router       /users/subscription-update-url 	[get]
+// It is not routed in this self-hosted fork (paid plans were removed), so it is not documented in Swagger.
 func (h *UserHandler) subscriptionUpdateURL(c fiber.Ctx) error {
 	ctx, span := h.tracer.StartFromFiberCtx(c)
 	defer span.End()
@@ -200,17 +190,7 @@ func (h *UserHandler) subscriptionUpdateURL(c fiber.Ctx) error {
 }
 
 // cancelSubscription cancels the subscription for the authenticated entities.User
-// @Summary      Cancel the user's subscription
-// @Description  Cancel the subscription of the authenticated user.
-// @Security	 ApiKeyAuth
-// @Tags         Users
-// @Produce      json
-// @Success      200 		{object}	responses.NoContent
-// @Failure      400		{object}	responses.BadRequest
-// @Failure 	 401    	{object}	responses.Unauthorized
-// @Failure      422		{object}	responses.UnprocessableEntity
-// @Failure      500		{object}	responses.InternalServerError
-// @Router       /users/subscription 	[delete]
+// It is not routed in this self-hosted fork (paid plans were removed), so it is not documented in Swagger.
 func (h *UserHandler) cancelSubscription(c fiber.Ctx) error {
 	ctx, span := h.tracer.StartFromFiberCtx(c)
 	defer span.End()
@@ -261,18 +241,7 @@ func (h *UserHandler) DeleteAPIKey(c fiber.Ctx) error {
 }
 
 // subscriptionPayments returns the last 10 payments of the currently authenticated user
-// @Summary      Get the last 10 subscription payments.
-// @Description  Subscription payments are generated throughout the lifecycle of a subscription, typically there is one at the time of purchase and then one for each renewal.
-// @Security	 ApiKeyAuth
-// @Tags         Users
-// @Accept       json
-// @Produce      json
-// @Success      200 		{object}	responses.UserSubscriptionPaymentsResponse
-// @Failure      400		{object}	responses.BadRequest
-// @Failure 	 401	    {object}	responses.Unauthorized
-// @Failure      422		{object}	responses.UnprocessableEntity
-// @Failure      500		{object}	responses.InternalServerError
-// @Router       /users/subscription/payments [get]
+// It is not routed in this self-hosted fork (paid plans were removed), so it is not documented in Swagger.
 func (h *UserHandler) subscriptionPayments(c fiber.Ctx) error {
 	ctx, span, ctxLogger := h.tracer.StartFromFiberCtxWithLogger(c, h.logger)
 	defer span.End()
@@ -287,20 +256,7 @@ func (h *UserHandler) subscriptionPayments(c fiber.Ctx) error {
 }
 
 // subscriptionInvoice generates an invoice for a given subscription invoice ID
-// @Summary      Generate a subscription payment invoice
-// @Description  Generates a new invoice PDF file for the given subscription payment with given parameters.
-// @Security	 ApiKeyAuth
-// @Tags         Users
-// @Accept       json
-// @Produce  	 application/pdf
-// @Param        payload   				body 		requests.UserPaymentInvoice  	true "Generate subscription payment invoice parameters"
-// @Param 		 subscriptionInvoiceID 	path		string 							true "ID of the subscription invoice to generate the PDF for"
-// @Success      200 					{file} 		file
-// @Failure      400					{object}	responses.BadRequest
-// @Failure 	 401	    			{object}	responses.Unauthorized
-// @Failure      422					{object}	responses.UnprocessableEntity
-// @Failure      500					{object}	responses.InternalServerError
-// @Router       /users/subscription/invoices/{subscriptionInvoiceID} [post]
+// It is not routed in this self-hosted fork (paid plans were removed), so it is not documented in Swagger.
 func (h *UserHandler) subscriptionInvoice(c fiber.Ctx) error {
 	ctx, span, ctxLogger := h.tracer.StartFromFiberCtxWithLogger(c, h.logger)
 	defer span.End()

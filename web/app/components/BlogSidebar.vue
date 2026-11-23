@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { mdiBookOpenVariant } from '@mdi/js'
-
-const appStore = useAppStore()
 </script>
 
 <template>
@@ -21,7 +19,7 @@ const appStore = useAppStore()
       >
       {{ $t('components.blogSidebar.descPart2') }}
     </p>
-    <VBtn variant="tonal" :href="appStore.appData.documentationUrl">
+    <VBtn variant="tonal" to="/docs">
       <VIcon start :icon="mdiBookOpenVariant" />
       {{ $t('components.blogSidebar.documentation') }}
     </VBtn>

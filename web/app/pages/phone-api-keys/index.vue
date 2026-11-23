@@ -269,8 +269,7 @@ onBeforeUnmount(() => unbindRealtime())
               <VSpacer />
               <VBtn
                 v-if="lgAndUp"
-                href="https://docs.httpsms.com/features/phone-api-keys"
-                target="_blank"
+                to="/docs/phone-api-keys"
                 variant="tonal"
                 class="mt-1"
               >

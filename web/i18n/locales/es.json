@@ -22,7 +22,8 @@
     "legal": "Legal",
     "termsAndConditions": "Términos y Condiciones",
     "privacyPolicy": "Política de Privacidad",
-    "contactSupport": "Contactar Soporte"
+    "contactSupport": "Contactar Soporte",
+    "docs": "Documentación"
   },
   "components": {
     "contactDialog": {
@@ -94,7 +95,8 @@
       "filtersLabel": "Filtros de conversaciones",
       "filterAll": "Todos",
       "filterUnread": "No leídos",
-      "filterError": "No se pudo actualizar el filtro de conversaciones"
+      "filterError": "No se pudo actualizar el filtro de conversaciones",
+      "documentation": "Documentación"
     },
     "redirectPromptPopover": {
       "skipNextTime": "¿Omitir esta página la próxima vez?",
@@ -258,7 +260,7 @@
       "titlePhoneApiKeys": "Claves API de Teléfono",
       "btnCreateApiKey": "Crear Clave API",
       "btnDocumentation": "Documentación",
-      "description": "Si tienes varios teléfonos, puedes crear claves API de teléfono únicas para tus diferentes teléfonos Android. Estas claves API solo se pueden usar en el teléfono móvil específico cuando llama al servidor httpSMS para acciones específicas como enviar latidos, registrar mensajes recibidos, informes de entrega, etc. Si deseas interactuar con la API de httpSMS completa, usa en su lugar la clave API que se encuentra en la página de configuración de tu cuenta https://httpsms.com/settings.",
+      "description": "Si tienes varios teléfonos, puedes crear claves API de teléfono únicas para cada uno. Estas claves solo sirven para que ese teléfono se comunique con tu servidor httpSMS en acciones concretas, como enviar latidos (heartbeats), registrar mensajes recibidos o reportar entregas. Para usar la API completa, utiliza la clave API de tu cuenta, que está en la página de Configuración.",
       "thName": "Nombre",
       "thCreatedAt": "Creado El",
       "thPhoneNumbers": "Números de Teléfono",
@@ -486,7 +488,7 @@
       "scheduleTextMessagesDesc": "Controla cuándo llegarán tus SMS a tus destinatarios, lo que te permite programar perfectamente promociones, alertas críticas, etc., programando tus mensajes por adelantado.",
       "getStartedSectionTitle": "Comenzar",
       "step1Title": "Paso 1",
-      "step1Desc": "Crea una cuenta en httpsms.com y obtén tu clave de API en la página de configuración.",
+      "step1Desc": "Crea tu cuenta en este panel y copia tu clave API desde la página de Configuración.",
       "step2Title": "Paso 2",
       "step2Desc": "Descarga e instala la aplicación para Android en tu teléfono e inicia sesión usando tu clave de API.",
       "step3Title": "Paso 3",
@@ -551,7 +553,7 @@
     "verify_email": "Verificar Correo",
     "timezone": "Zona Horaria",
     "api_key": "Clave API",
-    "api_key_desc": "Usa tu Clave API en el encabezado HTTP x-api-key al enviar solicitudes a los endpoints de https://api.httpsms.com.",
+    "api_key_desc": "Usa tu clave API en el encabezado HTTP x-api-key al enviar solicitudes a la API de tu servidor httpSMS.",
     "copy_api_key": "Copiar Clave API",
     "api_key_copied": "Clave API copiada con éxito",
     "show_qr_code": "Mostrar Código QR",
@@ -709,5 +711,32 @@
     "meta_description": "Guías y tutoriales para enviar y recibir SMS con tu teléfono Android — mensajería masiva, webhooks, cifrado de extremo a extremo, Zapier, Excel y Python.",
     "meta_ogTitle": "Blog de httpSMS - Guías y tutoriales de automatización de SMS",
     "meta_ogDescription": "Aprende cómo enviar y recibir SMS desde tu teléfono Android: mensajería masiva, webhooks, cifrado, tutoriales de Zapier, Excel y Python."
+  },
+  "docs": {
+    "title": "Documentación",
+    "metaTitleSuffix": "Documentación de httpSMS",
+    "metaDescription": "Aprende a enviar y recibir mensajes SMS con tu teléfono Android usando la API, los webhooks y las funciones de httpSMS.",
+    "toggleNavigation": "Mostrar u ocultar la navegación de la documentación",
+    "groups": {
+      "introduction": "Introducción",
+      "webhooks": "Webhooks",
+      "features": "Funciones"
+    },
+    "pages": {
+      "gettingStarted": "Primeros pasos",
+      "webhooksIntroduction": "Introducción",
+      "webhooksEvents": "Eventos",
+      "phoneApiKeys": "Claves API de teléfono",
+      "controlSmsSendRate": "Controlar la velocidad de envío",
+      "schedulingSmsMessages": "Programar mensajes SMS",
+      "outgoingMessageQueue": "Cola de mensajes salientes"
+    },
+    "apiReference": "Referencia de la API (Swagger)",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "fallbackNotice": "Esta página aún no está disponible en tu idioma, por lo que se muestra la versión en inglés.",
+    "notFoundTitle": "Página no encontrada",
+    "notFoundText": "La página de documentación que buscas no existe.",
+    "backToDocs": "Volver a la documentación"
   }
 }

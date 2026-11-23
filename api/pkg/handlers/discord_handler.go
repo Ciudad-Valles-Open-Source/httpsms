@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/google/uuid"
 
@@ -109,7 +110,7 @@ func (h *DiscordHandler) Index(c fiber.Ctx) error {
 // @Summary      Delete discord integration
 // @Description  Delete a discord integration for a user
 // @Security	 ApiKeyAuth
-// @Tags         Webhooks
+// @Tags         DiscordIntegration
 // @Accept       json
 // @Produce      json
 // @Param 		 discordID 	path		string 				true 	"ID of the discord integration"	default(32343a19-da5e-4b1b-a767-3298a73703ca)
@@ -220,7 +221,7 @@ func (h *DiscordHandler) Store(c fiber.Ctx) error {
 
 // Event consumes a discord event
 // @Summary      Consume a discord event
-// @Description  Publish a discord event to the registered listeners
+// @Description  Publish a discord event to the registered listeners. This is the Discord interactions endpoint: it is served at `/discord/event` on the API host, outside the `/v1` base path.
 // @Tags         Discord
 // @Accept       json
 // @Produce      json
@@ -287,7 +288,7 @@ func (h *DiscordHandler) sendSMS(ctx context.Context, c fiber.Ctx, payload map[s
 					"content": "**⚠️ error while sending message**",
 					"embeds": []fiber.Map{
 						{
-							"title": "We cannot find the link to your discord server to an account on [httpsms.com](https://httpsms.com/settings).",
+							"title": fmt.Sprintf("We cannot find the link to your discord server to an account on [%s](%s).", os.Getenv("APP_NAME"), strings.TrimSuffix(os.Getenv("APP_URL"), "/")+"/settings"),
 							"color": 14681092,
 						},
 					},

@@ -16,6 +16,7 @@ import {
   mdiCommentTextMultipleOutline,
   mdiAccountMultiple,
   mdiCircle,
+  mdiBookOpenVariant,
 } from '@mdi/js'
 import type { EntitiesPhone } from '~~/shared/types/api'
 
@@ -256,6 +257,12 @@ async function filterThreads(unreadOnly: boolean) {
             <template #prepend><v-icon :icon="mdiDownload" /></template>
             <v-list-item-title>{{
               $t('components.messageThreadHeader.downloadApp')
+            }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item to="/docs">
+            <template #prepend><v-icon :icon="mdiBookOpenVariant" /></template>
+            <v-list-item-title>{{
+              $t('components.messageThreadHeader.documentation')
             }}</v-list-item-title>
           </v-list-item>
           <v-list-item :to="{ name: 'statistics' }">
