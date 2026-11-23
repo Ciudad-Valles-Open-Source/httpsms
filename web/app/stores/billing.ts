@@ -12,8 +12,6 @@ import type {
   RequestsDiscordUpdate,
   RequestsMessageSendScheduleStore,
   RequestsUserNotificationUpdate,
-  RequestsUserPaymentInvoice,
-  ResponsesUserSubscriptionPaymentsResponse,
 } from '~~/shared/types/api'
 
 export const useBillingStore = defineStore('billing', () => {
@@ -36,56 +34,6 @@ export const useBillingStore = defineStore('billing', () => {
     billingUsageHistory.value = response.data
   }
 
-  async function getSubscriptionUpdateLink(): Promise<string> {
-    const response = await apiFetch<{ data: string }>(
-      '/v1/users/subscription-update-url',
-    )
-    return response.data
-  }
-
-  async function cancelSubscription(): Promise<string> {
-    const response = await apiFetch<{ message: string }>(
-      '/v1/users/subscription',
-      {
-        method: 'DELETE',
-      },
-    )
-    return response.message
-  }
-
-  async function indexSubscriptionPayments(): Promise<ResponsesUserSubscriptionPaymentsResponse> {
-    const response = await apiFetch<ResponsesUserSubscriptionPaymentsResponse>(
-      '/v1/users/subscription/payments',
-      { params: { limit: 100 } },
-    )
-    return response
-  }
-
-  async function generateSubscriptionPaymentInvoice(
-    subscriptionInvoiceId: string,
-    request: RequestsUserPaymentInvoice,
-  ): Promise<void> {
-    const response = await apiFetch(
-      `/v1/users/subscription/invoices/${subscriptionInvoiceId}`,
-      {
-        method: 'POST',
-        body: request,
-        responseType: 'blob',
-      },
-    )
-
-    const pdfBlob = new Blob([response as Blob], { type: 'application/pdf' })
-    const url = window.URL.createObjectURL(pdfBlob)
-    const tempLink = document.createElement('a')
-    tempLink.href = url
-    tempLink.setAttribute('download', 'Invoice.pdf')
-    document.body.appendChild(tempLink)
-    tempLink.click()
-    document.body.removeChild(tempLink)
-    window.URL.revokeObjectURL(url)
-  }
-
-  // Webhooks
   async function createWebhook(
     payload: RequestsWebhookStore,
   ): Promise<EntitiesWebhook> {
@@ -274,10 +222,6 @@ export const useBillingStore = defineStore('billing', () => {
     billingUsageHistory,
     loadBillingUsage,
     loadBillingUsageHistory,
-    getSubscriptionUpdateLink,
-    cancelSubscription,
-    indexSubscriptionPayments,
-    generateSubscriptionPaymentInvoice,
     createWebhook,
     getWebhooks,
     updateWebhook,

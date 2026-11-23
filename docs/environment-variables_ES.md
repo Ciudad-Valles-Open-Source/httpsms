@@ -82,7 +82,6 @@ These variables configure the internal system user that drives the asynchronous 
 
 | Variable              | Required | Default | Description                                                                                                                                                   |
 | --------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ENTITLEMENT_ENABLED` | No       | `false` | When `true`, enforces subscription-based message limits per user. Set to `false` for self-hosted deployments where all users should have unrestricted access. |
 
 ### Optional Integrations
 

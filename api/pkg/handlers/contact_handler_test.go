@@ -249,7 +249,8 @@ func TestContactHandler_Store_CreatesManyContactsFromObjectShape(t *testing.T) {
 	assert.Equal(t, "Bob", stored[0][1].Name)
 }
 
-func TestContactHandler_Store_RejectsBatchExceedingContactLimit(t *testing.T) {
+func TestContactHandler_Store_AllowsBatchBeyondFormerFreeLimit(t *testing.T) {
+	// This fork is 100% free: entitlements never limit the number of contacts.
 	repo := &contactHandlerFakeRepo{countResult: 199}
 	app := newContactHandlerTestAppWithEntitlements(repo, true, entities.SubscriptionNameFree)
 
@@ -262,10 +263,11 @@ func TestContactHandler_Store_RejectsBatchExceedingContactLimit(t *testing.T) {
 
 	resp, err := app.Test(req, fiber.TestConfig{Timeout: time.Second})
 	require.NoError(t, err)
-	require.Equal(t, http.StatusPaymentRequired, resp.StatusCode)
+	require.Equal(t, http.StatusCreated, resp.StatusCode)
 
 	stored, _, _, _ := repo.snapshot()
-	assert.Empty(t, stored)
+	require.Len(t, stored, 1)
+	assert.Len(t, stored[0], 2)
 }
 
 func TestContactHandler_Store_DisabledEntitlementsDoNotLimitContacts(t *testing.T) {
@@ -351,7 +353,8 @@ func TestContactHandler_Upload_CSVSuccess(t *testing.T) {
 	}
 }
 
-func TestContactHandler_Upload_RejectsBatchExceedingContactLimit(t *testing.T) {
+func TestContactHandler_Upload_AllowsBatchBeyondFormerFreeLimit(t *testing.T) {
+	// This fork is 100% free: entitlements never limit the number of contacts.
 	repo := &contactHandlerFakeRepo{countResult: 199}
 	app := newContactHandlerTestAppWithEntitlements(repo, true, entities.SubscriptionNameFree)
 
@@ -362,10 +365,11 @@ func TestContactHandler_Upload_RejectsBatchExceedingContactLimit(t *testing.T) {
 
 	resp, err := app.Test(req, fiber.TestConfig{Timeout: time.Second})
 	require.NoError(t, err)
-	require.Equal(t, http.StatusPaymentRequired, resp.StatusCode)
+	require.Equal(t, http.StatusCreated, resp.StatusCode)
 
 	stored, _, _, _ := repo.snapshot()
-	assert.Empty(t, stored)
+	require.Len(t, stored, 1)
+	assert.Len(t, stored[0], 2)
 }
 
 func TestContactHandler_Upload_NonCSVFile_ReturnsUnprocessableEntity(t *testing.T) {

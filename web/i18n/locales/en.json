@@ -443,7 +443,7 @@
       "faq2Question": "What's the minimum supported Android version?",
       "faq2Answer": "The httpSMS Android app works from Android 9 (Pie) and above. So you can install the application on your old Android phone which you don't use anymore.",
       "faq3Question": "Can I send unlimited number of messages per month?",
-      "faq3Answer": "We do have packages that allow up to 200,000 SMS messages per month but you can send us an email if you will like to send more messages so we create a custom plan just for you.",
+      "faq3Answer": "Yes. This project is 100% free and self-hosted: there are no paid plans and no message limits. The only limit is the one set by your carrier or SIM card.",
       "faq4Question": "Can I change the sender of the SMS message?",
       "faq4Answer": "No you cannot. When you send an SMS message using the httpSMS app it uses your SIM card to send the message so the recipient will see your phone number as the sender of the SMS. You cannot use your brand name as the sender ID.",
       "metaTitle": "Convert your Android phone into an SMS gateway - httpSMS",

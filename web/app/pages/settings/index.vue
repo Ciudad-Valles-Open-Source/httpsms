@@ -112,11 +112,6 @@ const timezones = (() => {
 
 const apiKey = computed(() => authStore.user?.api_key ?? '')
 
-const hasActiveSubscription = computed(() => {
-  if (authStore.user === null) return true
-  return authStore.user.subscription_renews_at != null
-})
-
 const phoneNumbers = computed(() =>
   phonesStore.phones.map((phone) => phone.phone_number),
 )
@@ -1336,12 +1331,6 @@ onMounted(async () => {
               Delete Account
             </h5>
             <p
-              v-if="hasActiveSubscription"
-              class="text-medium-emphasis"
-              v-html="$t('settings.cannot_delete_account_desc')"
-            ></p>
-            <p
-              v-else
               class="text-medium-emphasis"
               v-html="$t('settings.delete_account_desc')"
             ></p>
@@ -1349,7 +1338,6 @@ onMounted(async () => {
               color="error"
               :loading="deletingAccount"
               class="mt-2"
-              :disabled="hasActiveSubscription"
               @click="showDeleteAccountDialog = true"
             >
               <VIcon start :icon="mdiDelete" />

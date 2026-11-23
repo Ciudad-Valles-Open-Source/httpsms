@@ -151,8 +151,6 @@ func NewContainer(projectID string, version string) (container *Container) {
 	container.RegisterWebhookRoutes()
 	container.RegisterWebhookListeners()
 
-	container.RegisterLemonsqueezyRoutes()
-
 	container.RegisterIntegration3CXRoutes()
 	container.RegisterIntegration3CXListeners()
 

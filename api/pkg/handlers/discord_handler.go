@@ -11,7 +11,6 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/NdoleStudio/httpsms/pkg/repositories"
 	"github.com/NdoleStudio/httpsms/pkg/requests"
 	"github.com/NdoleStudio/httpsms/pkg/services"
 	"github.com/NdoleStudio/httpsms/pkg/telemetry"
@@ -208,17 +207,6 @@ func (h *DiscordHandler) Store(c fiber.Ctx) error {
 	if errors := h.validator.ValidateStore(ctx, request.Sanitize()); len(errors) != 0 {
 		ctxLogger.Warn(stacktrace.NewErrorf("validation errors [%s], while storing discord integration [%+#v]", spew.Sdump(errors), request))
 		return h.responseUnprocessableEntity(c, errors, "validation errors while storing discord integration")
-	}
-
-	discordIntegrations, err := h.service.Index(ctx, h.userIDFomContext(c), repositories.IndexParams{Skip: 0, Limit: 1})
-	if err != nil {
-		ctxLogger.Error(stacktrace.Propagatef(err, "cannot index discord integrations for user [%s]", h.userIDFomContext(c)))
-		return h.responseInternalServerError(c)
-	}
-
-	if len(discordIntegrations) > 0 {
-		ctxLogger.Warn(stacktrace.NewErrorf("user with ID [%s] wants to create more than 1 discord integration", h.userIDFomContext(c)))
-		return h.responsePaymentRequired(c, "You can't create more than 1 discord integration contact us to upgrade your account.")
 	}
 
 	discordIntegration, err := h.service.Store(ctx, request.ToStoreParams(h.userFromContext(c)))

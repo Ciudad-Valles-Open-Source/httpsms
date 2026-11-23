@@ -33,7 +33,6 @@ ARG CLOUDFLARE_TURNSTILE_SITE_KEY=
 ARG SOKETI_KEY=
 ARG SOKETI_CLUSTER=
 ARG USE_SOKETI=
-ARG ENABLE_BILLING=
 
 # Promote build args to env vars so Nuxt picks them up during generate
 ENV API_BASE_URL=$API_BASE_URL \
@@ -53,8 +52,7 @@ ENV API_BASE_URL=$API_BASE_URL \
     CLOUDFLARE_TURNSTILE_SITE_KEY=$CLOUDFLARE_TURNSTILE_SITE_KEY \
     SOKETI_KEY=$SOKETI_KEY \
     SOKETI_CLUSTER=$SOKETI_CLUSTER \
-    USE_SOKETI=$USE_SOKETI \
-    ENABLE_BILLING=$ENABLE_BILLING
+    USE_SOKETI=$USE_SOKETI
 
 # Install pnpm via corepack (built into Node 22)
 RUN corepack enable && corepack prepare pnpm@latest --activate

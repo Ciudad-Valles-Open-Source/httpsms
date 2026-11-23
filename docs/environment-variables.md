@@ -80,8 +80,6 @@ These variables configure the internal system user that drives the asynchronous 
 
 | Variable              | Required | Default | Description                                                                                                                                                   |
 | --------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ENTITLEMENT_ENABLED` | No       | `false` | When `true`, enforces subscription-based message limits per user. Set to `false` for self-hosted deployments where all users should have unrestricted access. |
-| `ENABLE_BILLING`      | No       | `false` | When `false`, ignores any billing limits in the backend and hides the UI elements.                                                                            |
 
 ### Optional Integrations
 
@@ -126,7 +124,6 @@ When using Docker Compose, the `docker-compose.yml` passes these values from the
 | `SOKETI_KEY`                    | No       | —                                        | Soketi public key for real-time updates.                                                                                                                        |
 | `SOKETI_CLUSTER`                | No       | —                                        | Soketi cluster for real-time updates.                                                                                                                           |
 | `USE_SOKETI`                    | No       | `false`                                  | Whether to use a Soketi instance. If true, uses the browser's current host and `/app/` route.                                     |
-| `ENABLE_BILLING`                | No       | `false`                                  | Enables or disables the billing UI menu and backend limits.                                                                                                     |
 
 ---
 

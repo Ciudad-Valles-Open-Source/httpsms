@@ -85,7 +85,6 @@ function startPoller() {
 
 <template>
   <v-app>
-    <BlackFridayBanner />
     <v-navigation-drawer v-if="lgAndUp && hasDrawer" :width="400" permanent>
       <template #default>
         <div class="message-thread-sidebar d-flex flex-column">

@@ -5,37 +5,18 @@ import {
   mdiCircle,
   mdiTwitter,
   mdiHeart,
-  mdiShieldStar,
   mdiLightbulbOn50,
   mdiCreation,
   mdiEyeOffOutline,
   mdiPost,
-  mdiCreditCardOutline,
   mdiScaleBalance,
   mdiEmailOutline,
   mdiBookOpenVariant,
 } from '@mdi/js'
 
-const router = useRouter()
-const route = useRoute()
 const { lgAndUp, mdAndUp } = useDisplay()
 const authStore = useAuthStore()
 const appStore = useAppStore()
-const config = useRuntimeConfig()
-
-function goToPricing() {
-  if (route.name === 'index') {
-    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })
-  } else {
-    router.push('/').then(() => {
-      setTimeout(() => {
-        document
-          .getElementById('pricing')
-          ?.scrollIntoView({ behavior: 'smooth' })
-      }, 300)
-    })
-  }
-}
 </script>
 
 <template>
@@ -61,16 +42,6 @@ function goToPricing() {
             </NuxtLink>
             <v-spacer />
             <LanguageSwitcher class="mt-6" />
-            <v-btn
-              v-show="lgAndUp && config.public.enableBilling"
-              size="large"
-              variant="text"
-              color="primary"
-              class="my-5 mr-2"
-              @click="goToPricing"
-            >
-              {{ $t('website.pricing') }}
-            </v-btn>
             <v-btn
               v-show="lgAndUp"
               size="large"
@@ -145,7 +116,8 @@ function goToPricing() {
             </NuxtLink>
             <div class="text-title-medium mb-4 text-medium-emphasis">
               {{ $t('website.madeWith') }}
-              <v-icon color="#cf1112" :icon="mdiHeart" /> {{ $t('website.inTallinn') }}
+              <v-icon color="#cf1112" :icon="mdiHeart" />
+              {{ $t('website.inTallinn') }}
               <v-img
                 class="d-inline-block"
                 width="20"
@@ -192,27 +164,10 @@ function goToPricing() {
             </a>
           </v-col>
           <v-col cols="12" md="3">
-            <h2 class="text-headline-small mb-2">{{ $t('website.resources') }}</h2>
+            <h2 class="text-headline-small mb-2">
+              {{ $t('website.resources') }}
+            </h2>
             <ul style="list-style: none" class="pa-0">
-              <li class="mb-2">
-                <a
-                  class="text-white text-decoration-none footer-link"
-                  style="cursor: pointer"
-                  @click.stop="goToPricing"
-                >
-                  {{ $t('website.pricing') }}
-                  <v-icon size="small" :icon="mdiCreditCardOutline" />
-                </a>
-              </li>
-              <li class="mb-2">
-                <a
-                  href="https://httpsms.lemonsqueezy.com/affiliates"
-                  class="text-white text-decoration-none footer-link"
-                >
-                  {{ $t('website.affiliates') }}
-                  <v-icon color="warning" size="small" :icon="mdiShieldStar" />
-                </a>
-              </li>
               <li class="mb-2">
                 <a
                   href="https://status.httpsms.com"
@@ -227,13 +182,16 @@ function goToPricing() {
                   class="text-white text-decoration-none footer-link"
                   to="/blog"
                 >
-                  {{ $t('website.blog') }} <v-icon size="small" :icon="mdiPost" />
+                  {{ $t('website.blog') }}
+                  <v-icon size="small" :icon="mdiPost" />
                 </NuxtLink>
               </li>
             </ul>
           </v-col>
           <v-col cols="12" md="3">
-            <h2 class="text-headline-small mb-2">{{ $t('website.developers') }}</h2>
+            <h2 class="text-headline-small mb-2">
+              {{ $t('website.developers') }}
+            </h2>
             <ul style="list-style: none" class="pa-0">
               <li class="mb-2">
                 <a
@@ -249,7 +207,8 @@ function goToPricing() {
                   :href="appStore.appData.githubUrl"
                   class="text-white text-decoration-none footer-link"
                 >
-                  {{ $t('website.github') }} <v-icon size="small" :icon="mdiGithub" />
+                  {{ $t('website.github') }}
+                  <v-icon size="small" :icon="mdiGithub" />
                 </a>
               </li>
               <li class="mb-2">

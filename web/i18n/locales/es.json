@@ -443,7 +443,7 @@
       "faq2Question": "¿Cuál es la versión mínima de Android compatible?",
       "faq2Answer": "La aplicación de Android httpSMS funciona desde Android 9 (Pie) y superior. Por lo que puedes instalar la aplicación en tu antiguo teléfono Android que ya no usas.",
       "faq3Question": "¿Puedo enviar un número ilimitado de mensajes al mes?",
-      "faq3Answer": "Tenemos paquetes que permiten hasta 200,000 mensajes SMS al mes, pero puedes enviarnos un correo si deseas enviar más mensajes para que creemos un plan personalizado solo para ti.",
+      "faq3Answer": "Sí. Este proyecto es 100% libre y autohospedado: no hay planes de pago ni límites de mensajes. El único límite es el que imponga tu operador o tarjeta SIM.",
       "faq4Question": "¿Puedo cambiar el remitente del mensaje SMS?",
       "faq4Answer": "No, no puedes. Cuando envías un mensaje SMS usando la app httpSMS, utiliza tu tarjeta SIM para enviar el mensaje, por lo que el destinatario verá tu número de teléfono como el remitente del SMS. No puedes usar tu marca como ID de remitente.",
       "metaTitle": "Convierte tu teléfono Android en una pasarela de SMS - httpSMS",

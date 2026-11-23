@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"strconv"
 	"testing"
 
 	"github.com/NdoleStudio/httpsms/pkg/entities"
@@ -44,61 +43,27 @@ func TestEntitlementService_CheckAdditional_DisabledAllowsWithoutLoadingUserOrCo
 	assert.Zero(t, countCalls)
 }
 
-func TestEntitlementService_CheckAdditional_UsesSubscriptionLimitForContactBatch(t *testing.T) {
-	tests := []struct {
-		name             string
-		subscriptionName entities.SubscriptionName
-		currentCount     int
-		additionalCount  int
-		allowed          bool
-	}{
-		{
-			name:             "free user can reach 200 contacts",
-			subscriptionName: entities.SubscriptionNameFree,
-			currentCount:     199,
-			additionalCount:  1,
-			allowed:          true,
-		},
-		{
-			name:             "free user cannot exceed 200 contacts",
-			subscriptionName: entities.SubscriptionNameFree,
-			currentCount:     199,
-			additionalCount:  2,
-			allowed:          false,
-		},
-		{
-			name:             "pro user can reach 5000 contacts",
-			subscriptionName: entities.SubscriptionNameProMonthly,
-			currentCount:     4999,
-			additionalCount:  1,
-			allowed:          true,
-		},
-		{
-			name:             "pro user cannot exceed 5000 contacts",
-			subscriptionName: entities.SubscriptionNameProMonthly,
-			currentCount:     4999,
-			additionalCount:  2,
-			allowed:          false,
-		},
+func TestEntitlementService_CheckAdditional_NeverLimitsUsers(t *testing.T) {
+	entityNames := []string{
+		entities.EntityNameContact,
+		entities.EntityNamePhoneAPIKey,
+		entities.EntityNameMessageSendSchedule,
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+	for _, entityName := range entityNames {
+		t.Run(entityName, func(t *testing.T) {
 			repository := &entitlementUserRepository{
-				user: &entities.User{SubscriptionName: test.subscriptionName},
+				user: &entities.User{SubscriptionName: entities.SubscriptionNameFree},
 			}
 			service := newEntitlementServiceForTest(true, repository)
 
-			result, err := service.CheckAdditional(context.Background(), "user-id", "Contact", test.additionalCount, func() (int, error) {
-				return test.currentCount, nil
+			result, err := service.CheckAdditional(context.Background(), "user-id", entityName, 1_000_000, func() (int, error) {
+				return 1_000_000, nil
 			})
 
 			require.NoError(t, err)
-			assert.Equal(t, test.allowed, result.Allowed)
-			if !test.allowed {
-				assert.Contains(t, result.Message, "more than ["+strconv.FormatUint(uint64(test.subscriptionName.Limit()), 10)+"]")
-				assert.Contains(t, result.Message, "Upgrade your plan")
-			}
+			assert.True(t, result.Allowed)
+			assert.Empty(t, result.Message)
 		})
 	}
 }

@@ -45,10 +45,6 @@ func (h *UserHandler) RegisterRoutes(router fiber.Router, middlewares ...fiber.H
 	h.register(router, fiber.MethodDelete, "/v1/users/me", middlewares, h.Delete)
 	h.register(router, fiber.MethodDelete, "/v1/users/:userID/api-keys", middlewares, h.DeleteAPIKey)
 	h.register(router, fiber.MethodPut, "/v1/users/:userID/notifications", middlewares, h.UpdateNotifications)
-	h.register(router, fiber.MethodGet, "/v1/users/subscription-update-url", middlewares, h.subscriptionUpdateURL)
-	h.register(router, fiber.MethodDelete, "/v1/users/subscription", middlewares, h.cancelSubscription)
-	h.register(router, fiber.MethodGet, "/v1/users/subscription/payments", middlewares, h.subscriptionPayments)
-	h.register(router, fiber.MethodPost, "/v1/users/subscription/invoices/:subscriptionInvoiceID", middlewares, h.subscriptionInvoice)
 }
 
 // Show returns an entities.User

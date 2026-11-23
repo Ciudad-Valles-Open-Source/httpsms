@@ -7,7 +7,6 @@ import {
   mdiLogout,
   mdiCellphoneKey,
   mdiDownload,
-  mdiFinance,
   mdiChartBar,
   mdiBatteryChargingHigh,
   mdiPackageUp,
@@ -24,7 +23,6 @@ const { t } = useI18n()
 
 const router = useRouter()
 const route = useRoute()
-const config = useRuntimeConfig()
 const { mdAndDown, lgAndUp } = useDisplay()
 const authStore = useAuthStore()
 const phonesStore = usePhonesStore()
@@ -227,15 +225,6 @@ async function logout() {
           <template #prepend><v-icon :icon="mdiDownload" /></template>
           <v-list-item-title>{{
             $t('components.messageThreadHeader.downloadApp')
-          }}</v-list-item-title>
-        </v-list-item>
-        <v-list-item
-          v-if="config.public.enableBilling"
-          :to="{ name: 'billing' }"
-        >
-          <template #prepend><v-icon :icon="mdiFinance" /></template>
-          <v-list-item-title>{{
-            $t('components.messageThreadHeader.usageBilling')
           }}</v-list-item-title>
         </v-list-item>
         <v-list-item :to="{ name: 'statistics' }">

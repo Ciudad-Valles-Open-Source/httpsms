@@ -118,8 +118,6 @@ services:
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
 
-      # ── Entitlements ────────────────────────────────────────────────────
-      ENTITLEMENT_ENABLED: ${ENTITLEMENT_ENABLED:-false}
       USE_HTTP_LOGGER: ${USE_HTTP_LOGGER:-true}
 
       # ── Cloudflare Turnstile ────────────────────────────────────────────
@@ -132,7 +130,6 @@ services:
       SOKETI_CLUSTER: ${SOKETI_CLUSTER:-mt1}
       SOKETI_HOST: ${SOKETI_HOST:-soketi:6001}
       SOKETI_SECURE: ${SOKETI_SECURE:-false}
-      ENABLE_BILLING: ${ENABLE_BILLING:-false}
 
       # ── Optional: Axiom observability ───────────────────────────────────
       AXIOM_TOKEN: ${AXIOM_TOKEN:-}
@@ -182,7 +179,6 @@ services:
         SOKETI_KEY: ${SOKETI_KEY:-app-key}
         SOKETI_CLUSTER: ${SOKETI_CLUSTER:-mt1}
         USE_SOKETI: ${USE_SOKETI:-true}
-        ENABLE_BILLING: ${ENABLE_BILLING:-false}
     ports:
       - "${WEB_PORT:-3000}:3000"
     depends_on:

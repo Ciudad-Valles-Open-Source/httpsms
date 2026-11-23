@@ -3,26 +3,11 @@ package services
 import (
 	"context"
 	"fmt"
-	"strings"
-	"unicode"
 
 	"github.com/NdoleStudio/httpsms/pkg/entities"
 	"github.com/NdoleStudio/httpsms/pkg/repositories"
 	"github.com/NdoleStudio/httpsms/pkg/telemetry"
-	"github.com/NdoleStudio/stacktrace"
-	pluralize "github.com/gertd/go-pluralize"
 )
-
-// entityLimits maps entity name → subscription plan → max count.
-// A limit of 0 means unlimited. If a plan is not listed, it defaults to unlimited (0).
-var entityLimits = map[string]map[entities.SubscriptionName]int{
-	entities.EntityNameMessageSendSchedule: {
-		entities.SubscriptionNameFree: 1,
-	},
-	entities.EntityNamePhoneAPIKey: {
-		entities.SubscriptionNameFree: 1,
-	},
-}
 
 // EntitlementCheckResult holds the outcome of an entitlement check.
 type EntitlementCheckResult struct {
@@ -66,100 +51,17 @@ func (service *EntitlementService) Check(
 	return service.CheckAdditional(ctx, userID, entityName, 1, countFunc)
 }
 
-// CheckAdditional verifies if the user can create additionalCount instances of
-// the given entity without exceeding their subscription plan limit.
+// CheckAdditional always allows creating more entities.
+// This fork is 100% free and self-hosted: there are no plan-based limits.
 func (service *EntitlementService) CheckAdditional(
 	ctx context.Context,
-	userID entities.UserID,
-	entityName string,
-	additionalCount int,
-	countFunc func() (int, error),
+	_ entities.UserID,
+	_ string,
+	_ int,
+	_ func() (int, error),
 ) (*EntitlementCheckResult, error) {
-	ctx, span := service.tracer.Start(ctx)
+	_, span := service.tracer.Start(ctx)
 	defer span.End()
 
-	if !service.enabled {
-		return &EntitlementCheckResult{Allowed: true}, nil
-	}
-
-	limits, hasConfiguredLimits := entityLimits[entityName]
-	if !hasConfiguredLimits && entityName != entities.EntityNameContact {
-		return &EntitlementCheckResult{Allowed: true}, nil
-	}
-
-	user, err := service.userRepository.Load(ctx, userID)
-	if err != nil {
-		return nil, service.tracer.WrapErrorSpan(
-			span,
-			stacktrace.Propagatef(err, "cannot load user [%s] for entitlement check", userID),
-		)
-	}
-
-	limit := int(user.SubscriptionName.Limit())
-	if entityName != entities.EntityNameContact {
-		var hasLimit bool
-		limit, hasLimit = limits[user.SubscriptionName]
-		if !hasLimit || limit == 0 {
-			return &EntitlementCheckResult{Allowed: true}, nil
-		}
-	}
-
-	currentCount, err := countFunc()
-	if err != nil {
-		return nil, service.tracer.WrapErrorSpan(
-			span,
-			stacktrace.Propagatef(err, "cannot count entities [%s] for user [%s]", entityName, userID),
-		)
-	}
-
-	if currentCount+additionalCount > limit {
-		return &EntitlementCheckResult{
-			Allowed: false,
-			Message: fmt.Sprintf(
-				"Upgrade your plan to create more than [%d] %s. Visit https://httpsms.com/pricing for details.",
-				limit,
-				formatEntityName(entityName, true),
-			),
-		}, nil
-	}
-
 	return &EntitlementCheckResult{Allowed: true}, nil
-}
-
-// formatEntityName converts a PascalCase entity name to lowercase words and optionally pluralizes it.
-// Consecutive uppercase letters (acronyms like API) are kept together as a single word.
-// e.g. "MessageSendSchedule" → "message send schedules", "PhoneAPIKey" → "phone API keys"
-func formatEntityName(name string, plural bool) string {
-	var words []string
-	runes := []rune(name)
-	start := 0
-	for i := 1; i < len(runes); i++ {
-		if unicode.IsUpper(runes[i]) {
-			if !unicode.IsUpper(runes[i-1]) {
-				// transition from lowercase to uppercase: split before i
-				words = append(words, string(runes[start:i]))
-				start = i
-			} else if i+1 < len(runes) && unicode.IsLower(runes[i+1]) {
-				// transition from uppercase run to a new word (e.g., "API" followed by "Key")
-				words = append(words, string(runes[start:i]))
-				start = i
-			}
-		}
-	}
-	words = append(words, string(runes[start:]))
-
-	for i, word := range words {
-		if word == strings.ToUpper(word) && len(word) > 1 {
-			// keep acronyms uppercase (e.g., "API")
-			continue
-		}
-		words[i] = strings.ToLower(word)
-	}
-
-	if plural && len(words) > 0 {
-		client := pluralize.NewClient()
-		words[len(words)-1] = client.Plural(words[len(words)-1])
-	}
-
-	return strings.Join(words, " ")
 }

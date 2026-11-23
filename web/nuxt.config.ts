@@ -156,7 +156,6 @@ export default defineNuxtConfig({
       firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '',
       firebaseAppId: process.env.FIREBASE_APP_ID || '',
       firebaseMeasurementId: process.env.FIREBASE_MEASUREMENT_ID || '',
-      enableBilling: process.env.ENABLE_BILLING !== 'false',
       useSoketi: process.env.USE_SOKETI === 'true',
     },
   },

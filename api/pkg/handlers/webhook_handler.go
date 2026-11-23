@@ -3,8 +3,6 @@ package handlers
 import (
 	"fmt"
 
-	"github.com/NdoleStudio/httpsms/pkg/repositories"
-
 	"github.com/NdoleStudio/httpsms/pkg/requests"
 	"github.com/google/uuid"
 
@@ -150,17 +148,6 @@ func (h *WebhookHandler) Store(c fiber.Ctx) error {
 	if errors := h.validator.ValidateStore(ctx, h.userIDFomContext(c), request.Sanitize()); len(errors) != 0 {
 		ctxLogger.Warn(stacktrace.NewErrorf("validation errors [%s], while storing webhook [%+#v]", spew.Sdump(errors), request))
 		return h.responseUnprocessableEntity(c, errors, "validation errors while storing webhook")
-	}
-
-	webhooks, err := h.service.Index(ctx, h.userIDFomContext(c), repositories.IndexParams{Skip: 0, Limit: 10})
-	if err != nil {
-		ctxLogger.Error(stacktrace.Propagatef(err, "cannot index webhooks for user [%s]", h.userIDFomContext(c)))
-		return h.responseInternalServerError(c)
-	}
-
-	if len(webhooks) == 10 {
-		ctxLogger.Warn(stacktrace.NewErrorf("user with ID [%s] wants to create more than 10 webhooks", h.userIDFomContext(c)))
-		return h.responsePaymentRequired(c, "You can't create more than 10 webhooks contact us to upgrade to our enterprise plan.")
 	}
 
 	webhook, err := h.service.Store(ctx, request.ToStoreParams(h.userFromContext(c)))
