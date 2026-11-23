@@ -122,6 +122,7 @@ La documentación completa de auto-alojamiento está organizada en el directorio
 | [docs/environment-variables_ES.md](./docs/environment-variables_ES.md) | Referencia para todas las variables de entorno |
 | [docs/deployment-platforms_ES.md](./docs/deployment-platforms_ES.md) | Instrucciones específicas de plataforma (Coolify, Portainer, CapRover, Swarm) |
 | [docs/docker-configuration_ES.md](./docs/docker-configuration_ES.md) | Referencia técnica de Dockerfile y docker-compose.yml |
+| [docs/realtime_ES.md](./docs/realtime_ES.md) | Tiempo real con Soketi: configuración, `SOKETI_KEY` alfanumérica y diagnóstico |
 
 ### Inicio Rápido (desarrollo local)
 

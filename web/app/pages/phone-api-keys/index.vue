@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { mdiArrowLeft, mdiPlus, mdiDelete, mdiEye } from '@mdi/js'
 import QRCode from 'qrcode'
-import Pusher from 'pusher-js'
-import type { Channel } from 'pusher-js'
+import { bindRealtimeEvents } from '~/composables/useRealtime'
 import { ErrorMessages } from '~/utils/errors'
 import { getApiErrorMessage, toApiError } from '~/utils/api-error'
 import type { EntitiesPhoneAPIKey } from '~~/shared/types/api'
@@ -15,7 +14,6 @@ useHead({
   title: computed(() => $t('pages.phoneApiKeys.title')),
 })
 
-const config = useRuntimeConfig()
 const { lgAndUp } = useVDisplay()
 const authStore = useAuthStore()
 const phonesStore = usePhonesStore()
@@ -38,7 +36,7 @@ const activePhoneApiKey = ref<EntitiesPhoneAPIKey | null>(null)
 const activePhoneNumber = ref('')
 
 const qrCodeCanvas = ref<HTMLCanvasElement | null>(null)
-let webhookChannel: Channel | null = null
+let unbindRealtime: () => void = () => {}
 
 function parseErrors(error: unknown): ErrorMessages {
   const bag = new ErrorMessages()
@@ -217,45 +215,14 @@ onMounted(async () => {
   await phonesStore.loadPhones()
   await loadPhoneApiKeys()
 
-  const pusherKey = config.public.soketiKey as string
-  const pusherCluster = config.public.soketiCluster as string
-  if (pusherKey && authStore.user?.id) {
-    const pusherOptions = config.public.useSoketi
-      ? {
-          wsHost: window.location.hostname,
-          wsPort: window.location.port
-            ? Number(window.location.port)
-            : window.location.protocol === 'https:'
-              ? 443
-              : 80,
-          wssPort: window.location.port
-            ? Number(window.location.port)
-            : window.location.protocol === 'https:'
-              ? 443
-              : 80,
-          forceTLS: window.location.protocol === 'https:',
-          disableStats: true,
-          enabledTransports: ['ws', 'wss'],
-          cluster: '',
-        }
-      : {
-          cluster: pusherCluster,
-        }
-    const pusher = new Pusher(pusherKey, pusherOptions)
-    webhookChannel = pusher.subscribe(authStore.user.id)
-    webhookChannel.bind('phone.updated', () => {
-      if (!loading.value) {
-        loadPhoneApiKeys()
-      }
-    })
-  }
+  unbindRealtime = bindRealtimeEvents(authStore.user?.id, {
+    'phone.updated': () => {
+      if (!loading.value) loadPhoneApiKeys()
+    },
+  })
 })
 
-onBeforeUnmount(() => {
-  if (webhookChannel) {
-    webhookChannel.unsubscribe()
-  }
-})
+onBeforeUnmount(() => unbindRealtime())
 </script>
 
 <template>

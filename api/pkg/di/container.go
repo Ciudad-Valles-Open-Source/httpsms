@@ -1624,8 +1624,10 @@ func (container *Container) RegisterPhoneListeners() {
 func (container *Container) RegisterWebsocketListeners() {
 	container.logger.Debug(fmt.Sprintf("registering listeners for %T", listeners.WebsocketListener{}))
 
-	if os.Getenv("PUSHER_SECRET") == "" {
-		container.logger.Warn(stacktrace.NewErrorf("skipping websocket listeners because the PUSHER_SECRET env variable is not set"))
+	// The Pusher client is configured from the SOKETI_* variables (see PusherClient),
+	// so the listeners must be enabled based on SOKETI_SECRET as well.
+	if os.Getenv("SOKETI_SECRET") == "" && os.Getenv("PUSHER_SECRET") == "" {
+		container.logger.Warn(stacktrace.NewErrorf("skipping websocket listeners because the SOKETI_SECRET env variable is not set"))
 		return
 	}
 

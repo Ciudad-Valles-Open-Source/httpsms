@@ -76,17 +76,12 @@ These variables configure the internal system user that drives the asynchronous 
 | --------------------------------- | -------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `CLOUDFLARE_TURNSTILE_SECRET_KEY` | No       | —       | Turnstile secret key used by the API to validate CAPTCHA tokens on the `/v1/messages/search` route. The route is unprotected if this value is empty. |
 
-### Entitlements
-
-| Variable              | Required | Default | Description                                                                                                                                                   |
-| --------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-
 ### Optional Integrations
 
 | Variable                | Required | Default | Description                                                                                                                    |
 | ----------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `SOKETI_APP_ID`         | No       | —       | Soketi application ID. Enables real-time updates in the web UI via WebSockets.                                 |
-| `SOKETI_KEY`            | No       | —       | Soketi public key.                                                                                                             |
+| `SOKETI_APP_ID`         | No       | —       | Soketi application ID. Enables real-time updates in the web UI via WebSockets. See [realtime.md](./realtime.md). |
+| `SOKETI_KEY`            | No       | —       | Soketi public key. Must be URL-safe (letters and numbers only, e.g. `openssl rand -hex 32`) because it is part of the WebSocket URL. |
 | `SOKETI_SECRET`         | No       | —       | Soketi secret key.                                                                                                             |
 | `SOKETI_HOST`           | No       | —       | Soketi Host (optional). Used when connecting to the WebSocket server.                                         |
 | `SOKETI_SECURE`         | No       | `false` | Soketi Secure flag (optional). Set to `false` when using local HTTP for the WebSocket server.                             |
@@ -121,7 +116,7 @@ When using Docker Compose, the `docker-compose.yml` passes these values from the
 | `FIREBASE_APP_ID`               | Yes      | —                                        | Firebase App ID.                                                                                                                                                |
 | `FIREBASE_MEASUREMENT_ID`       | No       | —                                        | Firebase Analytics measurement ID. Optional.                                                                                                                    |
 | `CLOUDFLARE_TURNSTILE_SITE_KEY` | No       | —                                        | Turnstile site key embedded in the search page form.                                                                                                            |
-| `SOKETI_KEY`                    | No       | —                                        | Soketi public key for real-time updates.                                                                                                                        |
+| `SOKETI_KEY`                    | No       | —                                        | Soketi public key for real-time updates. Must be URL-safe (letters and numbers only).                                                                         |
 | `SOKETI_CLUSTER`                | No       | —                                        | Soketi cluster for real-time updates.                                                                                                                           |
 | `USE_SOKETI`                    | No       | `false`                                  | Whether to use a Soketi instance. If true, uses the browser's current host and `/app/` route.                                     |
 

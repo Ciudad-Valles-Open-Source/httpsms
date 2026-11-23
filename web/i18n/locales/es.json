@@ -90,7 +90,11 @@
       "downloadApp": "Descargar App",
       "usageBilling": "Uso y Facturación",
       "statistics": "Estadísticas",
-      "logout": "Cerrar Sesión"
+      "logout": "Cerrar Sesión",
+      "filtersLabel": "Filtros de conversaciones",
+      "filterAll": "Todos",
+      "filterUnread": "No leídos",
+      "filterError": "No se pudo actualizar el filtro de conversaciones"
     },
     "redirectPromptPopover": {
       "skipNextTime": "¿Omitir esta página la próxima vez?",
@@ -660,7 +664,7 @@
     "select_message": "Selecciona un Mensaje",
     "discord_help_desc": "No dudes en enviarnos un mensaje en Discord si tienes alguna pregunta",
     "id": {
-      "message_length_error": "El mensaje debe tener menos de 320 caracteres",
+      "message_length_error": "El mensaje debe tener menos de 2048 caracteres",
       "message_id_copied": "ID de mensaje copiado al portapapeles",
       "edit_contact": "Editar Contacto",
       "add_contact": "Añadir Contacto",

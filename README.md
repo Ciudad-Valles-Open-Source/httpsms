@@ -143,6 +143,7 @@ The full self-hosting documentation is organized in the [`docs/`](./docs) direct
 | [docs/environment-variables.md](./docs/environment-variables.md) | Reference for all environment variables |
 | [docs/deployment-platforms.md](./docs/deployment-platforms.md) | Platform-specific instructions (Coolify, Portainer, CapRover, Swarm) |
 | [docs/docker-configuration.md](./docs/docker-configuration.md) | Dockerfile and docker-compose.yml technical reference |
+| [docs/realtime.md](./docs/realtime.md) | Real-time updates with Soketi: setup, alphanumeric `SOKETI_KEY` and troubleshooting |
 
 ### Quick start (local development)
 

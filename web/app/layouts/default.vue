@@ -1,86 +1,76 @@
 <script setup lang="ts">
-import Pusher from 'pusher-js'
 import { useDisplay } from 'vuetify'
 import { setAuthHeader } from '~/composables/useApi'
+import { bindRealtimeEvents } from '~/composables/useRealtime'
 import { getAuth } from 'firebase/auth'
 
 const route = useRoute()
-const config = useRuntimeConfig()
 const { lgAndUp } = useDisplay()
 const authStore = useAuthStore()
 const phonesStore = usePhonesStore()
 const threadsStore = useThreadsStore()
 const appStore = useAppStore()
 
-let poller: ReturnType<typeof setInterval> | null = null
-let canPoll = false
+// Events pushed by the API (through Soketi) which change the thread list.
+const REALTIME_EVENTS = [
+  'phone.updated',
+  'message.phone.received',
+  'message.phone.sent',
+  'message.send.failed',
+  'message.call.missed',
+]
+
+let unbindRealtime: () => void = () => {}
+let refreshTimer: ReturnType<typeof setTimeout> | null = null
 
 const hasDrawer = computed(() => {
   return ['threads', 'threads-id'].includes((route.name as string) ?? '')
 })
 
+// Several events usually arrive together, so refresh once after they settle.
+function scheduleRefresh() {
+  if (refreshTimer) clearTimeout(refreshTimer)
+  refreshTimer = setTimeout(() => void refresh(), 500)
+}
+
+async function refresh() {
+  if (authStore.authUser == null || !phonesStore.owner) return
+
+  appStore.setPolling(true)
+  try {
+    const token = await getAuth().currentUser?.getIdToken()
+    if (token) setAuthHeader(token)
+
+    await Promise.all([
+      phonesStore.loadPhones(true),
+      threadsStore.loadThreads(),
+      phonesStore.getHeartbeat(),
+    ])
+  } catch (error) {
+    console.error(error)
+  } finally {
+    setTimeout(() => appStore.setPolling(false), 1000)
+  }
+}
+
 onMounted(() => {
-  setTimeout(() => {
-    const pusherOptions = config.public.useSoketi
-      ? {
-          wsHost: window.location.hostname,
-          wsPort: window.location.port
-            ? Number(window.location.port)
-            : window.location.protocol === 'https:'
-              ? 443
-              : 80,
-          wssPort: window.location.port
-            ? Number(window.location.port)
-            : window.location.protocol === 'https:'
-              ? 443
-              : 80,
-          forceTLS: window.location.protocol === 'https:',
-          disableStats: true,
-          enabledTransports: ['ws', 'wss'],
-          cluster: '',
-        }
-      : {
-          cluster: config.public.soketiCluster as string,
-        }
-    const pusher = new Pusher(config.public.soketiKey as string, pusherOptions)
-
-    if (authStore.authUser) {
-      const channel = pusher.subscribe(authStore.authUser.id)
-      channel.bind('phone.updated', () => {
-        canPoll = true
-      })
-    }
-
-    startPoller()
-  }, 10_000)
+  watch(
+    () => authStore.authUser?.id,
+    (userId) => {
+      unbindRealtime()
+      unbindRealtime = bindRealtimeEvents(
+        userId,
+        Object.fromEntries(REALTIME_EVENTS.map((e) => [e, scheduleRefresh])),
+      )
+    },
+    { immediate: true },
+  )
 })
 
 onBeforeUnmount(() => {
-  if (poller) clearInterval(poller)
+  unbindRealtime()
+  if (refreshTimer) clearTimeout(refreshTimer)
 })
-
-function startPoller() {
-  poller = setInterval(async () => {
-    if (!canPoll || authStore.authUser == null) return
-
-    appStore.setPolling(true)
-
-    if (authStore.authUser && phonesStore.owner) {
-      const auth = getAuth()
-      const token = await auth.currentUser?.getIdToken()
-      if (token) setAuthHeader(token)
-
-      await Promise.all([
-        phonesStore.loadPhones(true),
-        threadsStore.loadThreads(),
-        phonesStore.getHeartbeat(),
-      ])
-    }
-
-    canPoll = false
-    setTimeout(() => appStore.setPolling(false), 1000)
-  }, 10_000)
-}
 </script>
 
 <template>

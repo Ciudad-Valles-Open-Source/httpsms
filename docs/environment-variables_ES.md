@@ -78,19 +78,16 @@ These variables configure the internal system user that drives the asynchronous 
 | --------------------------------- | -------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `CLOUDFLARE_TURNSTILE_SECRET_KEY` | No       | —       | Turnstile secret key used by the API to validate CAPTCHA tokens on the `/v1/messages/search` route. The route is unprotected if this value is empty. |
 
-### Entitlements
-
-| Variable              | Required | Default | Description                                                                                                                                                   |
-| --------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-
 ### Optional Integrations
 
 | Variable                | Required | Default | Description                                                                                                                    |
 | ----------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `PUSHER_APP_ID`         | No       | —       | Pusher application ID. Enables real-time updates in the web UI via WebSockets.                                                 |
-| `PUSHER_KEY`            | No       | —       | Pusher public key.                                                                                                             |
-| `PUSHER_SECRET`         | No       | —       | Pusher secret key.                                                                                                             |
-| `PUSHER_CLUSTER`        | No       | —       | Pusher cluster identifier (e.g., `mt1`, `eu`).                                                                                 |
+| `SOKETI_APP_ID`         | No       | —       | ID de la aplicación en Soketi. Activa las actualizaciones en tiempo real de la web mediante WebSockets. Ver [realtime_ES.md](./realtime_ES.md). |
+| `SOKETI_KEY`            | No       | —       | Clave pública de Soketi. **Solo letras y números** (p. ej. `openssl rand -hex 32`): forma parte de la URL del WebSocket y una clave base64 con `/` o `+` rompe la conexión. |
+| `SOKETI_SECRET`         | No       | —       | Clave secreta de Soketi. Si está vacía, la API no publica eventos en tiempo real.                                          |
+| `SOKETI_HOST`           | No       | `soketi:6001` | Dónde la API encuentra a Soketi (red interna de Docker).                                                           |
+| `SOKETI_SECURE`         | No       | `false` | `false` cuando la API se conecta a Soketi por HTTP dentro de Docker.                                                       |
+| `SOKETI_CLUSTER`        | No       | `mt1`   | Solo se usa con Pusher en la nube; con Soketi puede quedarse en `mt1`.                                                     |
 | `AXIOM_TOKEN`           | No       | —       | Axiom API token for centralized log and trace ingestion.                                                                       |
 | `AXIOM_DATASET_EVENTS`  | No       | —       | Axiom dataset name for logs and traces.                                                                                        |
 | `AXIOM_DATASET_METRICS` | No       | —       | Axiom dataset name for metrics.                                                                                                |
@@ -121,8 +118,9 @@ When using Docker Compose, the `docker-compose.yml` passes these values from the
 | `FIREBASE_APP_ID`               | Yes      | —                                        | Firebase App ID.                                                                                                                                                |
 | `FIREBASE_MEASUREMENT_ID`       | No       | —                                        | Firebase Analytics measurement ID. Optional.                                                                                                                    |
 | `CLOUDFLARE_TURNSTILE_SITE_KEY` | No       | —                                        | Turnstile site key embedded in the search page form.                                                                                                            |
-| `PUSHER_KEY`                    | No       | —                                        | Pusher public key for real-time updates.                                                                                                                        |
-| `PUSHER_CLUSTER`                | No       | —                                        | Pusher cluster for real-time updates.                                                                                                                           |
+| `SOKETI_KEY`                    | No       | —                                        | Clave pública de Soketi (la misma que en la API). **Solo letras y números.** Se integra al compilar: si cambia, recompila `web`. |
+| `SOKETI_CLUSTER`                | No       | —                                        | Cluster de Pusher; con Soketi puede quedarse en `mt1`.                                                                                                          |
+| `USE_SOKETI`                    | No       | `false`                                  | `true` para conectar al WebSocket del mismo dominio (`/app/`, vía nginx) en lugar de Pusher en la nube.                                                          |
 
 ---
 

@@ -17,8 +17,7 @@ import {
   mdiAccountPlus,
   mdiSquareEditOutline,
 } from '@mdi/js'
-import Pusher from 'pusher-js'
-import type { Channel } from 'pusher-js'
+import { bindRealtimeEvents } from '~/composables/useRealtime'
 import { isValidPhoneNumber } from 'libphonenumber-js'
 import { storeToRefs } from 'pinia'
 import { getApiErrorMessage, toApiError } from '~/utils/api-error'
@@ -42,7 +41,6 @@ useHead({
 
 const route = useRoute()
 const router = useRouter()
-const config = useRuntimeConfig()
 const { lgAndUp, mdAndDown, mdAndUp } = useVDisplay()
 const { formatPhoneNumber, startsWithLetter } = useFilters()
 const notificationsStore = useNotificationsStore()
@@ -68,10 +66,10 @@ threadsStore.setThreadId(route.params.id as string)
 
 const formMessageRules = [
   (v: string) =>
-    v === '' || (v && v.length <= 320) || t('threads.id.message_length_error'),
+    v === '' || (v && v.length <= 2048) || t('threads.id.message_length_error'),
 ]
 
-let webhookChannel: Channel | null = null
+let unbindRealtime: () => void = () => {}
 
 const contactIsPhoneNumber = computed(() => {
   const thread = currentThread.value
@@ -330,41 +328,15 @@ async function sendMessage(event: KeyboardEvent | Event) {
 onMounted(async () => {
   await loadData()
 
-  const pusherOptions = config.public.useSoketi
-    ? {
-        wsHost: window.location.hostname,
-        wsPort: window.location.port
-          ? Number(window.location.port)
-          : window.location.protocol === 'https:'
-            ? 443
-            : 80,
-        wssPort: window.location.port
-          ? Number(window.location.port)
-          : window.location.protocol === 'https:'
-            ? 443
-            : 80,
-        forceTLS: window.location.protocol === 'https:',
-        disableStats: true,
-        enabledTransports: ['ws', 'wss'],
-        cluster: '',
-      }
-    : {
-        cluster: config.public.soketiCluster as string,
-      }
-  const pusher = new Pusher(config.public.soketiKey as string, pusherOptions)
-
-  webhookChannel = pusher.subscribe(authStore.user!.id)
-  webhookChannel.bind('message.phone.sent', () => {
-    if (!loadingMessages.value) loadMessages(false)
-  })
-  webhookChannel.bind('message.send.failed', () => {
-    if (!loadingMessages.value) loadMessages(false)
-  })
-  webhookChannel.bind('message.phone.received', (_: never) => {
-    void handleInboundMessage()
-  })
-  webhookChannel.bind('message.call.missed', (_: never) => {
-    void handleInboundMessage()
+  unbindRealtime = bindRealtimeEvents(authStore.user?.id, {
+    'message.phone.sent': () => {
+      if (!loadingMessages.value) loadMessages(false)
+    },
+    'message.send.failed': () => {
+      if (!loadingMessages.value) loadMessages(false)
+    },
+    'message.phone.received': () => void handleInboundMessage(),
+    'message.call.missed': () => void handleInboundMessage(),
   })
 })
 
@@ -378,9 +350,7 @@ watch(
   },
 )
 
-onBeforeUnmount(() => {
-  if (webhookChannel) webhookChannel.unsubscribe()
-})
+onBeforeUnmount(() => unbindRealtime())
 </script>
 
 <template>

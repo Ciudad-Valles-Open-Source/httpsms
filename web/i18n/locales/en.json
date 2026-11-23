@@ -90,7 +90,11 @@
       "downloadApp": "Download App",
       "usageBilling": "Usage & Billing",
       "statistics": "Statistics",
-      "logout": "Logout"
+      "logout": "Logout",
+      "filtersLabel": "Message thread filters",
+      "filterAll": "All",
+      "filterUnread": "Unread",
+      "filterError": "The message thread filter could not be updated"
     },
     "redirectPromptPopover": {
       "skipNextTime": "Skip this page next time?",
@@ -660,7 +664,7 @@
     "select_message": "Select a Message",
     "discord_help_desc": "Don't hesitate to message us on Discord if you have any questions",
     "id": {
-      "message_length_error": "Message must be less than 320 characters",
+      "message_length_error": "Message must be less than 2048 characters",
       "message_id_copied": "Message ID copied to clipboard",
       "edit_contact": "Edit Contact",
       "add_contact": "Add Contact",
