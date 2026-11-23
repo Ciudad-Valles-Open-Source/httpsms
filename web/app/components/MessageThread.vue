@@ -8,6 +8,10 @@ import {
   mdiAccount,
 } from '@mdi/js'
 import type { EntitiesMessageThread } from '~~/shared/types/api'
+import {
+  isUrlNotificationToken,
+  formatWhatsappText,
+} from '~/utils/whatsapp-format'
 
 const { t } = useI18n()
 
@@ -47,6 +51,31 @@ function onInstallApp() {
   })
 }
 
+async function loadMoreThreads() {
+  try {
+    await threadsStore.loadMoreThreads()
+  } catch (error) {
+    notificationsStore.addNotification({
+      type: 'error',
+      message: 'More conversations could not be loaded',
+    })
+    console.error(error)
+  }
+}
+
+function isWhatsappFormatted(thread: EntitiesMessageThread): boolean {
+  const phone = phonesStore.phones.find((x) => x.phone_number === thread.owner)
+  return isUrlNotificationToken(phone?.fcm_token)
+}
+
+function threadPreviewHtml(thread: EntitiesMessageThread): string {
+  // Links are unwrapped because the preview sits inside a router link.
+  return formatWhatsappText(thread.last_message_content ?? '').replace(
+    /<a [^>]*>(.*?)<\/a>/g,
+    '$1',
+  )
+}
+
 function threadContactName(thread: EntitiesMessageThread): string {
   return thread.contact_details?.name?.trim() ?? ''
 }
@@ -79,7 +108,8 @@ function threadAvatarInitial(thread: EntitiesMessageThread): string {
     <div
       v-if="
         !threadsStore.loadingThreads &&
-        threadsStore.threads.length === 0 &&
+        threadsStore.visibleThreads.length === 0 &&
+        !threadsStore.unreadOnly &&
         !threadsStore.archivedThreads
       "
       class="text-center mt-6"
@@ -119,13 +149,27 @@ function threadAvatarInitial(thread: EntitiesMessageThread): string {
         {{ $t('components.messageThread.downloadApp') }}
       </v-btn>
     </div>
+    <p
+      v-if="
+        !threadsStore.loadingThreads &&
+        threadsStore.unreadOnly &&
+        threadsStore.visibleThreads.length === 0 &&
+        !threadsStore.hasMoreThreads &&
+        phonesStore.owner
+      "
+      class="text-medium-emphasis text-center mt-6"
+    >
+      No unread conversations
+    </p>
     <v-list
-      v-if="!threadsStore.loadingThreads && threadsStore.threads.length > 0"
+      v-if="
+        !threadsStore.loadingThreads && threadsStore.visibleThreads.length > 0
+      "
       class="py-0"
       lines="three"
     >
       <v-list-item
-        v-for="thread in threadsStore.threads"
+        v-for="thread in threadsStore.visibleThreads"
         :key="thread.id"
         color="primary"
         :to="{ name: 'threads-id', params: { id: thread.id } }"
@@ -161,7 +205,13 @@ function threadAvatarInitial(thread: EntitiesMessageThread): string {
           }"
           style="max-width: 250px"
         >
-          {{ thread.last_message_content }}
+          <!-- eslint-disable vue/no-v-html -->
+          <span
+            v-if="isWhatsappFormatted(thread)"
+            v-html="threadPreviewHtml(thread)"
+          />
+          <!-- eslint-enable vue/no-v-html -->
+          <template v-else>{{ thread.last_message_content }}</template>
         </v-list-item-subtitle>
         <template #append>
           <div class="d-flex flex-column align-end">
@@ -202,11 +252,27 @@ function threadAvatarInitial(thread: EntitiesMessageThread): string {
                   />
                 </div>
               </template>
-              <span>{{ $t(`components.messageThread.status.${thread.status}`) }}</span>
+              <span>{{
+                $t(`components.messageThread.status.${thread.status}`)
+              }}</span>
             </VTooltip>
           </div>
         </template>
       </v-list-item>
     </v-list>
+    <div
+      v-if="!threadsStore.loadingThreads && threadsStore.hasMoreThreads"
+      class="d-flex justify-center pa-4"
+    >
+      <v-btn
+        color="primary"
+        variant="tonal"
+        :loading="threadsStore.loadingMoreThreads"
+        :disabled="threadsStore.loadingMoreThreads"
+        @click="loadMoreThreads"
+      >
+        Load More
+      </v-btn>
+    </div>
   </div>
 </template>

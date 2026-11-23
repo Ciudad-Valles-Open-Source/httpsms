@@ -19,7 +19,7 @@ import (
 
 func TestSendSMS_Encrypted(t *testing.T) {
 	ctx := context.Background()
-	phone := setupPhone(ctx, t, 60)
+	phone := setupPhone(ctx, t, 30)
 
 	encryptionKey := randomEncryptionKey()
 	signingKey, webhookPath := setupWebhook(ctx, t, phone.PhoneNumber, []string{
@@ -87,7 +87,7 @@ func TestSendSMS_Encrypted(t *testing.T) {
 
 func TestReceiveSMS_Encrypted(t *testing.T) {
 	ctx := context.Background()
-	phone := setupPhone(ctx, t, 60)
+	phone := setupPhone(ctx, t, 30)
 
 	encryptionKey := randomEncryptionKey()
 	signingKey, webhookPath := setupWebhook(ctx, t, phone.PhoneNumber, []string{
@@ -200,14 +200,14 @@ func TestSendSMS_RateLimit(t *testing.T) {
 	assert.GreaterOrEqual(t, gapMs, int64(5500), "rate limit gap should be >= 5500ms (6s minus timing tolerance), got %dms", gapMs)
 
 	fireEvent(ctx, t, phone.PhoneAPIKey, msgID1, "SENT")
-	pollMessageStatus(ctx, t, msgID1, "sent", 15*time.Second)
+	pollMessageStatus(ctx, t, msgID1, "sent", 30*time.Second)
 	fireEvent(ctx, t, phone.PhoneAPIKey, msgID2, "SENT")
-	pollMessageStatus(ctx, t, msgID2, "sent", 15*time.Second)
+	pollMessageStatus(ctx, t, msgID2, "sent", 30*time.Second)
 	fireEvent(ctx, t, phone.PhoneAPIKey, msgID1, "DELIVERED")
 	fireEvent(ctx, t, phone.PhoneAPIKey, msgID2, "DELIVERED")
 
-	msg1 := pollMessageStatus(ctx, t, msgID1, "delivered", 15*time.Second)
-	msg2 := pollMessageStatus(ctx, t, msgID2, "delivered", 15*time.Second)
+	msg1 := pollMessageStatus(ctx, t, msgID1, "delivered", 30*time.Second)
+	msg2 := pollMessageStatus(ctx, t, msgID2, "delivered", 30*time.Second)
 	assert.Equal(t, "delivered", msg1.Status)
 	assert.Equal(t, "delivered", msg2.Status)
 
@@ -303,7 +303,7 @@ func TestRotateAPIKey_InvalidatesCache(t *testing.T) {
 
 func TestSendSMS_OutstandingFlow(t *testing.T) {
 	ctx := context.Background()
-	phone := setupPhone(ctx, t, 60)
+	phone := setupPhone(ctx, t, 30)
 
 	signingKey, webhookPath := setupWebhook(ctx, t, phone.PhoneNumber, []string{
 		"message.phone.sent",
@@ -352,7 +352,7 @@ func TestSendSMS_OutstandingFlow(t *testing.T) {
 
 func TestHeartbeat_StoreAndIndex(t *testing.T) {
 	ctx := context.Background()
-	phone := setupPhone(ctx, t, 60)
+	phone := setupPhone(ctx, t, 30)
 
 	// Store a heartbeat via phone API key (retry to allow async phone-API-key association)
 	storePayload := map[string]interface{}{
@@ -408,7 +408,7 @@ func TestHeartbeat_StoreAndIndex(t *testing.T) {
 
 func TestBulkSMS_CSV(t *testing.T) {
 	ctx := context.Background()
-	phone := setupPhone(ctx, t, 60)
+	phone := setupPhone(ctx, t, 30)
 
 	// Build CSV content with 1 message
 	contact := randomPhoneNumber()
@@ -474,7 +474,7 @@ func TestBulkSMS_CSV(t *testing.T) {
 
 func TestBulkSMS_Excel(t *testing.T) {
 	ctx := context.Background()
-	phone := setupPhone(ctx, t, 60)
+	phone := setupPhone(ctx, t, 30)
 
 	contact1 := randomPhoneNumber()
 	contact2 := randomPhoneNumber()

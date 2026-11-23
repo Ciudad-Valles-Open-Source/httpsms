@@ -53,9 +53,7 @@ const pricing = ref(0)
 const pricingLabels = ['10K', '20K', '50K', '100K', '200K']
 const pricingLabelsFull = ['10,000', '20,000', '50,000', '100,000', '200,000']
 
-const planMessages = computed(() =>
-  pricingLabels[pricing.value].replace('K', ',000'),
-)
+const planMessages = computed(() => pricingLabelsFull[pricing.value])
 const planMonthlyPrice = computed(() => [20, 35, 89, 175, 350][pricing.value])
 const planYearlyPrice = computed(
   () => [200, 350, 1068, 2100, 4200][pricing.value],
@@ -67,6 +65,7 @@ const planYearlyMonthlyPrice = computed(
 
 <template>
   <div>
+    <BlackFridayBanner />
     <VContainer>
       <VRow :class="{ 'py-4': lgAndUp }">
         <VCol
@@ -87,8 +86,10 @@ const planYearlyMonthlyPrice = computed(
           >
             {{ $t('pages.index.heroTitle') }}
           </h1>
-          <h2 class="text-medium-emphasis text-headline-small mt-8 mb-8" v-html="$t('pages.index.heroSubtitle')">
-          </h2>
+          <h2
+            class="text-medium-emphasis text-headline-small mt-8 mb-8"
+            v-html="$t('pages.index.heroSubtitle')"
+          ></h2>
           <div :class="{ 'text-center': mdAndDown }">
             <VBtn color="primary" size="large" class="mt-4 mb-4" to="/login">
               <VIcon v-if="lgAndUp" start :icon="mdiSend" />
@@ -104,7 +105,10 @@ const planYearlyMonthlyPrice = computed(
               {{ $t('pages.index.liveDemoBtn') }}
             </VBtn>
           </div>
-          <p class="text-body-medium mt-2" v-html="$t('pages.index.trustedBy')"></p>
+          <p
+            class="text-body-medium mt-2"
+            v-html="$t('pages.index.trustedBy')"
+          ></p>
           <div class="mt-4" :class="{ 'text-center': mdAndDown }">
             <VIcon color="success" :icon="mdiCheckCircle" />
             {{ $t('pages.index.freeToUse') }}
@@ -171,8 +175,10 @@ const planYearlyMonthlyPrice = computed(
                   {{ $t('pages.index.noCodeBadge') }}
                 </VChip>
               </h3>
-              <h5 class="text-title-large font-weight-light my-2" v-html="$t('pages.index.bulkSmsDesc')">
-              </h5>
+              <h5
+                class="text-title-large font-weight-light my-2"
+                v-html="$t('pages.index.bulkSmsDesc')"
+              ></h5>
               <VBtn
                 to="/blog/how-to-send-sms-messages-from-excel"
                 color="primary"
@@ -227,7 +233,9 @@ const planYearlyMonthlyPrice = computed(
         <VRow class="mb-16 mt-16">
           <VCol cols="12" md="6" class="d-flex align-center" order-lg="2">
             <div>
-              <h3 class="text-display-medium mb-1">{{ $t('pages.index.webhooksTitle') }}</h3>
+              <h3 class="text-display-medium mb-1">
+                {{ $t('pages.index.webhooksTitle') }}
+              </h3>
               <h5 class="text-title-large font-weight-light my-2">
                 {{ $t('pages.index.webhooksDesc') }}
               </h5>
@@ -250,7 +258,9 @@ const planYearlyMonthlyPrice = computed(
         <VRow class="mb-16 mt-16">
           <VCol cols="12" md="6" class="d-flex align-center" order-lg="1">
             <div>
-              <h3 class="text-display-medium mb-1">{{ $t('pages.index.controlSendingTitle') }}</h3>
+              <h3 class="text-display-medium mb-1">
+                {{ $t('pages.index.controlSendingTitle') }}
+              </h3>
               <h5 class="text-title-large font-weight-light my-2">
                 {{ $t('pages.index.controlSendingDesc') }}
               </h5>
@@ -272,7 +282,9 @@ const planYearlyMonthlyPrice = computed(
         <VRow class="mb-16 mt-16">
           <VCol cols="12" md="6" class="d-flex align-center" order-lg="2">
             <div>
-              <h3 class="text-display-medium mb-1">{{ $t('pages.index.monitoringTitle') }}</h3>
+              <h3 class="text-display-medium mb-1">
+                {{ $t('pages.index.monitoringTitle') }}
+              </h3>
               <h5 class="text-title-large font-weight-light my-2">
                 {{ $t('pages.index.monitoringDesc') }}
               </h5>
@@ -287,7 +299,9 @@ const planYearlyMonthlyPrice = computed(
         <VRow class="mt-16 mb-16">
           <VCol cols="12" md="6" class="d-flex align-center" order-lg="1">
             <div>
-              <h3 class="text-display-medium mb-1">{{ $t('pages.index.openSourceTitle') }}</h3>
+              <h3 class="text-display-medium mb-1">
+                {{ $t('pages.index.openSourceTitle') }}
+              </h3>
               <h5 class="text-title-large mb-3 font-weight-light my-2">
                 {{ $t('pages.index.openSourceDesc') }}
               </h5>
@@ -316,9 +330,13 @@ const planYearlyMonthlyPrice = computed(
         <VRow class="mt-16">
           <VCol cols="12" md="6" class="d-flex align-center" order-lg="2">
             <div>
-              <h3 class="text-display-medium mb-1">{{ $t('pages.index.encryptionTitle') }}</h3>
-              <h5 class="text-title-large mb-3 font-weight-light my-2" v-html="$t('pages.index.encryptionDesc')">
-              </h5>
+              <h3 class="text-display-medium mb-1">
+                {{ $t('pages.index.encryptionTitle') }}
+              </h3>
+              <h5
+                class="text-title-large mb-3 font-weight-light my-2"
+                v-html="$t('pages.index.encryptionDesc')"
+              ></h5>
               <VBtn
                 to="/blog/end-to-end-encryption-to-sms-messages"
                 color="primary"
@@ -341,7 +359,9 @@ const planYearlyMonthlyPrice = computed(
         <VRow class="mt-16">
           <VCol cols="12" md="6" class="d-flex align-center">
             <div>
-              <h3 class="text-display-medium mb-1">{{ $t('pages.index.multiplePhonesTitle') }}</h3>
+              <h3 class="text-display-medium mb-1">
+                {{ $t('pages.index.multiplePhonesTitle') }}
+              </h3>
               <h5 class="text-title-large mb-3 font-weight-light my-2">
                 {{ $t('pages.index.multiplePhonesDesc') }}
               </h5>
@@ -367,7 +387,9 @@ const planYearlyMonthlyPrice = computed(
         <VRow class="mt-16">
           <VCol cols="12" md="6" class="d-flex align-center" order-lg="2">
             <div>
-              <h3 class="text-display-medium mb-1">{{ $t('pages.index.scheduleTextMessagesTitle') }}</h3>
+              <h3 class="text-display-medium mb-1">
+                {{ $t('pages.index.scheduleTextMessagesTitle') }}
+              </h3>
               <h5 class="text-headline-small my-2 font-weight-light">
                 {{ $t('pages.index.scheduleTextMessagesDesc') }}
               </h5>
@@ -395,7 +417,9 @@ const planYearlyMonthlyPrice = computed(
     <VContainer class="pb-16">
       <VRow>
         <VCol>
-          <h2 class="text-display-large text-center mb-0">{{ $t('pages.index.getStartedSectionTitle') }}</h2>
+          <h2 class="text-display-large text-center mb-0">
+            {{ $t('pages.index.getStartedSectionTitle') }}
+          </h2>
         </VCol>
       </VRow>
       <VRow>
@@ -409,21 +433,36 @@ const planYearlyMonthlyPrice = computed(
               >
                 <VTimelineItem dot-color="primary" :icon="mdiTallyMark1">
                   <VCard variant="elevated">
-                    <VCardTitle class="text-headline-medium">{{ $t('pages.index.step1Title') }}</VCardTitle>
-                    <VCardText class="text-body-large" v-html="$t('pages.index.step1Desc')">
+                    <VCardTitle class="text-headline-medium">{{
+                      $t('pages.index.step1Title')
+                    }}</VCardTitle>
+                    <VCardText class="text-body-large"
+                      ><span v-html="$t('pages.index.step1Desc')" />
                     </VCardText>
                   </VCard>
                 </VTimelineItem>
                 <VTimelineItem dot-color="primary" :icon="mdiTallyMark2">
                   <VCard variant="elevated">
-                    <VCardTitle class="text-headline-medium">{{ $t('pages.index.step2Title') }}</VCardTitle>
-                    <VCardText class="text-body-large" v-html="$t('pages.index.step2Desc').replace('{url}', config.public.appDownloadUrl)">
+                    <VCardTitle class="text-headline-medium">{{
+                      $t('pages.index.step2Title')
+                    }}</VCardTitle>
+                    <VCardText class="text-body-large"
+                      ><span
+                        v-html="
+                          $t('pages.index.step2Desc').replace(
+                            '{url}',
+                            config.public.appDownloadUrl,
+                          )
+                        "
+                      />
                     </VCardText>
                   </VCard>
                 </VTimelineItem>
                 <VTimelineItem dot-color="primary" :icon="mdiTallyMark3">
                   <VCard variant="elevated">
-                    <VCardTitle class="text-headline-medium">{{ $t('pages.index.step3Title') }}</VCardTitle>
+                    <VCardTitle class="text-headline-medium">{{
+                      $t('pages.index.step3Title')
+                    }}</VCardTitle>
                     <VCardText class="text-body-large">
                       {{ $t('pages.index.step3Desc') }}
                       <a
@@ -643,279 +682,322 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
 
     <!-- Pricing Section -->
     <template v-if="config.public.enableBilling">
-    <VSheet class="mt-16 pb-16">
-      <VContainer>
-        <VRow>
-          <VCol md="6" offset-md="3">
-            <h2
-              id="pricing"
-              style="text-decoration-color: #329ef4"
-              class="text-center text-display-large mb-4 text-decoration-underline dark:text-white"
-            >
-              {{ $t('pages.index.pricingTitle') }}
-            </h2>
-            <h4 class="text-center text-headline-small text-medium-emphasis" v-html="$t('pages.index.pricingDesc')">
-            </h4>
-            <div class="d-flex justify-center mt-4 align-center">
-              <p
-                class="text-headline-small mr-3 mt-3"
-                :class="{ 'text-medium-emphasis': yearlyPricing }"
+      <VSheet class="mt-16 pb-16">
+        <VContainer>
+          <VRow>
+            <VCol md="6" offset-md="3">
+              <h2
+                id="pricing"
+                style="text-decoration-color: #329ef4"
+                class="text-center text-display-large mb-4 text-decoration-underline dark:text-white"
               >
-                {{ $t('pages.index.monthlyLabel') }}
-              </p>
-              <VSwitch
-                v-model="yearlyPricing"
+                {{ $t('pages.index.pricingTitle') }}
+              </h2>
+              <h4
+                class="text-center text-headline-small text-medium-emphasis"
+                v-html="$t('pages.index.pricingDesc')"
+              ></h4>
+              <div class="d-flex justify-center mt-4 align-center">
+                <p
+                  class="text-headline-small mr-3 mt-3"
+                  :class="{ 'text-medium-emphasis': yearlyPricing }"
+                >
+                  {{ $t('pages.index.monthlyLabel') }}
+                </p>
+                <VSwitch
+                  v-model="yearlyPricing"
+                  color="primary"
+                  class="mt-n2"
+                  hide-details
+                />
+                <p
+                  class="text-headline-small ml-3 mt-3"
+                  :class="{ 'text-medium-emphasis': !yearlyPricing }"
+                >
+                  {{ $t('pages.index.yearlyLabel') }}
+                  <VChip color="primary" size="small">
+                    <VIcon start :icon="mdiGift" size="small" />
+                    {{ $t('pages.index.twoMonthsFreeBadge') }}
+                  </VChip>
+                </p>
+              </div>
+            </VCol>
+          </VRow>
+          <VRow>
+            <VCol cols="12">
+              <VSlider
+                v-model="pricing"
+                :tick-labels="lgAndUp ? pricingLabelsFull : pricingLabels"
+                :max="4"
+                step="1"
                 color="primary"
-                class="mt-n2"
-                hide-details
-              />
-              <p
-                class="text-headline-small ml-3 mt-3"
-                :class="{ 'text-medium-emphasis': !yearlyPricing }"
+                thumb-color="primary"
+                thumb-label="always"
+                thumb-size="16"
+                tick-size="8"
+                show-ticks="always"
               >
-                {{ $t('pages.index.yearlyLabel') }}
-                <VChip color="primary" size="small">
-                  <VIcon start :icon="mdiGift" size="small" />
-                  {{ $t('pages.index.twoMonthsFreeBadge') }}
-                </VChip>
-              </p>
-            </div>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol cols="12">
-            <VSlider
-              v-model="pricing"
-              :tick-labels="lgAndUp ? pricingLabelsFull : pricingLabels"
-              :max="4"
-              step="1"
-              color="primary"
-              thumb-color="primary"
-              thumb-label="always"
-              thumb-size="16"
-              tick-size="8"
-              show-ticks="always"
-            >
-              <template #thumb-label>
-                {{ pricingLabels[pricing] }}
-              </template>
-            </VSlider>
-          </VCol>
-        </VRow>
-        <VRow>
-          <!-- Free Plan -->
-          <VCol cols="12" lg="4">
-            <VCard elevation="4" color="#121212">
-              <VCardText>
-                <h1 class="text-center text-display-medium mt-0 mb-4">{{ $t('pages.index.freePlanTitle') }}</h1>
-                <p
-                  class="text-body-large text-center mt-0 text-medium-emphasis"
-                >
-                  {{ $t('pages.index.freePlanDesc') }}
-                </p>
-                <p class="text-center">
-                  <span class="text-display-small">{{ $t('pages.index.freePlanCost') }}</span>
-                </p>
-                <p class="text-center mt-n3 text-medium-emphasis">
-                  {{ $t('pages.index.noCreditCard') }}
-                </p>
-                <VBtn block to="/login" variant="tonal" size="large"
-                  >{{ $t('pages.index.getStartedBtn') }}</VBtn
-                >
-                <p class="mt-6 text-md-body-large text-title-medium">
-                  <VIcon
-                    color="primary"
-                    class="mt-n1"
-                    start
-                    :icon="mdiCheckCircle"
-                  />
-                  Send or receive up to <b>200</b> SMS/month
-                </p>
-                <p class="text-md-body-large text-title-medium mt-n3">
-                  <VIcon
-                    color="primary"
-                    class="mt-n1"
-                    start
-                    :icon="mdiCheckCircle"
-                  />
-                  Offline notifications for your phone
-                </p>
-                <p class="text-md-body-large text-title-medium mt-n3">
-                  <VIcon
-                    color="primary"
-                    class="mt-n1"
-                    start
-                    :icon="mdiCheckCircle"
-                  />
-                  Forward received messages via webhook
-                </p>
-                <p class="text-md-body-large text-title-medium mt-n3">
-                  <VIcon
-                    color="primary"
-                    class="mt-n1"
-                    start
-                    :icon="mdiCheckCircle"
-                  />
-                  Basic email support
-                </p>
-              </VCardText>
-            </VCard>
-          </VCol>
-          <!-- Pro Plan -->
-          <VCol cols="12" lg="4">
-            <VCard elevation="4" color="#000000">
-              <VCardText>
-                <h1
-                  class="text-center text-display-medium mt-0 mb-4 text-primary"
-                >
-                  {{ $t('pages.index.proPlanTitle') }}
-                </h1>
-                <p
-                  class="text-body-large text-center mt-0 text-medium-emphasis"
-                >
-                  {{ $t('pages.index.proPlanDesc') }}
-                </p>
-                <p v-if="!yearlyPricing" class="text-center">
-                  <span class="text-display-small">$10</span>/month
-                </p>
-                <p v-else class="text-center">
-                  <span class="text-display-small">$100</span>/year
-                </p>
-                <p
-                  v-if="!yearlyPricing"
-                  class="text-center mt-n3 text-medium-emphasis"
-                  v-html="$t('pages.index.orPerYear').replace('{price}', '100')"
-                >
-                </p>
-                <p v-else class="text-center mt-n3 text-medium-emphasis" v-html="$t('pages.index.orPerMonth').replace('{price}', '8.33')">
-                </p>
-                <VBtn block color="primary" to="/login" size="large"
-                  >{{ $t('pages.index.tryForFreeBtn') }}</VBtn
-                >
-                <p class="mt-6 text-md-body-large text-title-medium">
-                  <VIcon
-                    color="primary"
-                    class="mt-n1"
-                    start
-                    :icon="mdiCheckCircle"
-                  />
-                  <span v-html="$t('pages.index.proPlanFeature1')"></span>
-                </p>
-                <p class="text-md-body-large text-title-medium mt-n3">
-                  <VIcon
-                    color="primary"
-                    class="mt-n1"
-                    start
-                    :icon="mdiCheckCircle"
-                  />
-                  {{ $t('pages.index.offlineNotifications') }}
-                </p>
-                <p class="text-md-body-large text-title-medium mt-n3">
-                  <VIcon
-                    color="primary"
-                    class="mt-n1"
-                    start
-                    :icon="mdiCheckCircle"
-                  />
-                  {{ $t('pages.index.forwardMessagesWebhook') }}
-                </p>
-                <p class="text-md-body-large text-title-medium mt-n3">
-                  <VIcon
-                    color="primary"
-                    class="mt-n1"
-                    start
-                    :icon="mdiCheckCircle"
-                  />
-                  {{ $t('pages.index.prioritySupport') }}
-                </p>
-              </VCardText>
-            </VCard>
-          </VCol>
-          <!-- Custom Plan -->
-          <VCol cols="12" lg="4">
-            <VCard elevation="4" color="#121212">
-              <VCardText>
-                <h1 class="text-center text-display-medium mt-0 mb-4">
-                  {{ $t('pages.index.customPlanTitle').replace('{plan}', pricingLabels[pricing]) }}
-                </h1>
-                <p
-                  class="text-body-large text-center mt-0 text-medium-emphasis"
-                >
-                  {{ $t('pages.index.customPlanDesc').replace('{messages}', planMessages) }}
-                </p>
-                <p v-if="!yearlyPricing" class="text-center">
-                  <span class="text-display-small">${{ planMonthlyPrice }}</span
-                  >/month
-                </p>
-                <p v-else class="text-center">
-                  <span class="text-display-small">${{ planYearlyPrice }}</span
-                  >/year
-                </p>
-                <p
-                  v-if="!yearlyPricing"
-                  class="text-center mt-n3 text-medium-emphasis"
-                  v-html="$t('pages.index.orPerYear').replace('{price}', planYearlyPrice)"
-                >
-                </p>
-                <p v-else class="text-center mt-n3 text-medium-emphasis" v-html="$t('pages.index.orPerMonth').replace('{price}', planYearlyMonthlyPrice)">
-                </p>
-                <VBtn block variant="tonal" to="/login" size="large"
-                  >{{ $t('pages.index.tryForFreeBtn') }}</VBtn
-                >
-                <p class="mt-6 text-md-body-large text-title-medium">
-                  <VIcon
-                    color="primary"
-                    class="mt-n1"
-                    start
-                    :icon="mdiCheckCircle"
-                  />
-                  <span v-html="$t('pages.index.customPlanFeature1').replace('{messages}', pricingLabels[pricing])"></span>
-                </p>
-                <p class="text-md-body-large text-title-medium mt-n3">
-                  <VIcon
-                    color="primary"
-                    class="mt-n1"
-                    start
-                    :icon="mdiCheckCircle"
-                  />
-                  {{ $t('pages.index.offlineNotifications') }}
-                </p>
-                <p class="text-md-body-large text-title-medium mt-n3">
-                  <VIcon
-                    color="primary"
-                    class="mt-n1"
-                    start
-                    :icon="mdiCheckCircle"
-                  />
-                  {{ $t('pages.index.forwardMessagesWebhook') }}
-                </p>
-                <p class="text-md-body-large text-title-medium mt-n3">
-                  <VIcon
-                    color="primary"
-                    class="mt-n1"
-                    start
-                    :icon="mdiCheckCircle"
-                  />
-                  {{ $t('pages.index.prioritySupport') }}
-                </p>
-              </VCardText>
-            </VCard>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VAlert
-              color="info"
-              :icon="mdAndUp ? mdiLightbulbOn60 : undefined"
-              :prominent="mdAndUp"
-              variant="tonal"
-            >
-              <span v-html="$t('pages.index.contactSupportAlert')"></span>
-            </VAlert>
-          </VCol>
-        </VRow>
-      </VContainer>
-    </VSheet>
+                <template #thumb-label>
+                  {{ pricingLabels[pricing] }}
+                </template>
+              </VSlider>
+            </VCol>
+          </VRow>
+          <VRow>
+            <!-- Free Plan -->
+            <VCol cols="12" lg="4">
+              <VCard elevation="4" color="#121212">
+                <VCardText>
+                  <h1 class="text-center text-display-medium mt-0 mb-4">
+                    {{ $t('pages.index.freePlanTitle') }}
+                  </h1>
+                  <p
+                    class="text-body-large text-center mt-0 text-medium-emphasis"
+                  >
+                    {{ $t('pages.index.freePlanDesc') }}
+                  </p>
+                  <p class="text-center">
+                    <span class="text-display-small">{{
+                      $t('pages.index.freePlanCost')
+                    }}</span>
+                  </p>
+                  <p class="text-center mt-n3 text-medium-emphasis">
+                    {{ $t('pages.index.noCreditCard') }}
+                  </p>
+                  <VBtn block to="/login" variant="tonal" size="large">{{
+                    $t('pages.index.getStartedBtn')
+                  }}</VBtn>
+                  <p class="mt-6 text-md-body-large text-title-medium">
+                    <VIcon
+                      color="primary"
+                      class="mt-n1"
+                      start
+                      :icon="mdiCheckCircle"
+                    />
+                    Send or receive up to <b>200</b> SMS/month
+                  </p>
+                  <p class="text-md-body-large text-title-medium mt-n3">
+                    <VIcon
+                      color="primary"
+                      class="mt-n1"
+                      start
+                      :icon="mdiCheckCircle"
+                    />
+                    Offline notifications for your phone
+                  </p>
+                  <p class="text-md-body-large text-title-medium mt-n3">
+                    <VIcon
+                      color="primary"
+                      class="mt-n1"
+                      start
+                      :icon="mdiCheckCircle"
+                    />
+                    Forward received messages via webhook
+                  </p>
+                  <p class="text-md-body-large text-title-medium mt-n3">
+                    <VIcon
+                      color="primary"
+                      class="mt-n1"
+                      start
+                      :icon="mdiCheckCircle"
+                    />
+                    Basic email support
+                  </p>
+                </VCardText>
+              </VCard>
+            </VCol>
+            <!-- Pro Plan -->
+            <VCol cols="12" lg="4">
+              <VCard elevation="4" color="#000000">
+                <VCardText>
+                  <h1
+                    class="text-center text-display-medium mt-0 mb-4 text-primary"
+                  >
+                    {{ $t('pages.index.proPlanTitle') }}
+                  </h1>
+                  <p
+                    class="text-body-large text-center mt-0 text-medium-emphasis"
+                  >
+                    {{ $t('pages.index.proPlanDesc') }}
+                  </p>
+                  <p v-if="!yearlyPricing" class="text-center">
+                    <span class="text-display-small">$10</span>/month
+                  </p>
+                  <p v-else class="text-center">
+                    <span class="text-display-small">$100</span>/year
+                  </p>
+                  <p
+                    v-if="!yearlyPricing"
+                    class="text-center mt-n3 text-medium-emphasis"
+                    v-html="
+                      $t('pages.index.orPerYear').replace('{price}', '100')
+                    "
+                  ></p>
+                  <p
+                    v-else
+                    class="text-center mt-n3 text-medium-emphasis"
+                    v-html="
+                      $t('pages.index.orPerMonth').replace('{price}', '8.33')
+                    "
+                  ></p>
+                  <VBtn block color="primary" to="/login" size="large">{{
+                    $t('pages.index.tryForFreeBtn')
+                  }}</VBtn>
+                  <p class="mt-6 text-md-body-large text-title-medium">
+                    <VIcon
+                      color="primary"
+                      class="mt-n1"
+                      start
+                      :icon="mdiCheckCircle"
+                    />
+                    <span v-html="$t('pages.index.proPlanFeature1')"></span>
+                  </p>
+                  <p class="text-md-body-large text-title-medium mt-n3">
+                    <VIcon
+                      color="primary"
+                      class="mt-n1"
+                      start
+                      :icon="mdiCheckCircle"
+                    />
+                    {{ $t('pages.index.offlineNotifications') }}
+                  </p>
+                  <p class="text-md-body-large text-title-medium mt-n3">
+                    <VIcon
+                      color="primary"
+                      class="mt-n1"
+                      start
+                      :icon="mdiCheckCircle"
+                    />
+                    {{ $t('pages.index.forwardMessagesWebhook') }}
+                  </p>
+                  <p class="text-md-body-large text-title-medium mt-n3">
+                    <VIcon
+                      color="primary"
+                      class="mt-n1"
+                      start
+                      :icon="mdiCheckCircle"
+                    />
+                    {{ $t('pages.index.prioritySupport') }}
+                  </p>
+                </VCardText>
+              </VCard>
+            </VCol>
+            <!-- Custom Plan -->
+            <VCol cols="12" lg="4">
+              <VCard elevation="4" color="#121212">
+                <VCardText>
+                  <h1 class="text-center text-display-medium mt-0 mb-4">
+                    {{
+                      $t('pages.index.customPlanTitle').replace(
+                        '{plan}',
+                        pricingLabels[pricing],
+                      )
+                    }}
+                  </h1>
+                  <p
+                    class="text-body-large text-center mt-0 text-medium-emphasis"
+                  >
+                    {{
+                      $t('pages.index.customPlanDesc').replace(
+                        '{messages}',
+                        planMessages,
+                      )
+                    }}
+                  </p>
+                  <p v-if="!yearlyPricing" class="text-center">
+                    <span class="text-display-small"
+                      >${{ planMonthlyPrice }}</span
+                    >/month
+                  </p>
+                  <p v-else class="text-center">
+                    <span class="text-display-small"
+                      >${{ planYearlyPrice }}</span
+                    >/year
+                  </p>
+                  <p
+                    v-if="!yearlyPricing"
+                    class="text-center mt-n3 text-medium-emphasis"
+                    v-html="
+                      $t('pages.index.orPerYear').replace(
+                        '{price}',
+                        planYearlyPrice,
+                      )
+                    "
+                  ></p>
+                  <p
+                    v-else
+                    class="text-center mt-n3 text-medium-emphasis"
+                    v-html="
+                      $t('pages.index.orPerMonth').replace(
+                        '{price}',
+                        planYearlyMonthlyPrice,
+                      )
+                    "
+                  ></p>
+                  <VBtn block variant="tonal" to="/login" size="large">{{
+                    $t('pages.index.tryForFreeBtn')
+                  }}</VBtn>
+                  <p class="mt-6 text-md-body-large text-title-medium">
+                    <VIcon
+                      color="primary"
+                      class="mt-n1"
+                      start
+                      :icon="mdiCheckCircle"
+                    />
+                    <span
+                      v-html="
+                        $t('pages.index.customPlanFeature1').replace(
+                          '{messages}',
+                          pricingLabels[pricing],
+                        )
+                      "
+                    ></span>
+                  </p>
+                  <p class="text-md-body-large text-title-medium mt-n3">
+                    <VIcon
+                      color="primary"
+                      class="mt-n1"
+                      start
+                      :icon="mdiCheckCircle"
+                    />
+                    {{ $t('pages.index.offlineNotifications') }}
+                  </p>
+                  <p class="text-md-body-large text-title-medium mt-n3">
+                    <VIcon
+                      color="primary"
+                      class="mt-n1"
+                      start
+                      :icon="mdiCheckCircle"
+                    />
+                    {{ $t('pages.index.forwardMessagesWebhook') }}
+                  </p>
+                  <p class="text-md-body-large text-title-medium mt-n3">
+                    <VIcon
+                      color="primary"
+                      class="mt-n1"
+                      start
+                      :icon="mdiCheckCircle"
+                    />
+                    {{ $t('pages.index.prioritySupport') }}
+                  </p>
+                </VCardText>
+              </VCard>
+            </VCol>
+          </VRow>
+          <VRow>
+            <VCol>
+              <VAlert
+                color="info"
+                :icon="mdAndUp ? mdiLightbulbOn60 : undefined"
+                :prominent="mdAndUp"
+                variant="tonal"
+              >
+                <span v-html="$t('pages.index.contactSupportAlert')"></span>
+              </VAlert>
+            </VCol>
+          </VRow>
+        </VContainer>
+      </VSheet>
     </template>
 
     <!-- Testimonials Section -->
@@ -951,8 +1033,10 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                   />
                 </div>
               </div>
-              <p class="text-title-large font-weight-light mt-0" v-html="$t('pages.index.testimonial1')">
-              </p>
+              <p
+                class="text-title-large font-weight-light mt-0"
+                v-html="$t('pages.index.testimonial1')"
+              ></p>
             </VCardText>
           </VCard>
         </VCol>
@@ -981,8 +1065,10 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                   <v-img width="64" src="/img/logos/uneed.svg" />
                 </div>
               </div>
-              <p class="text-title-large font-weight-light mt-0" v-html="$t('pages.index.testimonial2')">
-              </p>
+              <p
+                class="text-title-large font-weight-light mt-0"
+                v-html="$t('pages.index.testimonial2')"
+              ></p>
             </VCardText>
           </VCard>
         </VCol>
@@ -998,8 +1084,10 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
           >
             {{ $t('pages.index.faqTitle') }}
           </h2>
-          <p class="text-center text-title-large mt-4 text-medium-emphasis" v-html="$t('pages.index.faqDesc')">
-          </p>
+          <p
+            class="text-center text-title-large mt-4 text-medium-emphasis"
+            v-html="$t('pages.index.faqDesc')"
+          ></p>
         </VCol>
       </VRow>
       <VRow>
@@ -1045,8 +1133,7 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
                 </template>
               </VExpansionPanelTitle>
               <VExpansionPanelText>
-                <p class="mt-4" v-html="$t('pages.index.faq3Answer')">
-                </p>
+                <p class="mt-4" v-html="$t('pages.index.faq3Answer')"></p>
               </VExpansionPanelText>
             </VExpansionPanel>
             <VExpansionPanel>

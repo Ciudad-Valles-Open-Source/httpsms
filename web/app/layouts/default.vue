@@ -21,17 +21,27 @@ const hasDrawer = computed(() => {
 
 onMounted(() => {
   setTimeout(() => {
-    const pusherOptions = config.public.useSoketi ? {
-      wsHost: window.location.hostname,
-      wsPort: window.location.port ? Number(window.location.port) : (window.location.protocol === 'https:' ? 443 : 80),
-      wssPort: window.location.port ? Number(window.location.port) : (window.location.protocol === 'https:' ? 443 : 80),
-      forceTLS: window.location.protocol === 'https:',
-      disableStats: true,
-      enabledTransports: ['ws', 'wss'],
-      cluster: ''
-    } : {
-      cluster: config.public.soketiCluster as string,
-    }
+    const pusherOptions = config.public.useSoketi
+      ? {
+          wsHost: window.location.hostname,
+          wsPort: window.location.port
+            ? Number(window.location.port)
+            : window.location.protocol === 'https:'
+              ? 443
+              : 80,
+          wssPort: window.location.port
+            ? Number(window.location.port)
+            : window.location.protocol === 'https:'
+              ? 443
+              : 80,
+          forceTLS: window.location.protocol === 'https:',
+          disableStats: true,
+          enabledTransports: ['ws', 'wss'],
+          cluster: '',
+        }
+      : {
+          cluster: config.public.soketiCluster as string,
+        }
     const pusher = new Pusher(config.public.soketiKey as string, pusherOptions)
 
     if (authStore.authUser) {
@@ -75,12 +85,15 @@ function startPoller() {
 
 <template>
   <v-app>
+    <BlackFridayBanner />
     <v-navigation-drawer v-if="lgAndUp && hasDrawer" :width="400" permanent>
-      <template #prepend>
-        <div v-if="appStore.isLocal" class="py-2 bg-warning" />
-        <MessageThreadHeader />
-        <div class="overflow-y-auto v-navigation-drawer__message-thread">
-          <MessageThread />
+      <template #default>
+        <div class="message-thread-sidebar d-flex flex-column">
+          <div v-if="appStore.isLocal" class="py-2 bg-warning" />
+          <MessageThreadHeader />
+          <div class="overflow-y-auto v-navigation-drawer__message-thread">
+            <MessageThread />
+          </div>
         </div>
       </template>
     </v-navigation-drawer>
@@ -105,8 +118,12 @@ function startPoller() {
       padding-left: 400px;
     }
   }
+  .message-thread-sidebar {
+    height: 100%;
+  }
   .v-navigation-drawer__message-thread {
-    height: calc(100vh - 120px);
+    flex: 1;
+    min-height: 0;
     &::-webkit-scrollbar {
       width: 8px;
     }

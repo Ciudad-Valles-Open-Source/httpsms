@@ -21,6 +21,7 @@ type integrationThread struct {
 	Contact            string  `json:"contact"`
 	Owner              string  `json:"owner"`
 	IsArchived         bool    `json:"is_archived"`
+	UnreadCount        uint    `json:"unread_count"`
 	LastMessageContent *string `json:"last_message_content"`
 }
 
@@ -172,7 +173,7 @@ func archiveThread(ctx context.Context, t *testing.T, threadID string) {
 
 func TestUnarchiveThreadOnReceive_Enabled(t *testing.T) {
 	ctx := context.Background()
-	phone := setupPhone(ctx, t, 60)
+	phone := setupPhone(ctx, t, 30)
 	setUnarchiveThread(ctx, t, phone.PhoneNumber, true)
 
 	contact := randomPhoneNumber()
@@ -204,7 +205,7 @@ func TestUnarchiveThreadOnReceive_Enabled(t *testing.T) {
 
 func TestUnarchiveThreadOnReceive_Disabled(t *testing.T) {
 	ctx := context.Background()
-	phone := setupPhone(ctx, t, 60) // unarchive_thread defaults to false; do not enable it
+	phone := setupPhone(ctx, t, 30) // unarchive_thread defaults to false; do not enable it
 
 	contact := randomPhoneNumber()
 	content1 := "first inbound " + randomEncryptionKey()

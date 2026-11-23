@@ -32,7 +32,7 @@ function parseErrors(error: unknown): ErrorMessages {
   const bag = new ErrorMessages()
   const data = toApiError(error).data?.data
   if (data && typeof data === 'object') {
-    Object.keys(data).forEach((key) => bag.addMany(key, data[key]))
+    Object.entries(data).forEach(([key, values]) => bag.addMany(key, values))
   }
   return bag
 }
@@ -43,7 +43,7 @@ function cleanName(requestId: string): string {
   if (requestId.startsWith('bulk-xls-'))
     return requestId.replace(/^bulk-xls-/, '') + '.xlsx'
   const newFormatMatch = requestId.match(/^bulk-[0-9A-Za-z]+-(.+)$/)
-  if (newFormatMatch) return newFormatMatch[1]
+  if (newFormatMatch?.[1]) return newFormatMatch[1]
   return requestId.replace(/^bulk-/, '')
 }
 
@@ -90,12 +90,14 @@ async function sendBulkMessages() {
     fetchBulkOrders()
   } catch (error: unknown) {
     errorTitle.value = capitalize(
-      toApiError(error).data?.message ?? t('pages.bulkMessages.defaultErrorSending'),
+      toApiError(error).data?.message ??
+        t('pages.bulkMessages.defaultErrorSending'),
     )
     errorMessages.value = parseErrors(error)
     notificationsStore.addNotification({
       message:
-        toApiError(error).data?.message ?? t('pages.bulkMessages.defaultErrorsSending'),
+        toApiError(error).data?.message ??
+        t('pages.bulkMessages.defaultErrorsSending'),
       type: 'error',
     })
     loading.value = false
@@ -130,9 +132,10 @@ onMounted(async () => {
       <VContainer>
         <VRow>
           <VCol cols="12" md="10" offset-md="1" xxl="8" offset-xxl="2">
-            <h5 class="text-headline-large mb-3 mt-3">{{ $t('pages.bulkMessages.bulkMessages') }}</h5>
-            <p v-html="$t('pages.bulkMessages.description')">
-            </p>
+            <h5 class="text-headline-large mb-3 mt-3">
+              {{ $t('pages.bulkMessages.bulkMessages') }}
+            </h5>
+            <p v-html="$t('pages.bulkMessages.description')"></p>
             <VAlert v-if="errorTitle" variant="tonal" type="warning" prominent>
               <h6 class="text-title-large font-weight-bold">
                 {{ errorTitle }}
@@ -183,7 +186,9 @@ onMounted(async () => {
         </VRow>
         <VRow class="mt-8">
           <VCol cols="12" md="10" offset-md="1" xxl="8" offset-xxl="2">
-            <h4 class="text-headline-large mb-3">{{ $t('pages.bulkMessages.historyTitle') }}</h4>
+            <h4 class="text-headline-large mb-3">
+              {{ $t('pages.bulkMessages.historyTitle') }}
+            </h4>
             <p class="text-medium-emphasis">
               {{ $t('pages.bulkMessages.historyDesc') }}
             </p>
@@ -196,15 +201,33 @@ onMounted(async () => {
             <VTable v-else density="comfortable">
               <thead>
                 <tr class="text-uppercase text-medium-emphasis">
-                  <th class="text-left">{{ $t('pages.bulkMessages.thName') }}</th>
-                  <th class="text-center">{{ $t('pages.bulkMessages.thCreatedAt') }}</th>
-                  <th class="text-center">{{ $t('pages.bulkMessages.thTotal') }}</th>
-                  <th class="text-center">{{ $t('pages.bulkMessages.thPending') }}</th>
-                  <th class="text-center">{{ $t('pages.bulkMessages.thScheduled') }}</th>
-                  <th class="text-center">{{ $t('pages.bulkMessages.thSent') }}</th>
-                  <th class="text-center">{{ $t('pages.bulkMessages.thDelivered') }}</th>
-                  <th class="text-center">{{ $t('pages.bulkMessages.thFailed') }}</th>
-                  <th class="text-center">{{ $t('pages.bulkMessages.thExpired') }}</th>
+                  <th class="text-left">
+                    {{ $t('pages.bulkMessages.thName') }}
+                  </th>
+                  <th class="text-center">
+                    {{ $t('pages.bulkMessages.thCreatedAt') }}
+                  </th>
+                  <th class="text-center">
+                    {{ $t('pages.bulkMessages.thTotal') }}
+                  </th>
+                  <th class="text-center">
+                    {{ $t('pages.bulkMessages.thPending') }}
+                  </th>
+                  <th class="text-center">
+                    {{ $t('pages.bulkMessages.thScheduled') }}
+                  </th>
+                  <th class="text-center">
+                    {{ $t('pages.bulkMessages.thSent') }}
+                  </th>
+                  <th class="text-center">
+                    {{ $t('pages.bulkMessages.thDelivered') }}
+                  </th>
+                  <th class="text-center">
+                    {{ $t('pages.bulkMessages.thFailed') }}
+                  </th>
+                  <th class="text-center">
+                    {{ $t('pages.bulkMessages.thExpired') }}
+                  </th>
                 </tr>
               </thead>
               <tbody>

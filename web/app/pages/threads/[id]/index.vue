@@ -21,7 +21,16 @@ import Pusher from 'pusher-js'
 import type { Channel } from 'pusher-js'
 import { isValidPhoneNumber } from 'libphonenumber-js'
 import { storeToRefs } from 'pinia'
-import type { EntitiesMessage } from '~~/shared/types/api'
+import { getApiErrorMessage, toApiError } from '~/utils/api-error'
+import type {
+  EntitiesContact,
+  EntitiesMessage,
+  EntitiesMessageThread,
+} from '~~/shared/types/api'
+import {
+  isUrlNotificationToken,
+  formatWhatsappText,
+} from '~/utils/whatsapp-format'
 
 definePageMeta({
   middleware: ['auth'],
@@ -59,9 +68,7 @@ threadsStore.setThreadId(route.params.id as string)
 
 const formMessageRules = [
   (v: string) =>
-    v === '' ||
-    (v && v.length <= 320) ||
-    t('threads.id.message_length_error'),
+    v === '' || (v && v.length <= 320) || t('threads.id.message_length_error'),
 ]
 
 let webhookChannel: Channel | null = null
@@ -87,6 +94,11 @@ function isMo(message: EntitiesMessage): boolean {
 
 function isMissedCall(message: EntitiesMessage): boolean {
   return message.type === 'call/missed'
+}
+
+function isWhatsappFormatted(message: EntitiesMessage): boolean {
+  const phone = phonesStore.phones.find((x) => x.phone_number === message.owner)
+  return isUrlNotificationToken(phone?.fcm_token)
 }
 
 function isPending(message: EntitiesMessage): boolean {
@@ -120,8 +132,8 @@ function currentThreadContactTitle(): string {
   )
 }
 
-async function refreshThreadContact() {
-  await threadsStore.loadThreads()
+async function refreshThreadContact(contacts: EntitiesContact[]) {
+  await threadsStore.loadThreads(contacts)
 }
 
 function scrollToElement() {
@@ -193,6 +205,45 @@ async function loadData() {
     if (!authStore.user) await authStore.loadUser()
     await phonesStore.loadPhones()
     await threadsStore.loadThreads()
+  }
+
+  if (route.params.id !== threadId) return
+  if (!threadsStore.hasThreadId(threadId)) {
+    let requestedThread: EntitiesMessageThread
+    try {
+      requestedThread = await threadsStore.fetchThread(threadId)
+    } catch (error) {
+      if (route.params.id !== threadId) return
+      const status = toApiError(error).status
+      if (status === 404 || status === 422) {
+        notificationsStore.addNotification({
+          type: 'error',
+          message: 'The conversation could not be found',
+        })
+        await router.push('/threads')
+        return
+      }
+      notificationsStore.addNotification({
+        type: 'error',
+        message: getApiErrorMessage(
+          error,
+          'The conversation could not be loaded',
+        ),
+      })
+      throw error
+    }
+    if (route.params.id !== threadId) return
+    const contextChanged =
+      phonesStore.owner !== requestedThread.owner ||
+      threadsStore.archivedThreads !== requestedThread.is_archived
+    if (phonesStore.owner !== requestedThread.owner) {
+      await authStore.updateUser({ owner: requestedThread.owner })
+    }
+    if (route.params.id !== threadId) return
+    threadsStore.archivedThreads = requestedThread.is_archived
+    if (contextChanged) await threadsStore.loadThreads()
+    if (route.params.id !== threadId) return
+    threadsStore.setThreadId(threadId)
   }
 
   if (!threadsStore.hasThreadId(threadId)) {
@@ -279,17 +330,27 @@ async function sendMessage(event: KeyboardEvent | Event) {
 onMounted(async () => {
   await loadData()
 
-  const pusherOptions = config.public.useSoketi ? {
-    wsHost: window.location.hostname,
-    wsPort: window.location.port ? Number(window.location.port) : (window.location.protocol === 'https:' ? 443 : 80),
-    wssPort: window.location.port ? Number(window.location.port) : (window.location.protocol === 'https:' ? 443 : 80),
-    forceTLS: window.location.protocol === 'https:',
-    disableStats: true,
-    enabledTransports: ['ws', 'wss'],
-    cluster: ''
-  } : {
-    cluster: config.public.soketiCluster as string,
-  }
+  const pusherOptions = config.public.useSoketi
+    ? {
+        wsHost: window.location.hostname,
+        wsPort: window.location.port
+          ? Number(window.location.port)
+          : window.location.protocol === 'https:'
+            ? 443
+            : 80,
+        wssPort: window.location.port
+          ? Number(window.location.port)
+          : window.location.protocol === 'https:'
+            ? 443
+            : 80,
+        forceTLS: window.location.protocol === 'https:',
+        disableStats: true,
+        enabledTransports: ['ws', 'wss'],
+        cluster: '',
+      }
+    : {
+        cluster: config.public.soketiCluster as string,
+      }
   const pusher = new Pusher(config.public.soketiKey as string, pusherOptions)
 
   webhookChannel = pusher.subscribe(authStore.user!.id)
@@ -313,7 +374,7 @@ watch(
     if (!previousThreadId || threadId === previousThreadId) return
 
     threadsStore.setThreadId(threadId)
-    void loadMessages()
+    void loadData()
   },
 )
 
@@ -359,7 +420,9 @@ onBeforeUnmount(() => {
               <template #prepend>
                 <VIcon :icon="mdiSquareEditOutline" />
               </template>
-              <VListItemTitle>{{ $t('threads.id.edit_contact') }}</VListItemTitle>
+              <VListItemTitle>{{
+                $t('threads.id.edit_contact')
+              }}</VListItemTitle>
             </VListItem>
             <VListItem
               v-else-if="contactIsPhoneNumber"
@@ -368,7 +431,9 @@ onBeforeUnmount(() => {
               <template #prepend>
                 <VIcon :icon="mdiAccountPlus" />
               </template>
-              <VListItemTitle>{{ $t('threads.id.add_contact') }}</VListItemTitle>
+              <VListItemTitle>{{
+                $t('threads.id.add_contact')
+              }}</VListItemTitle>
             </VListItem>
             <VListItem
               v-if="currentThread && !currentThread.is_archived"
@@ -395,7 +460,9 @@ onBeforeUnmount(() => {
               <template #prepend>
                 <VIcon :icon="mdiDelete" color="error" />
               </template>
-              <VListItemTitle>{{ $t('threads.id.delete_thread') }}</VListItemTitle>
+              <VListItemTitle>{{
+                $t('threads.id.delete_thread')
+              }}</VListItemTitle>
             </VListItem>
           </VList>
         </VMenu>
@@ -463,25 +530,25 @@ onBeforeUnmount(() => {
                     <template #prepend
                       ><VIcon size="small" :icon="mdiRefresh"
                     /></template>
-                    <VListItemTitle class="text-body-medium"
-                      >{{ $t('threads.id.resend_message') }}</VListItemTitle
-                    >
+                    <VListItemTitle class="text-body-medium">{{
+                      $t('threads.id.resend_message')
+                    }}</VListItemTitle>
                   </VListItem>
                   <VListItem @click.prevent="copyMessageId(message)">
                     <template #prepend
                       ><VIcon size="small" :icon="mdiContentCopy"
                     /></template>
-                    <VListItemTitle class="text-body-medium"
-                      >{{ $t('threads.id.copy_message_id') }}</VListItemTitle
-                    >
+                    <VListItemTitle class="text-body-medium">{{
+                      $t('threads.id.copy_message_id')
+                    }}</VListItemTitle>
                   </VListItem>
                   <VListItem @click.prevent="deleteMessage(message)">
                     <template #prepend
                       ><VIcon size="small" :icon="mdiDelete" color="error"
                     /></template>
-                    <VListItemTitle class="text-body-medium"
-                      >{{ $t('threads.id.delete_message') }}</VListItemTitle
-                    >
+                    <VListItemTitle class="text-body-medium">{{
+                      $t('threads.id.delete_message')
+                    }}</VListItemTitle>
                   </VListItem>
                 </VList>
               </VMenu>
@@ -497,12 +564,18 @@ onBeforeUnmount(() => {
                     class="text-break"
                     style="white-space: pre-line"
                   >
-                    <span v-if="!isMissedCall(message)">{{
+                    <span
+                      v-if="
+                        !isMissedCall(message) && isWhatsappFormatted(message)
+                      "
+                      v-html="formatWhatsappText(message.content)"
+                    />
+                    <span v-else-if="!isMissedCall(message)">{{
                       message.content
                     }}</span>
-                    <span v-else class="text-medium-emphasis"
-                      >{{ $t('threads.id.missed_phone_call') }}</span
-                    >
+                    <span v-else class="text-medium-emphasis">{{
+                      $t('threads.id.missed_phone_call')
+                    }}</span>
                   </VCardText>
                 </VCard>
                 <VCard
@@ -587,25 +660,25 @@ onBeforeUnmount(() => {
                     <template #prepend
                       ><VIcon size="small" :icon="mdiRefresh"
                     /></template>
-                    <VListItemTitle class="text-body-medium"
-                      >{{ $t('threads.id.resend_message') }}</VListItemTitle
-                    >
+                    <VListItemTitle class="text-body-medium">{{
+                      $t('threads.id.resend_message')
+                    }}</VListItemTitle>
                   </VListItem>
                   <VListItem @click.prevent="copyMessageId(message)">
                     <template #prepend
                       ><VIcon size="small" :icon="mdiContentCopy"
                     /></template>
-                    <VListItemTitle class="text-body-medium"
-                      >{{ $t('threads.id.copy_message_id') }}</VListItemTitle
-                    >
+                    <VListItemTitle class="text-body-medium">{{
+                      $t('threads.id.copy_message_id')
+                    }}</VListItemTitle>
                   </VListItem>
                   <VListItem @click.prevent="deleteMessage(message)">
                     <template #prepend
                       ><VIcon size="small" :icon="mdiDelete" color="error"
                     /></template>
-                    <VListItemTitle class="text-body-medium"
-                      >{{ $t('threads.id.delete_message') }}</VListItemTitle
-                    >
+                    <VListItemTitle class="text-body-medium">{{
+                      $t('threads.id.delete_message')
+                    }}</VListItemTitle>
                   </VListItem>
                 </VList>
               </VMenu>

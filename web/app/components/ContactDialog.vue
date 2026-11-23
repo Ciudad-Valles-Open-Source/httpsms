@@ -47,7 +47,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  saved: []
+  saved: [contacts: EntitiesContact[]]
   'update:modelValue': [value: boolean]
 }>()
 
@@ -57,7 +57,9 @@ const form = ref<ContactForm>(emptyForm())
 const formErrors = ref(new ErrorMessages())
 
 const dialogTitle = computed(() =>
-  props.contact ? t('components.contactDialog.editContact') : t('components.contactDialog.addContact'),
+  props.contact
+    ? t('components.contactDialog.editContact')
+    : t('components.contactDialog.addContact'),
 )
 
 function phoneNumberRow(value = ''): PhoneNumberRow {
@@ -185,17 +187,17 @@ async function submitForm() {
   const payload = buildPayload()
   saving.value = true
   try {
-    if (props.contact) {
-      await contactsStore.updateContact(props.contact.id, payload, {
-        refresh: props.refreshContacts,
-      })
-    } else {
-      await contactsStore.saveContacts([payload], {
-        refresh: props.refreshContacts,
-      })
-    }
+    const savedContacts = props.contact
+      ? [
+          await contactsStore.updateContact(props.contact.id, payload, {
+            refresh: props.refreshContacts,
+          }),
+        ]
+      : await contactsStore.saveContacts([payload], {
+          refresh: props.refreshContacts,
+        })
     closeDialog()
-    emit('saved')
+    emit('saved', savedContacts)
   } catch (error: unknown) {
     const bag = new ErrorMessages()
     const messages = fieldErrorsFromApi(error)
@@ -269,7 +271,9 @@ watch(
         />
 
         <div class="d-flex align-center mt-2 mb-1">
-          <span class="text-subtitle-2">{{ $t('components.contactDialog.phoneNumbers') }}</span>
+          <span class="text-subtitle-2">{{
+            $t('components.contactDialog.phoneNumbers')
+          }}</span>
           <VSpacer />
           <VBtn
             variant="text"
@@ -316,7 +320,9 @@ watch(
         </div>
 
         <div class="d-flex align-center mt-2 mb-1">
-          <span class="text-subtitle-2">{{ $t('components.contactDialog.emailAddresses') }}</span>
+          <span class="text-subtitle-2">{{
+            $t('components.contactDialog.emailAddresses')
+          }}</span>
           <VSpacer />
           <VBtn
             variant="text"
@@ -355,7 +361,9 @@ watch(
         </div>
 
         <div class="d-flex align-center mt-2 mb-1">
-          <span class="text-subtitle-2">{{ $t('components.contactDialog.properties') }}</span>
+          <span class="text-subtitle-2">{{
+            $t('components.contactDialog.properties')
+          }}</span>
           <VSpacer />
           <VBtn
             variant="text"
@@ -406,7 +414,9 @@ watch(
           {{ $t('components.contactDialog.saveContact') }}
         </VBtn>
         <VSpacer />
-        <VBtn color="warning" variant="text" @click="closeDialog">{{ $t('components.contactDialog.close') }}</VBtn>
+        <VBtn color="warning" variant="text" @click="closeDialog">{{
+          $t('components.contactDialog.close')
+        }}</VBtn>
       </VCardActions>
     </VCard>
   </VDialog>

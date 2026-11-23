@@ -142,8 +142,14 @@ async function logout() {
               <v-icon v-else size="x-small" color="success" :icon="mdiCircle" />
             </v-btn>
           </template>
-          <h4 class="font-weight-bold mt-0 mb-0">{{ $t('components.messageThreadHeader.lastHeartbeat') }}</h4>
-          {{ $t('components.messageThreadHeader.timeAgo', { time: humanizeTime(phonesStore.heartbeat.timestamp) }) }}
+          <h4 class="font-weight-bold mt-0 mb-0">
+            {{ $t('components.messageThreadHeader.lastHeartbeat') }}
+          </h4>
+          {{
+            $t('components.messageThreadHeader.timeAgo', {
+              time: humanizeTime(phonesStore.heartbeat.timestamp),
+            })
+          }}
         </v-tooltip>
       </div>
     </div>
@@ -169,55 +175,80 @@ async function logout() {
             <v-icon v-else :icon="mdiPackageUp" />
           </template>
           <v-list-item-title>
-            {{ threadsStore.archivedThreads ? $t('components.messageThreadHeader.unarchived') : $t('components.messageThreadHeader.archived') }}
+            {{
+              threadsStore.archivedThreads
+                ? $t('components.messageThreadHeader.unarchived')
+                : $t('components.messageThreadHeader.archived')
+            }}
           </v-list-item-title>
         </v-list-item>
         <v-list-item v-if="phonesStore.owner" :to="{ name: 'messages' }">
           <template #prepend><v-icon :icon="mdiPlus" /></template>
-          <v-list-item-title>{{ $t('components.messageThreadHeader.newMessage') }}</v-list-item-title>
+          <v-list-item-title>{{
+            $t('components.messageThreadHeader.newMessage')
+          }}</v-list-item-title>
         </v-list-item>
         <v-list-item v-if="phonesStore.owner" :to="{ name: 'bulk-messages' }">
           <template #prepend
             ><v-icon :icon="mdiCommentTextMultipleOutline"
           /></template>
-          <v-list-item-title>{{ $t('components.messageThreadHeader.bulkMessages') }}</v-list-item-title>
+          <v-list-item-title>{{
+            $t('components.messageThreadHeader.bulkMessages')
+          }}</v-list-item-title>
         </v-list-item>
         <v-list-item v-if="phonesStore.owner" :to="{ name: 'search-messages' }">
           <template #prepend><v-icon :icon="mdiMagnify" /></template>
-          <v-list-item-title>{{ $t('components.messageThreadHeader.searchMessages') }}</v-list-item-title>
+          <v-list-item-title>{{
+            $t('components.messageThreadHeader.searchMessages')
+          }}</v-list-item-title>
         </v-list-item>
         <v-list-item :to="{ name: 'contacts' }">
           <template #prepend><v-icon :icon="mdiAccountMultiple" /></template>
-          <v-list-item-title>{{ $t('components.messageThreadHeader.contacts') }}</v-list-item-title>
+          <v-list-item-title>{{
+            $t('components.messageThreadHeader.contacts')
+          }}</v-list-item-title>
         </v-list-item>
         <v-list-item :to="{ name: 'settings' }">
           <template #prepend><v-icon :icon="mdiAccountCog" /></template>
-          <v-list-item-title>{{ $t('components.messageThreadHeader.settings') }}</v-list-item-title>
+          <v-list-item-title>{{
+            $t('components.messageThreadHeader.settings')
+          }}</v-list-item-title>
         </v-list-item>
         <v-list-item :to="{ name: 'phone-api-keys' }">
           <template #prepend><v-icon :icon="mdiCellphoneKey" /></template>
-          <v-list-item-title :class="{ 'pr-16': lgAndUp }"
-            >{{ $t('components.messageThreadHeader.phoneApiKeys') }}</v-list-item-title
-          >
+          <v-list-item-title :class="{ 'pr-16': lgAndUp }">{{
+            $t('components.messageThreadHeader.phoneApiKeys')
+          }}</v-list-item-title>
         </v-list-item>
         <v-list-item
           v-if="phonesStore.owner"
           :href="appStore.appData.appDownloadUrl"
         >
           <template #prepend><v-icon :icon="mdiDownload" /></template>
-          <v-list-item-title>{{ $t('components.messageThreadHeader.downloadApp') }}</v-list-item-title>
+          <v-list-item-title>{{
+            $t('components.messageThreadHeader.downloadApp')
+          }}</v-list-item-title>
         </v-list-item>
-        <v-list-item v-if="config.public.enableBilling" :to="{ name: 'billing' }">
+        <v-list-item
+          v-if="config.public.enableBilling"
+          :to="{ name: 'billing' }"
+        >
           <template #prepend><v-icon :icon="mdiFinance" /></template>
-          <v-list-item-title>{{ $t('components.messageThreadHeader.usageBilling') }}</v-list-item-title>
+          <v-list-item-title>{{
+            $t('components.messageThreadHeader.usageBilling')
+          }}</v-list-item-title>
         </v-list-item>
         <v-list-item :to="{ name: 'statistics' }">
           <template #prepend><v-icon :icon="mdiChartBar" /></template>
-          <v-list-item-title>{{ $t('components.messageThreadHeader.statistics') }}</v-list-item-title>
+          <v-list-item-title>{{
+            $t('components.messageThreadHeader.statistics')
+          }}</v-list-item-title>
         </v-list-item>
         <v-list-item @click.prevent="logout">
           <template #prepend><v-icon :icon="mdiLogout" /></template>
-          <v-list-item-title>{{ $t('components.messageThreadHeader.logout') }}</v-list-item-title>
+          <v-list-item-title>{{
+            $t('components.messageThreadHeader.logout')
+          }}</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-menu>

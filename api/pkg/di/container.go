@@ -1417,6 +1417,7 @@ func (container *Container) DiscordClient() (client *discord.Client) {
 func (container *Container) PlunkClient() (client *plunk.Client) {
 	container.logger.Debug(fmt.Sprintf("creating %T", client))
 	return plunk.New(
+		plunk.WithBaseURL(os.Getenv("PLUNK_BASE_URL")),
 		plunk.WithHTTPClient(container.HTTPClient("plunk")),
 		plunk.WithSecretKey(os.Getenv("PLUNK_SECRET_KEY")),
 		plunk.WithPublicKey(os.Getenv("PLUNK_PUBLIC_KEY")),
@@ -1960,7 +1961,7 @@ func (container *Container) initializeGoogleTraceProvider(version string, namesp
 	}
 
 	tp := trace.NewTracerProvider(
-		trace.WithBatcher(traceExporter),
+		trace.WithSpanProcessor(telemetry.NewSamplingSpanProcessor(traceExporter)),
 		trace.WithSampler(trace.AlwaysSample()),
 		trace.WithResource(container.OtelResources(version, namespace)),
 	)
@@ -1973,6 +1974,7 @@ func (container *Container) initializeGoogleTraceProvider(version string, namesp
 
 	meterProvider := metric.NewMeterProvider(
 		metric.WithReader(metric.NewPeriodicReader(metricExporter)),
+		metric.WithExemplarFilter(telemetry.SampledTraceExemplarFilter),
 		metric.WithResource(container.OtelResources(version, namespace)),
 	)
 	otel.SetMeterProvider(meterProvider)
@@ -2005,7 +2007,7 @@ func (container *Container) initializeAxiomTraceProvider(version string, namespa
 	}
 
 	tp := trace.NewTracerProvider(
-		trace.WithBatcher(traceExporter),
+		trace.WithSpanProcessor(telemetry.NewSamplingSpanProcessor(traceExporter)),
 		trace.WithSampler(trace.AlwaysSample()),
 		trace.WithResource(container.OtelResources(version, namespace)),
 	)
@@ -2032,6 +2034,7 @@ func (container *Container) initializeAxiomTraceProvider(version string, namespa
 
 	meterProvider := metric.NewMeterProvider(
 		metric.WithReader(metric.NewPeriodicReader(metricExporter)),
+		metric.WithExemplarFilter(telemetry.SampledTraceExemplarFilter),
 		metric.WithResource(container.OtelResources(version, namespace)),
 	)
 	otel.SetMeterProvider(meterProvider)

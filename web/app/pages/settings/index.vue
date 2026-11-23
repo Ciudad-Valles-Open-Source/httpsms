@@ -22,8 +22,8 @@ import {
   type User as FirebaseUser,
 } from 'firebase/auth'
 import QRCode from 'qrcode'
-import { ErrorMessages } from '~/utils/errors'
-import { getApiErrorMessage, toApiError } from '~/utils/api-error'
+import { ErrorMessages, getErrorMessages } from '~/utils/errors'
+import { getApiErrorMessage } from '~/utils/api-error'
 import type {
   EntitiesPhone,
   EntitiesWebhook,
@@ -134,15 +134,6 @@ const webhookEventOptions = [
 
 function resetErrors() {
   errorMessages.value = new ErrorMessages()
-}
-
-function parseErrors(error: unknown): ErrorMessages {
-  const bag = new ErrorMessages()
-  const data = toApiError(error).data?.data
-  if (data && typeof data === 'object') {
-    Object.keys(data).forEach((key) => bag.addMany(key, data[key]!))
-  }
-  return bag
 }
 
 // ---------------------------------------------------------------------------
@@ -290,13 +281,15 @@ async function saveWebhook() {
       await billingStore.createWebhook(payload)
     }
     notificationsStore.addNotification({
-      message: activeWebhook.value.id ? t('settings.webhook_updated') : t('settings.webhook_created'),
+      message: activeWebhook.value.id
+        ? t('settings.webhook_updated')
+        : t('settings.webhook_created'),
       type: 'success',
     })
     showWebhookEdit.value = false
     await loadWebhooks()
   } catch (error: unknown) {
-    errorMessages.value = parseErrors(error)
+    errorMessages.value = getErrorMessages(error)
     if (errorMessages.value.size() === 0) {
       notificationsStore.addNotification({
         message: getApiErrorMessage(error, t('settings.failed_save_webhook')),
@@ -398,13 +391,15 @@ async function saveDiscord() {
       await billingStore.createDiscord(payload)
     }
     notificationsStore.addNotification({
-      message: activeDiscord.value.id ? t('settings.discord_updated') : t('settings.discord_created'),
+      message: activeDiscord.value.id
+        ? t('settings.discord_updated')
+        : t('settings.discord_created'),
       type: 'success',
     })
     showDiscordEdit.value = false
     await loadDiscordIntegrations()
   } catch (error: unknown) {
-    errorMessages.value = parseErrors(error)
+    errorMessages.value = getErrorMessages(error)
     if (errorMessages.value.size() === 0) {
       notificationsStore.addNotification({
         message: getApiErrorMessage(error, t('settings.failed_save_discord')),
@@ -441,6 +436,7 @@ async function deleteDiscord(id: string) {
 // ---------------------------------------------------------------------------
 const updatingPhone = ref(false)
 const showPhoneEdit = ref(false)
+const showPhoneDelete = ref(false)
 const activePhone = ref<EntitiesPhone | null>(null)
 
 function showEditPhone(phoneId: string) {
@@ -453,24 +449,29 @@ function showEditPhone(phoneId: string) {
 
 async function updatePhone() {
   if (!activePhone.value) return
+  resetErrors()
   updatingPhone.value = true
   try {
     await phonesStore.updatePhone(activePhone.value)
     showPhoneEdit.value = false
     activePhone.value = null
+  } catch (error: unknown) {
+    errorMessages.value = getErrorMessages(error)
   } finally {
     updatingPhone.value = false
   }
 }
 
-async function deletePhone(phoneId: string) {
+async function deletePhone() {
+  if (!activePhone.value || updatingPhone.value) return
   updatingPhone.value = true
   try {
-    await phonesStore.deletePhone(phoneId)
+    await phonesStore.deletePhone(activePhone.value.id)
     notificationsStore.addNotification({
       message: t('settings.phone_deleted'),
       type: 'success',
     })
+    showPhoneDelete.value = false
     showPhoneEdit.value = false
     activePhone.value = null
   } catch (error: unknown) {
@@ -641,9 +642,9 @@ function scheduleWindowError(index: number): string | null {
     ? errorMessages.value.get('windows')
     : []
   if (messages.length === 0) return null
-  const message = messages.find((x) => x.includes(`day_of_week ${index}`))
+  const message = messages.find((x) => x.includes(`Day of week ${index}`))
   return message
-    ? message.replace(`day_of_week ${index}`, getWeekday(index))
+    ? message.replace(`Day of week ${index}`, getWeekday(index))
     : null
 }
 
@@ -675,7 +676,7 @@ async function saveSchedule() {
     showScheduleEdit.value = false
     await loadSendSchedules()
   } catch (error: unknown) {
-    errorMessages.value = parseErrors(error)
+    errorMessages.value = getErrorMessages(error)
     if (errorMessages.value.size() === 0) {
       notificationsStore.addNotification({
         type: 'error',
@@ -749,7 +750,10 @@ async function saveEmailNotifications() {
     syncEmailNotifications()
   } catch (error: unknown) {
     notificationsStore.addNotification({
-      message: getApiErrorMessage(error, t('settings.failed_save_email_notifications')),
+      message: getApiErrorMessage(
+        error,
+        t('settings.failed_save_email_notifications'),
+      ),
       type: 'error',
     })
   } finally {
@@ -876,8 +880,13 @@ onMounted(async () => {
             </div>
 
             <!-- API Key -->
-            <h5 class="text-headline-large mb-3 mt-0">{{ $t('settings.api_key') }}</h5>
-            <p class="text-medium-emphasis" v-html="$t('settings.api_key_desc')"></p>
+            <h5 class="text-headline-large mb-3 mt-0">
+              {{ $t('settings.api_key') }}
+            </h5>
+            <p
+              class="text-medium-emphasis"
+              v-html="$t('settings.api_key_desc')"
+            ></p>
             <div v-if="apiKey === ''" class="mb-n9 pl-3 pt-5">
               <VProgressCircular
                 :size="20"
@@ -919,9 +928,18 @@ onMounted(async () => {
                 opacity="0.9"
               >
                 <VCard>
-                  <VCardTitle class="text-center">{{ $t('settings.qr_code_title') }}</VCardTitle>
+                  <VCardTitle class="text-center">{{
+                    $t('settings.qr_code_title')
+                  }}</VCardTitle>
                   <VCardText class="text-center">
-                    <p class="text-body-large mt-0" v-html="$t('settings.qr_code_desc', { url: config.public.appDownloadUrl })"></p>
+                    <p
+                      class="text-body-large mt-0"
+                      v-html="
+                        $t('settings.qr_code_desc', {
+                          url: config.public.appDownloadUrl,
+                        })
+                      "
+                    ></p>
                     <canvas ref="qrCodeCanvas" />
                   </VCardText>
                   <VCardActions>
@@ -956,10 +974,12 @@ onMounted(async () => {
                   </VBtn>
                 </template>
                 <VCard>
-                  <VCardTitle class="text-headline-small"
-                    >{{ $t('settings.rotate_api_key_confirm') }}</VCardTitle
-                  >
-                  <VCardText class="text-medium-emphasis" v-html="$t('settings.rotate_api_key_desc')"></VCardText>
+                  <VCardTitle class="text-headline-small">{{
+                    $t('settings.rotate_api_key_confirm')
+                  }}</VCardTitle>
+                  <VCardText class="text-medium-emphasis"
+                    ><span v-html="$t('settings.rotate_api_key_desc')"
+                  /></VCardText>
                   <VCardActions class="pb-4">
                     <VBtn
                       color="primary"
@@ -986,7 +1006,10 @@ onMounted(async () => {
             <h5 id="webhook-settings" class="text-headline-large mb-3 mt-12">
               Webhooks
             </h5>
-            <p class="text-medium-emphasis" v-html="$t('settings.webhooks_desc')"></p>
+            <p
+              class="text-medium-emphasis"
+              v-html="$t('settings.webhooks_desc')"
+            ></p>
             <div v-if="loadingWebhooks">
               <VProgressCircular
                 :size="60"
@@ -999,9 +1022,15 @@ onMounted(async () => {
             <VTable v-else-if="webhooks.length" class="mb-4">
               <thead>
                 <tr class="text-uppercase text-title-medium">
-                  <th v-if="xlAndUp" class="text-left">{{ $t('settings.id') }}</th>
-                  <th class="text-left text-break">{{ $t('settings.callback_url') }}</th>
-                  <th v-if="lgAndUp" class="text-center">{{ $t('settings.events') }}</th>
+                  <th v-if="xlAndUp" class="text-left">
+                    {{ $t('settings.id') }}
+                  </th>
+                  <th class="text-left text-break">
+                    {{ $t('settings.callback_url') }}
+                  </th>
+                  <th v-if="lgAndUp" class="text-center">
+                    {{ $t('settings.events') }}
+                  </th>
                   <th class="text-center">{{ $t('settings.action') }}</th>
                 </tr>
               </thead>
@@ -1027,7 +1056,9 @@ onMounted(async () => {
                       @click.prevent="onWebhookEdit(webhook.id)"
                     >
                       <VIcon size="small" :icon="mdiSquareEditOutline" />
-                      <span v-if="!mdAndDown" class="ml-1">{{ $t('settings.edit') }}</span>
+                      <span v-if="!mdAndDown" class="ml-1">{{
+                        $t('settings.edit')
+                      }}</span>
                     </VBtn>
                   </td>
                 </tr>
@@ -1050,7 +1081,10 @@ onMounted(async () => {
             <h5 id="discord-settings" class="text-headline-large mb-3 mt-12">
               Discord Integration
             </h5>
-            <p class="text-medium-emphasis" v-html="$t('settings.discord_integration_desc')"></p>
+            <p
+              class="text-medium-emphasis"
+              v-html="$t('settings.discord_integration_desc')"
+            ></p>
             <div v-if="loadingDiscordIntegrations">
               <VProgressCircular
                 :size="60"
@@ -1083,7 +1117,9 @@ onMounted(async () => {
                       @click.prevent="onDiscordEdit(discord.id)"
                     >
                       <VIcon size="small" :icon="mdiSquareEditOutline" />
-                      <span v-if="!mdAndDown" class="ml-1">{{ $t('settings.edit') }}</span>
+                      <span v-if="!mdAndDown" class="ml-1">{{
+                        $t('settings.edit')
+                      }}</span>
                     </VBtn>
                   </td>
                 </tr>
@@ -1095,14 +1131,23 @@ onMounted(async () => {
             </VBtn>
 
             <!-- Phones -->
-            <h5 id="phones" class="text-headline-large mb-3 mt-12">{{ $t('settings.phones') }}</h5>
-            <p class="text-medium-emphasis" v-html="$t('settings.phones_desc')"></p>
+            <h5 id="phones" class="text-headline-large mb-3 mt-12">
+              {{ $t('settings.phones') }}
+            </h5>
+            <p
+              class="text-medium-emphasis"
+              v-html="$t('settings.phones_desc')"
+            ></p>
             <VTable class="mb-4" density="comfortable">
               <thead>
                 <tr class="text-uppercase text-medium-emphasis">
-                  <th v-if="xlAndUp" class="text-left">{{ $t('settings.id') }}</th>
+                  <th v-if="xlAndUp" class="text-left">
+                    {{ $t('settings.id') }}
+                  </th>
                   <th class="text-left">{{ $t('settings.phone_number') }}</th>
-                  <th v-if="lgAndUp" class="text-center">{{ $t('settings.retries') }}</th>
+                  <th v-if="lgAndUp" class="text-center">
+                    {{ $t('settings.retries') }}
+                  </th>
                   <th class="text-center">{{ $t('settings.rate') }}</th>
                   <th class="text-center">{{ $t('settings.updated_at') }}</th>
                   <th class="text-center">{{ $t('settings.action') }}</th>
@@ -1135,7 +1180,9 @@ onMounted(async () => {
                       @click.prevent="showEditPhone(phone.id)"
                     >
                       <VIcon size="small" :icon="mdiSquareEditOutline" />
-                      <span v-if="!mdAndDown" class="ml-1">{{ $t('settings.edit') }}</span>
+                      <span v-if="!mdAndDown" class="ml-1">{{
+                        $t('settings.edit')
+                      }}</span>
                     </VBtn>
                   </td>
                 </tr>
@@ -1146,7 +1193,10 @@ onMounted(async () => {
             <h5 id="send-schedules" class="text-headline-large mb-3 mt-12">
               Send Schedules
             </h5>
-            <p class="text-medium-emphasis" v-html="$t('settings.send_schedules_desc')"></p>
+            <p
+              class="text-medium-emphasis"
+              v-html="$t('settings.send_schedules_desc')"
+            ></p>
             <div v-if="loadingSendSchedules">
               <VProgressCircular
                 :size="60"
@@ -1192,7 +1242,9 @@ onMounted(async () => {
                       @click.prevent="openEditSchedule(schedule)"
                     >
                       <VIcon size="small" :icon="mdiSquareEditOutline" />
-                      <span v-if="!mdAndDown" class="ml-1">{{ $t('settings.edit') }}</span>
+                      <span v-if="!mdAndDown" class="ml-1">{{
+                        $t('settings.edit')
+                      }}</span>
                     </VBtn>
                   </td>
                 </tr>
@@ -1215,7 +1267,10 @@ onMounted(async () => {
             <h5 id="email-notifications" class="text-headline-large mb-3 mt-12">
               Email Notifications
             </h5>
-            <p class="text-medium-emphasis" v-html="$t('settings.email_notifications_desc')"></p>
+            <p
+              class="text-medium-emphasis"
+              v-html="$t('settings.email_notifications_desc')"
+            ></p>
             <VSwitch
               v-model="notificationSettings.heartbeat_enabled"
               color="primary"
@@ -1262,7 +1317,10 @@ onMounted(async () => {
             <h5 class="text-headline-large mb-3 mt-12">
               Message Data Retention
             </h5>
-            <p class="text-medium-emphasis" v-html="$t('settings.message_data_retention_desc')"></p>
+            <p
+              class="text-medium-emphasis"
+              v-html="$t('settings.message_data_retention_desc')"
+            ></p>
             <VSelect
               :items="['1 Year']"
               model-value="1 Year"
@@ -1277,8 +1335,16 @@ onMounted(async () => {
             <h5 class="text-headline-large text-error mb-3 mt-10">
               Delete Account
             </h5>
-            <p v-if="hasActiveSubscription" class="text-medium-emphasis" v-html="$t('settings.cannot_delete_account_desc')"></p>
-            <p v-else class="text-medium-emphasis" v-html="$t('settings.delete_account_desc')"></p>
+            <p
+              v-if="hasActiveSubscription"
+              class="text-medium-emphasis"
+              v-html="$t('settings.cannot_delete_account_desc')"
+            ></p>
+            <p
+              v-else
+              class="text-medium-emphasis"
+              v-html="$t('settings.delete_account_desc')"
+            ></p>
             <VBtn
               color="error"
               :loading="deletingAccount"
@@ -1291,10 +1357,12 @@ onMounted(async () => {
             </VBtn>
             <VDialog v-model="showDeleteAccountDialog" max-width="600px">
               <VCard>
-                <VCardTitle class="text-center"
-                  >{{ $t('settings.delete_account_title') }}</VCardTitle
-                >
-                <VCardText class="mt-2 text-center text-medium-emphasis" v-html="$t('settings.delete_account_confirm')"></VCardText>
+                <VCardTitle class="text-center">{{
+                  $t('settings.delete_account_title')
+                }}</VCardTitle>
+                <VCardText class="mt-2 text-center text-medium-emphasis"
+                  ><span v-html="$t('settings.delete_account_confirm')"
+                /></VCardText>
                 <VCardActions>
                   <VBtn
                     color="error"
@@ -1311,7 +1379,9 @@ onMounted(async () => {
                     variant="flat"
                     @click="showDeleteAccountDialog = false"
                   >
-                    <span v-if="lgAndUp">{{ $t('settings.keep_my_account') }}</span>
+                    <span v-if="lgAndUp">{{
+                      $t('settings.keep_my_account')
+                    }}</span>
                     <span v-else>{{ $t('settings.close') }}</span>
                   </VBtn>
                 </VCardActions>
@@ -1326,7 +1396,9 @@ onMounted(async () => {
     <VDialog v-model="showWebhookEdit" max-width="600px" opacity="0.9">
       <VCard>
         <VCardTitle>
-          <span v-if="!activeWebhook.id">{{ $t('settings.add_new') }}&nbsp;</span>
+          <span v-if="!activeWebhook.id"
+            >{{ $t('settings.add_new') }}&nbsp;</span
+          >
           <span v-else>{{ $t('settings.edit_text') }}&nbsp;</span>
           {{ $t('settings.webhook_text') }}
         </VCardTitle>
@@ -1405,7 +1477,11 @@ onMounted(async () => {
             :loading="updatingWebhook"
             @click="saveWebhook"
           >
-            {{ activeWebhook.id ? $t('settings.update_webhook') : $t('settings.save_webhook') }}
+            {{
+              activeWebhook.id
+                ? $t('settings.update_webhook')
+                : $t('settings.save_webhook')
+            }}
           </LoadingButton>
           <VSpacer />
           <VBtn
@@ -1434,14 +1510,19 @@ onMounted(async () => {
     <VDialog v-model="showDiscordEdit" max-width="700px">
       <VCard>
         <VCardTitle>
-          <span v-if="!activeDiscord.id">{{ $t('settings.add_new') }}&nbsp;</span>
+          <span v-if="!activeDiscord.id"
+            >{{ $t('settings.add_new') }}&nbsp;</span
+          >
           <span v-else>{{ $t('settings.edit_text') }}&nbsp;</span>
           {{ $t('settings.discord_integration_text') }}
         </VCardTitle>
         <VCardText>
           <VRow>
             <VCol class="pt-8">
-              <p class="mt-n4 text-body-1" v-html="$t('settings.discord_add_desc')"></p>
+              <p
+                class="mt-n4 text-body-1"
+                v-html="$t('settings.discord_add_desc')"
+              ></p>
               <VBtn
                 color="#5865f2"
                 class="mb-6"
@@ -1506,7 +1587,11 @@ onMounted(async () => {
             :loading="updatingDiscord"
             @click="saveDiscord"
           >
-            {{ activeDiscord.id ? $t('settings.update_discord') : $t('settings.save_discord') }}
+            {{
+              activeDiscord.id
+                ? $t('settings.update_discord')
+                : $t('settings.save_discord')
+            }}
           </LoadingButton>
           <VSpacer />
           <VBtn
@@ -1544,6 +1629,7 @@ onMounted(async () => {
                   disabled
                   :label="$t('settings.id')"
                   :model-value="activePhone.id"
+                  :error-messages="errorMessages.get('id')"
                 />
                 <VTextField
                   variant="outlined"
@@ -1551,6 +1637,7 @@ onMounted(async () => {
                   density="compact"
                   :label="$t('settings.phone_number')"
                   :model-value="activePhone.phone_number"
+                  :error-messages="errorMessages.get('phone_number')"
                 />
                 <VTextField
                   variant="outlined"
@@ -1558,6 +1645,7 @@ onMounted(async () => {
                   density="compact"
                   :label="$t('settings.sim')"
                   :model-value="activePhone.sim"
+                  :error-messages="errorMessages.get('sim')"
                 />
                 <VTextarea
                   variant="outlined"
@@ -1565,28 +1653,37 @@ onMounted(async () => {
                   density="compact"
                   :label="$t('settings.fcm_token')"
                   :model-value="activePhone.fcm_token"
+                  :error-messages="errorMessages.get('fcm_token')"
                 />
                 <VTextField
                   v-model="activePhone.message_expiration_seconds"
+                  class="mt-3"
                   variant="outlined"
                   type="number"
                   density="compact"
                   :label="$t('settings.message_expiration')"
+                  :error-messages="
+                    errorMessages.get('message_expiration_seconds')
+                  "
                 />
                 <VTextField
                   v-model="activePhone.messages_per_minute"
+                  class="mt-3"
                   variant="outlined"
                   type="number"
                   density="compact"
                   :label="$t('settings.messages_per_minute')"
+                  :error-messages="errorMessages.get('messages_per_minute')"
                 />
                 <VTextField
                   v-model="activePhone.max_send_attempts"
+                  class="mt-3"
                   variant="outlined"
                   type="number"
                   density="compact"
                   :placeholder="$t('settings.max_send_attempts_placeholder')"
                   :label="$t('settings.max_send_attempts')"
+                  :error-messages="errorMessages.get('max_send_attempts')"
                   min="1"
                   max="5"
                   :rules="[
@@ -1597,11 +1694,15 @@ onMounted(async () => {
                 />
                 <VAutocomplete
                   v-model="activePhone.message_send_schedule_id"
+                  class="mt-3"
                   variant="outlined"
                   :readonly="sendSchedules.length === 0"
                   density="compact"
                   clearable
                   :label="$t('settings.send_schedule')"
+                  :error-messages="
+                    errorMessages.get('message_send_schedule_id')
+                  "
                   :items="sendSchedules"
                   item-title="name"
                   item-value="id"
@@ -1614,10 +1715,25 @@ onMounted(async () => {
                   density="compact"
                   class="mt-6"
                   :label="$t('settings.missed_call_autoreply')"
+                  :error-messages="errorMessages.get('missed_call_auto_reply')"
                   persistent-placeholder
                   persistent-hint
-                  :placeholder="$t('settings.missed_call_autoreply_placeholder')"
+                  :placeholder="
+                    $t('settings.missed_call_autoreply_placeholder')
+                  "
                   :hint="$t('settings.missed_call_autoreply_hint')"
+                />
+                <VSwitch
+                  v-model="activePhone.archive_new_outgoing_message_threads"
+                  class="mt-4"
+                  color="primary"
+                  density="compact"
+                  label="Archive New Outgoing Message Threads"
+                  :error-messages="
+                    errorMessages.get('archive_new_outgoing_message_threads')
+                  "
+                  hint="Automatically archive new conversations started by an outgoing message. Conversations started by an incoming message are not affected."
+                  persistent-hint
                 />
                 <VSwitch
                   v-model="activePhone.unarchive_thread"
@@ -1626,6 +1742,7 @@ onMounted(async () => {
                   density="compact"
                   :label="$t('settings.unarchive_threads_automatically')"
                   :hint="$t('settings.unarchive_threads_hint')"
+                  :error-messages="errorMessages.get('unarchive_thread')"
                   persistent-hint
                 />
               </VCol>
@@ -1642,10 +1759,45 @@ onMounted(async () => {
             color="error"
             variant="text"
             :disabled="updatingPhone"
-            @click="deletePhone(activePhone?.id ?? '')"
+            @click="showPhoneDelete = true"
           >
             <VIcon v-if="lgAndUp" start :icon="mdiDelete" />
             {{ $t('settings.delete') }}
+          </VBtn>
+        </VCardActions>
+      </VCard>
+    </VDialog>
+
+    <VDialog
+      v-model="showPhoneDelete"
+      max-width="500"
+      opacity="0.9"
+      :persistent="updatingPhone"
+    >
+      <VCard>
+        <VCardTitle>Delete Phone</VCardTitle>
+        <VCardText class="text-medium-emphasis">
+          Are you sure you want to delete the phone
+          <b>{{ activePhone?.phone_number }}</b
+          >? This action cannot be undone.
+        </VCardText>
+        <VCardActions>
+          <VBtn
+            variant="flat"
+            color="error"
+            :loading="updatingPhone"
+            :disabled="updatingPhone"
+            @click="deletePhone"
+          >
+            Delete
+          </VBtn>
+          <VSpacer />
+          <VBtn
+            variant="text"
+            :disabled="updatingPhone"
+            @click="showPhoneDelete = false"
+          >
+            Cancel
           </VBtn>
         </VCardActions>
       </VCard>
@@ -1655,7 +1807,9 @@ onMounted(async () => {
     <VDialog v-model="showScheduleEdit" max-width="800px" opacity="0.9">
       <VCard>
         <VCardTitle>
-          <span v-if="!activeSchedule.id">{{ $t('settings.create_message_send_schedule') }}</span>
+          <span v-if="!activeSchedule.id">{{
+            $t('settings.create_message_send_schedule')
+          }}</span>
           <span v-else>{{ $t('settings.edit_message_send_schedule') }}</span>
         </VCardTitle>
         <VCardText class="mt-4" :class="{ 'px-2': mdAndDown }">
@@ -1781,7 +1935,11 @@ onMounted(async () => {
             :loading="savingSchedule"
             @click="saveSchedule"
           >
-            {{ activeSchedule.id ? $t('settings.update_schedule') : $t('settings.save_schedule') }}
+            {{
+              activeSchedule.id
+                ? $t('settings.update_schedule')
+                : $t('settings.save_schedule')
+            }}
           </LoadingButton>
           <VSpacer />
           <VBtn
@@ -1810,7 +1968,14 @@ onMounted(async () => {
     <VDialog v-model="showScheduleDelete" max-width="500" opacity="0.9">
       <VCard>
         <VCardTitle>{{ $t('settings.delete_schedule') }}</VCardTitle>
-        <VCardText class="text-medium-emphasis" v-html="$t('settings.delete_schedule_confirm', { name: activeSchedule.name })"></VCardText>
+        <VCardText class="text-medium-emphasis"
+          ><span
+            v-html="
+              $t('settings.delete_schedule_confirm', {
+                name: activeSchedule.name,
+              })
+            "
+        /></VCardText>
         <VCardActions>
           <VBtn
             variant="flat"
@@ -1821,7 +1986,9 @@ onMounted(async () => {
             {{ $t('settings.delete') }}
           </VBtn>
           <VSpacer />
-          <VBtn variant="text" @click="showScheduleDelete = false">{{ $t('settings.cancel') }}</VBtn>
+          <VBtn variant="text" @click="showScheduleDelete = false">{{
+            $t('settings.cancel')
+          }}</VBtn>
         </VCardActions>
       </VCard>
     </VDialog>

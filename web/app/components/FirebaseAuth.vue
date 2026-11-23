@@ -86,12 +86,18 @@ function validateLoginForm(): boolean {
   } else {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email.value.trim())) {
-      errorMessages.value.add('email', t('components.firebaseAuth.emailInvalid'))
+      errorMessages.value.add(
+        'email',
+        t('components.firebaseAuth.emailInvalid'),
+      )
       valid = false
     }
   }
   if (!password.value) {
-    errorMessages.value.add('password', t('components.firebaseAuth.passwordRequired'))
+    errorMessages.value.add(
+      'password',
+      t('components.firebaseAuth.passwordRequired'),
+    )
     valid = false
   }
   return valid
@@ -228,11 +234,20 @@ function handleError(error: unknown, isSocial = false) {
 
   switch (code) {
     case 'auth/wrong-password':
-      errorMessages.value.add('password', t('components.firebaseAuth.incorrectPassword'))
+      errorMessages.value.add(
+        'password',
+        t('components.firebaseAuth.incorrectPassword'),
+      )
       break
     case 'auth/invalid-credential':
-      errorMessages.value.add('email', t('components.firebaseAuth.invalidCredentials'))
-      errorMessages.value.add('password', t('components.firebaseAuth.invalidCredentials'))
+      errorMessages.value.add(
+        'email',
+        t('components.firebaseAuth.invalidCredentials'),
+      )
+      errorMessages.value.add(
+        'password',
+        t('components.firebaseAuth.invalidCredentials'),
+      )
       break
     case 'auth/user-not-found':
       errorMessages.value.add(
@@ -241,13 +256,13 @@ function handleError(error: unknown, isSocial = false) {
       )
       break
     case 'auth/invalid-email':
-      errorMessages.value.add('email', t('components.firebaseAuth.emailInvalid'))
-      break
-    case 'auth/email-already-in-use':
       errorMessages.value.add(
         'email',
-        t('components.firebaseAuth.emailInUse'),
+        t('components.firebaseAuth.emailInvalid'),
       )
+      break
+    case 'auth/email-already-in-use':
+      errorMessages.value.add('email', t('components.firebaseAuth.emailInUse'))
       break
     case 'auth/weak-password':
       errorMessages.value.add(
@@ -256,17 +271,22 @@ function handleError(error: unknown, isSocial = false) {
       )
       break
     case 'auth/user-disabled':
-      errorMessages.value.add('email', t('components.firebaseAuth.userDisabled'))
+      errorMessages.value.add(
+        'email',
+        t('components.firebaseAuth.userDisabled'),
+      )
       break
     case 'auth/too-many-requests':
       generalError.value = t('components.firebaseAuth.tooManyRequests')
       break
     case 'auth/network-request-failed':
-      generalError.value =
-        t('components.firebaseAuth.networkError')
+      generalError.value = t('components.firebaseAuth.networkError')
       break
     case 'auth/missing-email':
-      errorMessages.value.add('email', t('components.firebaseAuth.emailRequired'))
+      errorMessages.value.add(
+        'email',
+        t('components.firebaseAuth.emailRequired'),
+      )
       break
     default:
       generalError.value =
@@ -302,7 +322,7 @@ function getGeneralErrorMessage(
       block
       color="white"
       size="large"
-      class="mb-3 position-relative"
+      class="mb-3 position-relative overflow-visible"
       :loading="loading"
       :disabled="loading"
       @click="signInWithGoogle"
@@ -326,7 +346,7 @@ function getGeneralErrorMessage(
       size="large"
       variant="flat"
       color="black"
-      class="mb-3 position-relative"
+      class="mb-3 position-relative overflow-visible"
       :loading="loading"
       :disabled="loading"
       @click="signInWithGithub"
@@ -351,7 +371,7 @@ function getGeneralErrorMessage(
       size="large"
       variant="flat"
       color="red"
-      class="mb-3 position-relative"
+      class="mb-3 position-relative overflow-visible"
       :disabled="loading"
       @click="showEmailForm = true"
     >
@@ -491,7 +511,11 @@ function getGeneralErrorMessage(
         type="submit"
         :loading="loading"
       >
-        {{ isSignUp ? $t('components.firebaseAuth.signUp') : $t('components.firebaseAuth.signIn') }}
+        {{
+          isSignUp
+            ? $t('components.firebaseAuth.signUp')
+            : $t('components.firebaseAuth.signIn')
+        }}
       </v-btn>
       <v-btn
         block
@@ -502,7 +526,9 @@ function getGeneralErrorMessage(
         @click="toggleAuthMode"
       >
         {{
-          isSignUp ? $t('components.firebaseAuth.alreadyHaveAccount') : $t('components.firebaseAuth.noAccount')
+          isSignUp
+            ? $t('components.firebaseAuth.alreadyHaveAccount')
+            : $t('components.firebaseAuth.noAccount')
         }}
       </v-btn>
     </v-form>

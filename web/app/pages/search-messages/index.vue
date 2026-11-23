@@ -87,7 +87,11 @@ const headers = computed(() => [
   { title: t('pages.searchMessages.headerContact'), key: 'contact' },
   { title: t('pages.searchMessages.headerType'), key: 'type' },
   { title: t('pages.searchMessages.headerStatus'), key: 'status' },
-  { title: t('pages.searchMessages.headerContent'), key: 'content', sortable: false },
+  {
+    title: t('pages.searchMessages.headerContent'),
+    key: 'content',
+    sortable: false,
+  },
 ])
 
 const selectedMessages = computed<EntitiesMessage[]>(() =>
@@ -112,9 +116,18 @@ const phoneNumberSelectItems = computed(() =>
 )
 
 const messageTypeSelectItems = computed(() => [
-  { title: t('pages.searchMessages.typeOutboundLabel'), value: 'mobile-terminated' },
-  { title: t('pages.searchMessages.typeInboundLabel'), value: 'mobile-originated' },
-  { title: t('pages.searchMessages.typeMissedCallsLabel'), value: 'call/missed' },
+  {
+    title: t('pages.searchMessages.typeOutboundLabel'),
+    value: 'mobile-terminated',
+  },
+  {
+    title: t('pages.searchMessages.typeInboundLabel'),
+    value: 'mobile-originated',
+  },
+  {
+    title: t('pages.searchMessages.typeMissedCallsLabel'),
+    value: 'call/missed',
+  },
 ])
 
 const messageStatusSelectItems = computed(() => [
@@ -153,7 +166,7 @@ function parseErrors(error: unknown): ErrorMessages {
   const bag = new ErrorMessages()
   const data = toApiError(error).data?.data
   if (data && typeof data === 'object') {
-    Object.keys(data).forEach((key) => bag.addMany(key, data[key]))
+    Object.entries(data).forEach(([key, values]) => bag.addMany(key, values))
   }
   return bag
 }
@@ -317,7 +330,12 @@ async function resendMessages() {
       })
     } else {
       notificationsStore.addNotification({
-        message: t('pages.searchMessages.infoMessageResend').replace('{successCount}', (results.length - failed.length).toString()).replace('{failCount}', failed.length.toString()),
+        message: t('pages.searchMessages.infoMessageResend')
+          .replace(
+            '{successCount}',
+            (results.length - failed.length).toString(),
+          )
+          .replace('{failCount}', failed.length.toString()),
         type: 'info',
       })
       selectedIds.value = []
@@ -363,7 +381,9 @@ onBeforeUnmount(() => {
           <VIcon :icon="mdiArrowLeft" />
         </VBtn>
         <VToolbarTitle>
-          <div class="py-16">{{ $t('pages.searchMessages.titleSearchMessages') }}</div>
+          <div class="py-16">
+            {{ $t('pages.searchMessages.titleSearchMessages') }}
+          </div>
         </VToolbarTitle>
         <VProgressLinear
           :active="loading"
@@ -376,9 +396,10 @@ onBeforeUnmount(() => {
       <VContainer>
         <VRow>
           <VCol cols="12">
-            <h5 class="text-headline-large mb-3 mt-0">{{ $t('pages.searchMessages.titleSearchMessages') }}</h5>
-            <p v-html="$t('pages.searchMessages.description')">
-            </p>
+            <h5 class="text-headline-large mb-3 mt-0">
+              {{ $t('pages.searchMessages.titleSearchMessages') }}
+            </h5>
+            <p v-html="$t('pages.searchMessages.description')"></p>
             <VAlert v-if="errorTitle" variant="tonal" prominent type="warning">
               <h6 class="text-title-large font-weight-bold">
                 {{ errorTitle }}
@@ -454,7 +475,9 @@ onBeforeUnmount(() => {
                   @click="fetchMessages(true)"
                 >
                   <VIcon v-if="mdAndUp" start :icon="mdiMagnify" />
-                  <span v-if="smAndDown">{{ $t('pages.searchMessages.btnSearchShort') }}</span>
+                  <span v-if="smAndDown">{{
+                    $t('pages.searchMessages.btnSearchShort')
+                  }}</span>
                   <span v-else>{{ $t('pages.searchMessages.btnSearch') }}</span>
                 </VBtn>
               </VCol>
@@ -477,14 +500,27 @@ onBeforeUnmount(() => {
                   v-bind="props"
                 >
                   <VIcon v-if="mdAndUp" start :icon="mdiDelete" />
-                  <span v-if="smAndDown">{{ $t('pages.searchMessages.btnDeleteShort') }}</span>
+                  <span v-if="smAndDown">{{
+                    $t('pages.searchMessages.btnDeleteShort')
+                  }}</span>
                   <span v-else>{{ $t('pages.searchMessages.btnDelete') }}</span>
                 </VBtn>
               </template>
               <VCard>
-                <VCardTitle v-html="$t('pages.searchMessages.dialogDeleteTitle').replace('{count}', selectedMessages.length.toString())">
+                <VCardTitle
+                  ><span
+                    v-html="
+                      $t('pages.searchMessages.dialogDeleteTitle').replace(
+                        '{count}',
+                        selectedMessages.length.toString(),
+                      )
+                    "
+                  />
                 </VCardTitle>
-                <VCardText class="text-medium-emphasis" v-html="$t('pages.searchMessages.dialogDeleteSubtitle')">
+                <VCardText class="text-medium-emphasis"
+                  ><span
+                    v-html="$t('pages.searchMessages.dialogDeleteSubtitle')"
+                  />
                 </VCardText>
                 <VCardActions class="pb-4">
                   <VBtn
@@ -516,9 +552,20 @@ onBeforeUnmount(() => {
                 </VBtn>
               </template>
               <VCard>
-                <VCardTitle class="text-headline-medium text-break" v-html="$t('pages.searchMessages.dialogResendTitle').replace('{count}', selectedMessages.length.toString())">
+                <VCardTitle class="text-headline-medium text-break"
+                  ><span
+                    v-html="
+                      $t('pages.searchMessages.dialogResendTitle').replace(
+                        '{count}',
+                        selectedMessages.length.toString(),
+                      )
+                    "
+                  />
                 </VCardTitle>
-                <VCardText class="text-medium-emphasis" v-html="$t('pages.searchMessages.dialogResendSubtitle')">
+                <VCardText class="text-medium-emphasis"
+                  ><span
+                    v-html="$t('pages.searchMessages.dialogResendSubtitle')"
+                  />
                 </VCardText>
                 <VCardActions class="pb-4">
                   <VBtn
@@ -545,7 +592,9 @@ onBeforeUnmount(() => {
               @click="exportMessages"
             >
               <VIcon v-if="mdAndUp" start :icon="mdiExport" />
-              <span v-if="smAndDown">{{ $t('pages.searchMessages.btnExportShort') }}</span>
+              <span v-if="smAndDown">{{
+                $t('pages.searchMessages.btnExportShort')
+              }}</span>
               <span v-else>{{ $t('pages.searchMessages.btnExport') }}</span>
             </VBtn>
           </VCol>

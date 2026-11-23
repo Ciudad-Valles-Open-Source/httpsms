@@ -2,8 +2,6 @@
 import {
   mdiAlert,
   mdiArrowLeft,
-  mdiCallMade,
-  mdiCallReceived,
   mdiCheck,
   mdiDownloadOutline,
   mdiInvoice,
@@ -15,6 +13,7 @@ import type {
 
 import { countries, getStateOptions } from '~/utils/countries'
 import { getApiErrorMessage } from '~/utils/api-error'
+import { getBlackFridayCheckoutUrl } from '~/utils/black-friday'
 
 type SubscriptionPayment =
   ResponsesUserSubscriptionPaymentsResponse['data'][number]
@@ -30,6 +29,7 @@ useHead({
 const config = useRuntimeConfig()
 const { lgAndUp } = useVDisplay()
 const authStore = useAuthStore()
+const promotion = useBlackFridayStore()
 const billingStore = useBillingStore()
 const notificationsStore = useNotificationsStore()
 const { formatDecimal, formatTimestamp } = useFilters()
@@ -127,6 +127,9 @@ const plan = computed<PaymentPlan>(() => {
 })
 
 const isOnFreePlan = computed(() => plan.value.id === 'free')
+const blackFridayDiscountAvailable = computed(
+  () => authStore.user?.subscription_name === 'free' && promotion.active,
+)
 const isOnLifetimePlan = computed(() => plan.value.id === 'pro-lifetime')
 const subscriptionIsCancelled = computed(
   () => authStore.user?.subscription_status === 'cancelled',
@@ -156,7 +159,11 @@ const checkoutURL = computed(() => {
       url.searchParams.append('checkout[name]', user.displayName)
     }
   }
-  return url.toString()
+  return getBlackFridayCheckoutUrl(
+    url,
+    authStore.user?.subscription_name,
+    promotion.now,
+  )
 })
 
 const enterpriseCheckoutURL = computed(() => {
@@ -171,7 +178,11 @@ const enterpriseCheckoutURL = computed(() => {
       url.searchParams.append('checkout[name]', user.displayName)
     }
   }
-  return url.toString()
+  return getBlackFridayCheckoutUrl(
+    url,
+    authStore.user?.subscription_name,
+    promotion.now,
+  )
 })
 
 async function loadData() {
@@ -288,166 +299,231 @@ onMounted(async () => {
           <VCol cols="12" md="9" offset-md="1" xl="8" offset-xl="2">
             <!-- Current Plan -->
             <template v-if="config.public.enableBilling">
-            <h4 class="text-headline-large mb-3 mt-0">{{ $t('pages.billing.currentPlan') }}</h4>
-            <VRow v-if="authStore.user">
-              <VCol md="6">
-                <VAlert type="info" :icon="false" variant="tonal" prominent>
-                  <div>
-                    <h1
-                      class="text-title-large mt-0 mb-0 font-weight-bold text-uppercase"
-                    >
-                      <span v-if="isOnFreePlan">{{ plan.name }}</span>
-                      <span v-else-if="subscriptionIsCancelled" v-html="$t('pages.billing.downgradedFree').replace('{date}', new Date(authStore.user.subscription_ends_at!).toLocaleDateString())">
-                      </span>
-                      <span v-else>{{ plan.name }}</span>
-                    </h1>
-                    <p
-                      v-if="
-                        !isOnFreePlan &&
-                        !isOnLifetimePlan &&
-                        !subscriptionIsCancelled
-                      "
-                      class="text-medium-emphasis mt-1"
-                      v-html="$t('pages.billing.nextBill').replace('{price}', String(plan.price)).replace('{date}', new Date(authStore.user.subscription_renews_at!).toLocaleDateString())"
-                    >
-                    </p>
-                    <p v-if="isOnLifetimePlan" class="text-medium-emphasis" v-html="$t('pages.billing.lifetimePlanDesc').replace('{price}', String(plan.price))">
-                    </p>
-                    <p
-                      v-else-if="subscriptionIsCancelled"
-                      class="text-medium-emphasis"
-                      v-html="$t('pages.billing.downgradedFree').replace('{date}', new Date(authStore.user.subscription_ends_at!).toLocaleDateString())"
-                    >
-                    </p>
-                    <p v-if="!config.public.enableBilling" class="text-medium-emphasis mt-1">
-                      {{ formatDecimal(totalMessages) }} {{ $t('pages.billing.messagesSent') }}
-                    </p>
-                    <p v-else class="text-medium-emphasis mt-1">
-                      {{ $t('pages.billing.messagesRatio').replace('{used}', formatDecimal(totalMessages)).replace('{total}', formatDecimal(plan.messagesPerMonth)) }}
-                    </p>
-                  </div>
-                  <div class="d-flex mb-1 mt-1">
-                    <VBtn
-                      v-if="
-                        !subscriptionIsCancelled &&
-                        !isOnFreePlan &&
-                        !isOnLifetimePlan
-                      "
-                      color="primary"
-                      :loading="loading"
-                      @click="updateDetails"
-                    >
-                      {{ $t('pages.billing.updatePlan') }}
-                    </VBtn>
-                    <VBtn
-                      v-else-if="!isOnLifetimePlan"
-                      color="primary"
-                      :href="checkoutURL"
-                    >
-                      {{ $t('pages.billing.upgradePlan') }}
-                    </VBtn>
-                    <VSpacer />
-                    <VDialog
-                      v-if="
-                        !subscriptionIsCancelled &&
-                        !isOnFreePlan &&
-                        !isOnLifetimePlan
-                      "
-                      v-model="dialog"
-                      max-width="590"
-                      opacity="0.9"
-                    >
-                      <template #activator="{ props: activatorProps }">
-                        <VBtn
-                          v-bind="activatorProps"
-                          color="error"
-                          variant="text"
+              <h4 class="text-headline-large mb-3 mt-0">
+                {{ $t('pages.billing.currentPlan') }}
+              </h4>
+              <VRow v-if="authStore.user">
+                <VCol md="6">
+                  <VAlert type="info" :icon="false" variant="tonal" prominent>
+                    <div>
+                      <h1
+                        class="text-title-large mt-0 mb-0 font-weight-bold text-uppercase"
+                      >
+                        <span v-if="isOnFreePlan">{{ plan.name }}</span>
+                        <span
+                          v-else-if="subscriptionIsCancelled"
+                          v-html="
+                            $t('pages.billing.downgradedFree').replace(
+                              '{date}',
+                              new Date(
+                                authStore.user.subscription_ends_at!,
+                              ).toLocaleDateString(),
+                            )
+                          "
                         >
-                          {{ $t('pages.billing.cancelPlan') }}
-                        </VBtn>
-                      </template>
-                      <VCard>
-                        <VCardText class="pt-4">
-                          <h2 class="text-headline-medium mt-0 mb-2">
-                            {{ $t('pages.billing.cancelConfirmTitle') }}
-                          </h2>
-                          <p class="text-medium-emphasis" v-html="$t('pages.billing.cancelConfirmDesc').replace('{date}', new Date(authStore.user.subscription_renews_at!).toLocaleDateString())">
-                          </p>
-                        </VCardText>
-                        <VCardActions class="mt-n6 px-6 pb-6">
+                        </span>
+                        <span v-else>{{ plan.name }}</span>
+                      </h1>
+                      <p
+                        v-if="
+                          !isOnFreePlan &&
+                          !isOnLifetimePlan &&
+                          !subscriptionIsCancelled
+                        "
+                        class="text-medium-emphasis mt-1"
+                        v-html="
+                          $t('pages.billing.nextBill')
+                            .replace('{price}', String(plan.price))
+                            .replace(
+                              '{date}',
+                              new Date(
+                                authStore.user.subscription_renews_at!,
+                              ).toLocaleDateString(),
+                            )
+                        "
+                      ></p>
+                      <p
+                        v-if="isOnLifetimePlan"
+                        class="text-medium-emphasis"
+                        v-html="
+                          $t('pages.billing.lifetimePlanDesc').replace(
+                            '{price}',
+                            String(plan.price),
+                          )
+                        "
+                      ></p>
+                      <p
+                        v-else-if="subscriptionIsCancelled"
+                        class="text-medium-emphasis"
+                        v-html="
+                          $t('pages.billing.downgradedFree').replace(
+                            '{date}',
+                            new Date(
+                              authStore.user.subscription_ends_at!,
+                            ).toLocaleDateString(),
+                          )
+                        "
+                      ></p>
+                      <p
+                        v-if="!config.public.enableBilling"
+                        class="text-medium-emphasis mt-1"
+                      >
+                        {{ formatDecimal(totalMessages) }}
+                        {{ $t('pages.billing.messagesSent') }}
+                      </p>
+                      <p v-else class="text-medium-emphasis mt-1">
+                        {{
+                          $t('pages.billing.messagesRatio')
+                            .replace('{used}', formatDecimal(totalMessages))
+                            .replace(
+                              '{total}',
+                              formatDecimal(plan.messagesPerMonth),
+                            )
+                        }}
+                      </p>
+                    </div>
+                    <div class="d-flex mb-1 mt-1">
+                      <VBtn
+                        v-if="
+                          !subscriptionIsCancelled &&
+                          !isOnFreePlan &&
+                          !isOnLifetimePlan
+                        "
+                        color="primary"
+                        :loading="loading"
+                        @click="updateDetails"
+                      >
+                        {{ $t('pages.billing.updatePlan') }}
+                      </VBtn>
+                      <VBtn
+                        v-else-if="!isOnLifetimePlan"
+                        color="primary"
+                        :href="checkoutURL"
+                      >
+                        {{ $t('pages.billing.upgradePlan') }}
+                      </VBtn>
+                      <VSpacer />
+                      <VDialog
+                        v-if="
+                          !subscriptionIsCancelled &&
+                          !isOnFreePlan &&
+                          !isOnLifetimePlan
+                        "
+                        v-model="dialog"
+                        max-width="590"
+                        opacity="0.9"
+                      >
+                        <template #activator="{ props: activatorProps }">
                           <VBtn
-                            color="primary"
-                            variant="flat"
-                            @click="dialog = false"
-                          >
-                            {{ $t('pages.billing.keepSubscription') }}
-                          </VBtn>
-                          <VSpacer />
-                          <VBtn
-                            v-if="!isOnFreePlan"
-                            variant="text"
-                            :loading="loading"
+                            v-bind="activatorProps"
                             color="error"
-                            @click="cancelPlan"
+                            variant="text"
                           >
                             {{ $t('pages.billing.cancelPlan') }}
                           </VBtn>
-                        </VCardActions>
-                      </VCard>
-                    </VDialog>
-                  </div>
-                </VAlert>
-              </VCol>
-            </VRow>
-
-            <!-- Upgrade Plan (only for free users) -->
-            <template v-if="isOnFreePlan">
-              <h2 class="text-headline-large mt-4 mb-2">{{ $t('pages.billing.upgradePlanTitle') }}</h2>
-              <VRow>
-                <VCol cols="12" md="6">
-                  <VCard :href="checkoutURL" link>
-                    <VCardText>
-                      <VRow align="center">
-                        <VCol class="flex-grow-1 flex-shrink-1">
-                          <h1
-                            class="text-title-large font-weight-bold text-uppercase mt-3"
-                          >
-                            {{ $t('pages.billing.proPlanTitle') }}
-                          </h1>
-                          <p class="text-medium-emphasis">
-                            {{ $t('pages.billing.proPlanFeatures') }}
-                          </p>
-                        </VCol>
-                        <VCol class="flex-grow-0 flex-shrink-0 text-center">
-                          <span class="text-headline-medium">$10</span>{{ $t('pages.billing.perMonth') }}
-                        </VCol>
-                      </VRow>
-                    </VCardText>
-                  </VCard>
-                </VCol>
-                <VCol cols="12" md="6">
-                  <VCard :href="enterpriseCheckoutURL" link>
-                    <VCardText>
-                      <VRow align="center">
-                        <VCol class="flex-grow-1 flex-shrink-1">
-                          <h1
-                            class="text-title-large font-weight-bold text-uppercase mt-3"
-                          >
-                            {{ $t('pages.billing.enterprisePlanTitle') }}
-                          </h1>
-                          <p class="text-medium-emphasis">
-                            {{ $t('pages.billing.enterprisePlanFeatures') }}
-                          </p>
-                        </VCol>
-                        <VCol class="flex-grow-0 flex-shrink-0 text-center">
-                          <span class="text-headline-medium">$89</span>{{ $t('pages.billing.perMonth') }}
-                        </VCol>
-                      </VRow>
-                    </VCardText>
-                  </VCard>
+                        </template>
+                        <VCard>
+                          <VCardText class="pt-4">
+                            <h2 class="text-headline-medium mt-0 mb-2">
+                              {{ $t('pages.billing.cancelConfirmTitle') }}
+                            </h2>
+                            <p
+                              class="text-medium-emphasis"
+                              v-html="
+                                $t('pages.billing.cancelConfirmDesc').replace(
+                                  '{date}',
+                                  new Date(
+                                    authStore.user.subscription_renews_at!,
+                                  ).toLocaleDateString(),
+                                )
+                              "
+                            ></p>
+                          </VCardText>
+                          <VCardActions class="mt-n6 px-6 pb-6">
+                            <VBtn
+                              color="primary"
+                              variant="flat"
+                              @click="dialog = false"
+                            >
+                              {{ $t('pages.billing.keepSubscription') }}
+                            </VBtn>
+                            <VSpacer />
+                            <VBtn
+                              v-if="!isOnFreePlan"
+                              variant="text"
+                              :loading="loading"
+                              color="error"
+                              @click="cancelPlan"
+                            >
+                              {{ $t('pages.billing.cancelPlan') }}
+                            </VBtn>
+                          </VCardActions>
+                        </VCard>
+                      </VDialog>
+                    </div>
+                  </VAlert>
                 </VCol>
               </VRow>
-            </template>
+
+              <!-- Upgrade Plan (only for free users) -->
+              <template v-if="isOnFreePlan">
+                <h2 id="upgrade-plan" class="text-headline-large mt-4 mb-2">
+                  {{ $t('pages.billing.upgradePlanTitle') }}
+                </h2>
+                <VRow>
+                  <VCol cols="12" md="6">
+                    <VCard :href="checkoutURL" link>
+                      <VCardText>
+                        <VRow align="center">
+                          <VCol class="flex-grow-1 flex-shrink-1">
+                            <h1
+                              class="text-title-large font-weight-bold text-uppercase mt-3"
+                            >
+                              {{ $t('pages.billing.proPlanTitle') }}
+                            </h1>
+                            <p class="text-medium-emphasis">
+                              {{ $t('pages.billing.proPlanFeatures') }}
+                            </p>
+                            <p
+                              v-if="blackFridayDiscountAvailable"
+                              class="mb-0 text-warning"
+                            >
+                              Or <strong>$60/year</strong> with code
+                              <strong>BF2026</strong>.
+                            </p>
+                          </VCol>
+                          <VCol class="flex-grow-0 flex-shrink-0 text-center">
+                            <span class="text-headline-medium">$10</span
+                            >{{ $t('pages.billing.perMonth') }}
+                          </VCol>
+                        </VRow>
+                      </VCardText>
+                    </VCard>
+                  </VCol>
+                  <VCol cols="12" md="6">
+                    <VCard :href="enterpriseCheckoutURL" link>
+                      <VCardText>
+                        <VRow align="center">
+                          <VCol class="flex-grow-1 flex-shrink-1">
+                            <h1
+                              class="text-title-large font-weight-bold text-uppercase mt-3"
+                            >
+                              {{ $t('pages.billing.enterprisePlanTitle') }}
+                            </h1>
+                            <p class="text-medium-emphasis">
+                              {{ $t('pages.billing.enterprisePlanFeatures') }}
+                            </p>
+                          </VCol>
+                          <VCol class="flex-grow-0 flex-shrink-0 text-center">
+                            <span class="text-headline-medium">$89</span
+                            >{{ $t('pages.billing.perMonth') }}
+                          </VCol>
+                        </VRow>
+                      </VCardText>
+                    </VCard>
+                  </VCol>
+                </VRow>
+              </template>
             </template>
 
             <!-- Overview & Usage Statistics -->
@@ -458,8 +534,10 @@ onMounted(async () => {
               <h4 class="text-headline-large mb-3 mt-8">
                 {{ $t('pages.billing.subscriptionPayments') }}
               </h4>
-              <p class="text-medium-emphasis" v-html="$t('pages.billing.subscriptionPaymentsDesc')">
-              </p>
+              <p
+                class="text-medium-emphasis"
+                v-html="$t('pages.billing.subscriptionPaymentsDesc')"
+              ></p>
               <VProgressCircular
                 v-if="payments == null && loadingSubscriptionPayments"
                 :size="20"
@@ -470,10 +548,18 @@ onMounted(async () => {
               <VTable v-if="payments">
                 <thead>
                   <tr class="text-uppercase">
-                    <th v-if="lgAndUp" class="text-left">{{ $t('pages.billing.thId') }}</th>
-                    <th class="text-left">{{ $t('pages.billing.thTimestamp') }}</th>
-                    <th class="text-left">{{ $t('pages.billing.thStatus') }}</th>
-                    <th v-if="lgAndUp" class="text-left">{{ $t('pages.billing.thTax') }}</th>
+                    <th v-if="lgAndUp" class="text-left">
+                      {{ $t('pages.billing.thId') }}
+                    </th>
+                    <th class="text-left">
+                      {{ $t('pages.billing.thTimestamp') }}
+                    </th>
+                    <th class="text-left">
+                      {{ $t('pages.billing.thStatus') }}
+                    </th>
+                    <th v-if="lgAndUp" class="text-left">
+                      {{ $t('pages.billing.thTax') }}
+                    </th>
                     <th class="text-left">{{ $t('pages.billing.thTotal') }}</th>
                     <th></th>
                   </tr>
@@ -521,7 +607,6 @@ onMounted(async () => {
                 </tbody>
               </VTable>
             </template>
-
           </VCol>
         </VRow>
       </VContainer>
@@ -535,8 +620,23 @@ onMounted(async () => {
       opacity="0.9"
     >
       <VCard>
-        <VCardTitle class="text-headline-large">{{ $t('pages.billing.invoiceDialogTitle') }}</VCardTitle>
-        <VCardSubtitle class="mt-n1" v-html="$t('pages.billing.invoiceDialogDesc').replace('{amount}', selectedPayment?.attributes.total_formatted || '').replace('{date}', formatTimestamp(selectedPayment?.attributes.created_at ?? ''))">
+        <VCardTitle class="text-headline-large">{{
+          $t('pages.billing.invoiceDialogTitle')
+        }}</VCardTitle>
+        <VCardSubtitle class="mt-n1"
+          ><span
+            v-html="
+              $t('pages.billing.invoiceDialogDesc')
+                .replace(
+                  '{amount}',
+                  selectedPayment?.attributes.total_formatted || '',
+                )
+                .replace(
+                  '{date}',
+                  formatTimestamp(selectedPayment?.attributes.created_at ?? ''),
+                )
+            "
+          />
         </VCardSubtitle>
         <VCardText class="pb-0">
           <VContainer>

@@ -21,7 +21,7 @@ export default defineNuxtConfig({
     download: true,
   },
 
-  css: ['vuetify/styles'],
+  css: ['vuetify/styles', 'v-phone-input/styles'],
 
   i18n: {
     compilation: {
@@ -133,7 +133,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8000',
-      clientVersion: process.env.GITHUB_SHA || 'dev',
+      clientVersion: process.env.GITHUB_RUN_ID || 'dev',
       appUrl: process.env.APP_URL || 'https://httpsms.com',
       appName: process.env.APP_NAME || 'HTTP SMS',
       appGithubUrl:

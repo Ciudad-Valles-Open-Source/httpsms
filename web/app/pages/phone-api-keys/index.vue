@@ -18,7 +18,6 @@ useHead({
 const config = useRuntimeConfig()
 const { lgAndUp } = useVDisplay()
 const authStore = useAuthStore()
-const appStore = useAppStore()
 const phonesStore = usePhonesStore()
 const notificationsStore = useNotificationsStore()
 const { formatTimestamp, formatPhoneNumber } = useFilters()
@@ -45,7 +44,7 @@ function parseErrors(error: unknown): ErrorMessages {
   const bag = new ErrorMessages()
   const data = toApiError(error).data?.data
   if (data && typeof data === 'object') {
-    Object.keys(data).forEach((key) => bag.addMany(key, data[key]))
+    Object.entries(data).forEach(([key, values]) => bag.addMany(key, values))
   }
   return bag
 }
@@ -61,7 +60,10 @@ async function loadPhoneApiKeys() {
     phoneApiKeys.value = response.data ?? []
   } catch (error: unknown) {
     notificationsStore.addNotification({
-      message: getApiErrorMessage(error, t('pages.phoneApiKeys.errorMessageLoad')),
+      message: getApiErrorMessage(
+        error,
+        t('pages.phoneApiKeys.errorMessageLoad'),
+      ),
       type: 'error',
     })
   } finally {
@@ -89,7 +91,10 @@ async function createPhoneApiKey() {
     errorMessages.value = parseErrors(error)
     if (errorMessages.value.size() === 0) {
       notificationsStore.addNotification({
-        message: getApiErrorMessage(error, t('pages.phoneApiKeys.errorMessageCreate')),
+        message: getApiErrorMessage(
+          error,
+          t('pages.phoneApiKeys.errorMessageCreate'),
+        ),
         type: 'error',
       })
     }
@@ -158,7 +163,10 @@ async function deleteApiKey() {
     await loadPhoneApiKeys()
   } catch (error: unknown) {
     notificationsStore.addNotification({
-      message: getApiErrorMessage(error, t('pages.phoneApiKeys.errorMessageDelete')),
+      message: getApiErrorMessage(
+        error,
+        t('pages.phoneApiKeys.errorMessageDelete'),
+      ),
       type: 'error',
     })
     loading.value = false
@@ -212,17 +220,27 @@ onMounted(async () => {
   const pusherKey = config.public.soketiKey as string
   const pusherCluster = config.public.soketiCluster as string
   if (pusherKey && authStore.user?.id) {
-    const pusherOptions = config.public.useSoketi ? {
-      wsHost: window.location.hostname,
-      wsPort: window.location.port ? Number(window.location.port) : (window.location.protocol === 'https:' ? 443 : 80),
-      wssPort: window.location.port ? Number(window.location.port) : (window.location.protocol === 'https:' ? 443 : 80),
-      forceTLS: window.location.protocol === 'https:',
-      disableStats: true,
-      enabledTransports: ['ws', 'wss'],
-      cluster: ''
-    } : {
-      cluster: pusherCluster,
-    }
+    const pusherOptions = config.public.useSoketi
+      ? {
+          wsHost: window.location.hostname,
+          wsPort: window.location.port
+            ? Number(window.location.port)
+            : window.location.protocol === 'https:'
+              ? 443
+              : 80,
+          wssPort: window.location.port
+            ? Number(window.location.port)
+            : window.location.protocol === 'https:'
+              ? 443
+              : 80,
+          forceTLS: window.location.protocol === 'https:',
+          disableStats: true,
+          enabledTransports: ['ws', 'wss'],
+          cluster: '',
+        }
+      : {
+          cluster: pusherCluster,
+        }
     const pusher = new Pusher(pusherKey, pusherOptions)
     webhookChannel = pusher.subscribe(authStore.user.id)
     webhookChannel.bind('phone.updated', () => {
@@ -247,7 +265,9 @@ onBeforeUnmount(() => {
         <VBtn icon to="/threads">
           <VIcon :icon="mdiArrowLeft" />
         </VBtn>
-        <VToolbarTitle>{{ $t('pages.phoneApiKeys.titlePhoneApiKeys') }}</VToolbarTitle>
+        <VToolbarTitle>{{
+          $t('pages.phoneApiKeys.titlePhoneApiKeys')
+        }}</VToolbarTitle>
         <VProgressLinear
           color="primary"
           :active="loading"
@@ -290,15 +310,25 @@ onBeforeUnmount(() => {
                 {{ $t('pages.phoneApiKeys.btnDocumentation') }}
               </VBtn>
             </div>
-            <p class="text-medium-emphasis" v-html="$t('pages.phoneApiKeys.description')">
-            </p>
+            <p
+              class="text-medium-emphasis"
+              v-html="$t('pages.phoneApiKeys.description')"
+            ></p>
             <VTable class="mb-4 api-key-table" density="comfortable">
               <thead>
                 <tr class="text-uppercase text-medium-emphasis">
-                  <th class="text-left">{{ $t('pages.phoneApiKeys.thName') }}</th>
-                  <th class="text-left">{{ $t('pages.phoneApiKeys.thCreatedAt') }}</th>
-                  <th class="text-left">{{ $t('pages.phoneApiKeys.thPhoneNumbers') }}</th>
-                  <th class="text-left">{{ $t('pages.phoneApiKeys.thActions') }}</th>
+                  <th class="text-left">
+                    {{ $t('pages.phoneApiKeys.thName') }}
+                  </th>
+                  <th class="text-left">
+                    {{ $t('pages.phoneApiKeys.thCreatedAt') }}
+                  </th>
+                  <th class="text-left">
+                    {{ $t('pages.phoneApiKeys.thPhoneNumbers') }}
+                  </th>
+                  <th class="text-left">
+                    {{ $t('pages.phoneApiKeys.thActions') }}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -337,7 +367,8 @@ onBeforeUnmount(() => {
                       :disabled="loading"
                       @click="showPhoneApiKey(phoneApiKey)"
                     >
-                      <VIcon start :icon="mdiEye" /> {{ $t('pages.phoneApiKeys.btnView') }}
+                      <VIcon start :icon="mdiEye" />
+                      {{ $t('pages.phoneApiKeys.btnView') }}
                     </VBtn>
                     <VBtn
                       class="ml-2"
@@ -346,7 +377,8 @@ onBeforeUnmount(() => {
                       :disabled="loading"
                       @click="showDeletePhoneApiKeyDialog(phoneApiKey)"
                     >
-                      <VIcon start :icon="mdiDelete" /> {{ $t('pages.phoneApiKeys.btnDelete') }}
+                      <VIcon start :icon="mdiDelete" />
+                      {{ $t('pages.phoneApiKeys.btnDelete') }}
                     </VBtn>
                   </td>
                 </tr>
@@ -359,7 +391,9 @@ onBeforeUnmount(() => {
 
     <VDialog v-model="showCreateApiKeyDialog" max-width="600" opacity="0.9">
       <VCard>
-        <VCardTitle>{{ $t('pages.phoneApiKeys.dialogCreateTitle') }}</VCardTitle>
+        <VCardTitle>{{
+          $t('pages.phoneApiKeys.dialogCreateTitle')
+        }}</VCardTitle>
         <VCardSubtitle class="mt-2" style="white-space: normal">
           {{ $t('pages.phoneApiKeys.dialogCreateSubtitle') }}
         </VCardSubtitle>
@@ -385,7 +419,11 @@ onBeforeUnmount(() => {
             :loading="loading"
             @click="createPhoneApiKey"
           >
-            {{ $t('pages.phoneApiKeys.btnCreate') }}<span v-if="lgAndUp" class="mx-1">{{ $t('pages.phoneApiKeys.phoneApiText') }}</span>{{ $t('pages.phoneApiKeys.keyText') }}
+            {{ $t('pages.phoneApiKeys.btnCreate')
+            }}<span v-if="lgAndUp" class="mx-1">{{
+              $t('pages.phoneApiKeys.phoneApiText')
+            }}</span
+            >{{ $t('pages.phoneApiKeys.keyText') }}
           </loading-button>
           <VSpacer />
           <VBtn
@@ -402,7 +440,8 @@ onBeforeUnmount(() => {
     <VDialog v-model="showPhoneApiKeyQrCode" max-width="600" opacity="0.9">
       <VCard>
         <VCardTitle>{{ $t('pages.phoneApiKeys.dialogQrTitle') }}</VCardTitle>
-        <VCardSubtitle class="mt-2" style="white-space: normal" v-html="$t('pages.phoneApiKeys.dialogQrSubtitle')">
+        <VCardSubtitle class="mt-2" style="white-space: normal"
+          ><span v-html="$t('pages.phoneApiKeys.dialogQrSubtitle')" />
         </VCardSubtitle>
         <VCardText class="text-center">
           <VTextField
@@ -437,7 +476,8 @@ onBeforeUnmount(() => {
         <VCardTitle class="text-h5 text-break">
           {{ $t('pages.phoneApiKeys.dialogDeleteTitle') }}
         </VCardTitle>
-        <VCardText class="text-medium-emphasis" v-html="$t('pages.phoneApiKeys.dialogDeleteSubtitle')">
+        <VCardText class="text-medium-emphasis"
+          ><span v-html="$t('pages.phoneApiKeys.dialogDeleteSubtitle')" />
         </VCardText>
         <VCardActions class="pb-2 mt-n2">
           <VBtn
@@ -469,7 +509,15 @@ onBeforeUnmount(() => {
         <VCardTitle class="text-h5 text-break">
           {{ $t('pages.phoneApiKeys.dialogRemoveTitle') }}
         </VCardTitle>
-        <VCardText v-html="$t('pages.phoneApiKeys.dialogRemoveSubtitle').replace('{phoneNumber}', formatPhoneNumber(activePhoneNumber))">
+        <VCardText
+          ><span
+            v-html="
+              $t('pages.phoneApiKeys.dialogRemoveSubtitle').replace(
+                '{phoneNumber}',
+                formatPhoneNumber(activePhoneNumber),
+              )
+            "
+          />
         </VCardText>
         <VCardActions class="pb-4">
           <VBtn
