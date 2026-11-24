@@ -489,7 +489,7 @@
       "openSourceDesc": "httpSMS es transparente y totalmente de código abierto. El código fuente está disponible en GitHub. Siéntete libre de bifurcarlo, verificarlo o enviar un pull request.",
       "encryptionTitle": "Encriptación 🔐",
       "encryptionDesc": "Toma el control de tu privacidad con nuestra función de SMS encriptados de extremo a extremo. Protege tus mensajes de miradas indiscretas, garantizando absoluta confidencialidad con el algoritmo militar AES-256.",
-      "setupEncryptionBtn": "Configurar encriptación de extremo a extremo",
+      "setupEncryptionBtn": "Configurar el cifrado",
       "multiplePhonesTitle": "Múltiples Teléfonos",
       "multiplePhonesDesc": "Configura la app de pasarela Android httpSMS en múltiples teléfonos de forma independiente y segura sin compartir datos bajo una misma cuenta creando claves de API únicas para cada teléfono.",
       "scheduleTextMessagesTitle": "Programar Mensajes",
