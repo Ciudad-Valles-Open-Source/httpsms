@@ -103,6 +103,11 @@ services:
       GCP_PROJECT_ID: ${GCP_PROJECT_ID:-}
       FIREBASE_CREDENTIALS: ${FIREBASE_CREDENTIALS:-}
 
+      # ── Account approval ───────────────────────────────────────────────
+      # Comma-separated administrator emails. When set, new accounts stay
+      # pending until an administrator approves them. Empty = open sign-up.
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
+
       # ── Event Queue (system user) ──────────────────────────────────────
       EVENTS_QUEUE_TYPE: ${EVENTS_QUEUE_TYPE:-emulator}
       EVENTS_QUEUE_NAME: ${EVENTS_QUEUE_NAME:-events-local}

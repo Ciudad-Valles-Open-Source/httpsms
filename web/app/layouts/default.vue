@@ -12,6 +12,16 @@ const authStore = useAuthStore()
 const phonesStore = usePhonesStore()
 const threadsStore = useThreadsStore()
 const appStore = useAppStore()
+const adminStore = useAdminStore()
+
+// Administrators see how many accounts are waiting for approval.
+watch(
+  () => authStore.isAdmin,
+  (isAdmin) => {
+    if (isAdmin) adminStore.loadPendingCount().catch(console.error)
+  },
+  { immediate: true },
+)
 
 // Events pushed by the API (through Soketi) which change the thread list.
 const REALTIME_EVENTS = [

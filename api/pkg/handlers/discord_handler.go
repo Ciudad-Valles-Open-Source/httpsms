@@ -12,6 +12,8 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/NdoleStudio/httpsms/pkg/entities"
+	"github.com/NdoleStudio/httpsms/pkg/middlewares"
 	"github.com/NdoleStudio/httpsms/pkg/requests"
 	"github.com/NdoleStudio/httpsms/pkg/services"
 	"github.com/NdoleStudio/httpsms/pkg/telemetry"
@@ -31,6 +33,7 @@ type DiscordHandler struct {
 	validator        *validators.DiscordHandlerValidator
 	service          *services.DiscordService
 	messageService   *services.MessageService
+	accountGate      middlewares.AccountGate
 }
 
 // NewDiscordHandler creates a new DiscordHandler
@@ -42,8 +45,10 @@ func NewDiscordHandler(
 	messageService *services.MessageService,
 	billingService *services.BillingService,
 	messageValidator *validators.MessageHandlerValidator,
+	accountGate middlewares.AccountGate,
 ) (h *DiscordHandler) {
 	return &DiscordHandler{
+		accountGate:      accountGate,
 		logger:           logger.WithService(fmt.Sprintf("%T", h)),
 		tracer:           tracer,
 		validator:        validator,
@@ -297,6 +302,25 @@ func (h *DiscordHandler) sendSMS(ctx context.Context, c fiber.Ctx, payload map[s
 		)
 	}
 
+	// Discord events are not authenticated as a user, so the account approval gate is checked here.
+	if allowed, reason := h.isAccountActive(ctx, discord.UserID); !allowed {
+		ctxLogger.Warn(stacktrace.NewErrorf("user with ID [%s] can't send a message from discord server [%s]: %s", discord.UserID, discord.ServerID, reason))
+		return c.JSON(
+			fiber.Map{
+				"type": 4,
+				"data": fiber.Map{
+					"content": "**⚠️ error while sending message**",
+					"embeds": []fiber.Map{
+						{
+							"title": reason,
+							"color": 14681092,
+						},
+					},
+				},
+			},
+		)
+	}
+
 	request := h.createRequest(payload)
 	messageEmbed := fiber.Map{
 		"fields": []fiber.Map{
@@ -389,6 +413,23 @@ func (h *DiscordHandler) sendSMS(ctx context.Context, c fiber.Ctx, payload map[s
 			},
 		},
 	)
+}
+
+// isAccountActive checks the account approval gate for the owner of a discord integration
+func (h *DiscordHandler) isAccountActive(ctx context.Context, userID entities.UserID) (bool, string) {
+	if h.accountGate == nil || !h.accountGate.Enabled() || h.accountGate.IsSystemUser(userID) {
+		return true, ""
+	}
+
+	status, err := h.accountGate.LoadStatus(ctx, userID)
+	if err != nil || status != entities.UserStatusActive {
+		if status == entities.UserStatusSuspended {
+			return false, "The account linked to this discord server has been suspended by an administrator."
+		}
+		return false, "The account linked to this discord server is not active."
+	}
+
+	return true, ""
 }
 
 // verifyInteraction implements message verification of the discord interactions api

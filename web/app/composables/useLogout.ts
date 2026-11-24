@@ -9,6 +9,7 @@ export function useLogout() {
   const threadsStore = useThreadsStore()
   const notificationsStore = useNotificationsStore()
   const redirectPreferenceStore = useRedirectPreferenceStore()
+  const adminStore = useAdminStore()
 
   return async function logout() {
     const auth = getAuth()
@@ -16,6 +17,7 @@ export function useLogout() {
     authStore.resetState()
     phonesStore.resetState()
     threadsStore.resetState()
+    adminStore.resetState()
     redirectPreferenceStore.resetState()
     notificationsStore.addNotification({
       type: 'info',

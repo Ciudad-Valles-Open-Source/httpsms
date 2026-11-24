@@ -23,7 +23,7 @@ const threadsStore = useThreadsStore()
 const appStore = useAppStore()
 const notificationsStore = useNotificationsStore()
 const { formatPhoneNumber, phoneCountry, humanizeTime } = useFilters()
-const { items: navItems, isActive } = usePanelNav()
+const { items: navItems, isActive, badgeFor } = usePanelNav()
 const logout = useLogout()
 
 const selectedMenuItem = ref(-1)
@@ -123,6 +123,18 @@ async function filterThreads(unreadOnly: boolean) {
             >
               <template #prepend><v-icon :icon="item.icon" /></template>
               <v-list-item-title>{{ $t(item.label) }}</v-list-item-title>
+              <template v-if="badgeFor(item)" #append>
+                <v-badge
+                  inline
+                  color="warning"
+                  :content="badgeFor(item)"
+                  :aria-label="
+                    $t('components.messageThreadHeader.pendingUsers', {
+                      count: badgeFor(item),
+                    })
+                  "
+                />
+              </template>
             </v-list-item>
             <v-divider class="my-1" />
             <v-list-item

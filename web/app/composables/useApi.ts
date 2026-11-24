@@ -1,5 +1,11 @@
+import {
+  getAccountBlockedCode,
+  type AccountBlockedCode,
+} from '../utils/account-status'
+
 let authToken: string | null = null
 let apiKey: string | null = null
+let accountBlockedHandler: ((code: AccountBlockedCode) => void) | null = null
 
 export function setAuthHeader(token: string | null) {
   authToken = token
@@ -7,6 +13,17 @@ export function setAuthHeader(token: string | null) {
 
 export function setApiKey(key: string | null) {
   apiKey = key
+}
+
+/**
+ * Registers the callback run when the API rejects a request because the
+ * signed-in account is pending approval or suspended (HTTP 403 with
+ * `data.code` = `account_pending` / `account_suspended`).
+ */
+export function setAccountBlockedHandler(
+  handler: ((code: AccountBlockedCode) => void) | null,
+) {
+  accountBlockedHandler = handler
 }
 
 function createApiFetch() {
@@ -28,6 +45,11 @@ function createApiFetch() {
         headers.set('x-api-key', apiKey)
       }
       options.headers = headers
+    },
+    onResponseError({ response }) {
+      if (response.status !== 403 || !accountBlockedHandler) return
+      const code = getAccountBlockedCode(response._data)
+      if (code) accountBlockedHandler(code)
     },
   })
 }

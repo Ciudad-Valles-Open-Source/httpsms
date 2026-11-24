@@ -126,6 +126,7 @@ La documentación completa de auto-alojamiento está organizada en el directorio
 | [docs/ci_ES.md](./docs/ci_ES.md) | CI en GitHub Actions: qué revisa, secretos necesarios y cómo publicar el APK |
 | [docs/secrets_ES.md](./docs/secrets_ES.md) | Manejo de secretos: qué nunca subir, Coolify, GitHub Secrets y el escáner de pre-commit |
 | [docs/realtime_ES.md](./docs/realtime_ES.md) | Tiempo real con Soketi: configuración, `SOKETI_KEY` alfanumérica y diagnóstico |
+| [docs/admin_ES.md](./docs/admin_ES.md) | Aprobación de cuentas: `ADMIN_EMAILS`, aprobar/suspender usuarios y notas de seguridad |
 
 ### Inicio Rápido (desarrollo local)
 

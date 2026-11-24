@@ -7,7 +7,7 @@ import { useApi, setAuthHeader, setApiKey } from '../composables/useApi'
 import { useAuthStore } from './auth'
 
 interface UserResponse {
-  data: { id: string; api_key: string }
+  data: { id: string; api_key: string; is_admin?: boolean }
 }
 
 function deferred<T>() {
@@ -194,4 +194,30 @@ test('a pending Firebase token cannot restore credentials after logout', async (
 
   assert.equal(store.authUser, null)
   assert.equal(calls.at(-1)?.has('Authorization'), false)
+})
+
+test('saving the profile keeps admin rights when the response omits is_admin', async () => {
+  const { store, respondWith } = setupStore()
+  await store.onAuthStateChanged(firebaseUser('account-a'))
+  respondWith(
+    Promise.resolve({
+      data: { id: 'account-a', api_key: 'key-a', is_admin: true },
+    }),
+  )
+  await store.loadUser()
+  assert.equal(store.isAdmin, true)
+
+  // PUT /v1/users/me from an API that does not report is_admin
+  respondWith(Promise.resolve({ data: { id: 'account-a', api_key: 'key-a' } }))
+  await store.updateUser({ timezone: 'America/Mexico_City' })
+  assert.equal(store.isAdmin, true)
+
+  // an explicit value from the API still wins
+  respondWith(
+    Promise.resolve({
+      data: { id: 'account-a', api_key: 'key-a', is_admin: false },
+    }),
+  )
+  await store.updateUser({ timezone: 'America/Mexico_City' })
+  assert.equal(store.isAdmin, false)
 })

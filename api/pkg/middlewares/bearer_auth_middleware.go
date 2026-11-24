@@ -33,18 +33,53 @@ func BearerAuth(logger telemetry.Logger, tracer telemetry.Tracer, authClient *au
 
 		token, err := authClient.VerifyIDToken(context.Background(), authToken)
 		if err != nil {
-			ctxLogger.Warn(tracer.WrapErrorSpan(span, stacktrace.Propagatef(err, "invalid firebase id token [%s]", authToken)))
+			// Never log the token itself: API keys are also sent as "Bearer <key>".
+			ctxLogger.Debug(stacktrace.Propagatef(err, "bearer token is not a valid firebase id token").Error())
 			return c.Next()
 		}
 
 		span.AddEvent(fmt.Sprintf("[%s] token is valid", bearerScheme))
 
-		authUser := entities.AuthContext{
-			Email: token.Claims["email"].(string),
-			ID:    entities.UserID(token.Claims["user_id"].(string)),
+		authUser := authContextFromToken(token)
+		if authUser.IsNoop() {
+			ctxLogger.Warn(tracer.WrapErrorSpan(span, stacktrace.NewErrorf("firebase id token for uid [%s] has no email or user_id claim", token.UID)))
+			return c.Next()
 		}
 
 		c.Locals(ContextKeyAuthUserID, authUser)
 		return c.Next()
 	}
+}
+
+// authContextFromToken builds an entities.AuthContext from a verified Firebase ID token.
+// Missing claims or claims with an unexpected type never panic: they become zero values.
+func authContextFromToken(token *auth.Token) entities.AuthContext {
+	if token == nil {
+		return entities.AuthContext{}
+	}
+
+	userID := stringClaim(token.Claims, "user_id")
+	if userID == "" {
+		userID = token.UID
+	}
+
+	return entities.AuthContext{
+		ID:              entities.UserID(userID),
+		Email:           stringClaim(token.Claims, "email"),
+		EmailVerified:   boolClaim(token.Claims, "email_verified"),
+		FirebaseIDToken: true,
+	}
+}
+
+func stringClaim(claims map[string]interface{}, name string) string {
+	value, ok := claims[name].(string)
+	if !ok {
+		return ""
+	}
+	return value
+}
+
+func boolClaim(claims map[string]interface{}, name string) bool {
+	value, ok := claims[name].(bool)
+	return ok && value
 }

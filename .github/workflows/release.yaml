@@ -97,7 +97,8 @@ jobs:
           HTTPSMS_SENTRY_DSN: ${{ secrets.HTTPSMS_SENTRY_DSN }}
           HTTPSMS_LOGS_URL: ${{ secrets.HTTPSMS_LOGS_URL }}
           HTTPSMS_LOGS_TOKEN: ${{ secrets.HTTPSMS_LOGS_TOKEN }}
-        run: ./gradlew --no-daemon :app:testReleaseUnitTest :app:assembleRelease
+        # Unit tests only exist for the debug build type (AGP default).
+        run: ./gradlew --no-daemon :app:testDebugUnitTest :app:assembleRelease
 
       - name: Collect APK
         run: |

@@ -104,7 +104,7 @@ func (h *BillingHandler) Usage(c fiber.Ctx) error {
 
 	billingUsage, err := h.service.GetCurrentUsage(ctx, h.userIDFomContext(c))
 	if err != nil {
-		ctxLogger.Error(stacktrace.Propagatef(err, "cannot get current usage record for user [%s]", h.userFromContext(c)))
+		ctxLogger.Error(stacktrace.Propagatef(err, "cannot get current usage record for user [%s]", h.userIDFomContext(c)))
 		return h.responseInternalServerError(c)
 	}
 

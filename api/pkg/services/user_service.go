@@ -3,9 +3,11 @@ package services
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"firebase.google.com/go/auth"
+	"github.com/NdoleStudio/httpsms/pkg/config"
 	"github.com/NdoleStudio/httpsms/pkg/emails"
 	"github.com/NdoleStudio/httpsms/pkg/events"
 	"github.com/NdoleStudio/httpsms/pkg/repositories"
@@ -26,6 +28,7 @@ type UserService struct {
 	repository   repositories.UserRepository
 	dispatcher   *EventDispatcher
 	authClient   *auth.Client
+	adminPolicy  *config.AdminPolicy
 }
 
 // NewUserService creates a new UserService
@@ -37,8 +40,10 @@ func NewUserService(
 	emailFactory emails.UserEmailFactory,
 	dispatcher *EventDispatcher,
 	authClient *auth.Client,
+	adminPolicy *config.AdminPolicy,
 ) (s *UserService) {
 	return &UserService{
+		adminPolicy:  adminPolicy,
 		logger:       logger.WithService(fmt.Sprintf("%T", s)),
 		tracer:       tracer,
 		mailer:       mailer,
@@ -51,19 +56,51 @@ func NewUserService(
 
 // Get fetches or creates an entities.User
 func (service *UserService) Get(ctx context.Context, source string, authUser entities.AuthContext) (*entities.User, error) {
-	ctx, span := service.tracer.Start(ctx)
+	ctx, span, ctxLogger := service.tracer.StartWithLogger(ctx, service.logger)
 	defer span.End()
 
-	user, isNew, err := service.repository.LoadOrStore(ctx, authUser)
+	user, _, err := service.loadOrStore(ctx, source, authUser)
 	if err != nil {
 		return nil, service.tracer.WrapErrorSpan(span, stacktrace.Propagatef(err, "could not get [%T] with from [%+#v]", user, authUser))
+	}
+
+	// An administrator whose account was created before their email was verified
+	// (or before they were added to ADMIN_EMAILS) is activated on their next login.
+	if user.Status != entities.UserStatusActive && service.adminPolicy.IsAdmin(authUser) {
+		now := time.Now().UTC()
+		approvedBy := strings.ToLower(strings.TrimSpace(authUser.Email))
+		activated, err := service.repository.UpdateStatus(ctx, user.ID, repositories.UserStatusUpdate{
+			Status:     entities.UserStatusActive,
+			ApprovedAt: &now,
+			ApprovedBy: &approvedBy,
+		})
+		if err != nil {
+			return nil, service.tracer.WrapErrorSpan(span, stacktrace.Propagatef(err, "cannot activate the account of administrator [%s]", user.ID))
+		}
+		ctxLogger.Info(fmt.Sprintf("activated the account of administrator [%s] with user ID [%s]", authUser.Email, user.ID))
+		user = activated
+	}
+
+	return user, nil
+}
+
+// IsAdmin checks if an authenticated request is made by an administrator
+func (service *UserService) IsAdmin(authUser entities.AuthContext) bool {
+	return service.adminPolicy.IsAdmin(authUser)
+}
+
+// loadOrStore fetches the user or atomically creates it with the status decided by the config.AdminPolicy
+func (service *UserService) loadOrStore(ctx context.Context, source string, authUser entities.AuthContext) (*entities.User, bool, error) {
+	user, isNew, err := service.repository.LoadOrStore(ctx, authUser, service.adminPolicy.InitialStatus(authUser))
+	if err != nil {
+		return nil, false, err
 	}
 
 	if isNew {
 		service.dispatchUserCreatedEvent(ctx, source, user)
 	}
 
-	return user, nil
+	return user, isNew, nil
 }
 
 func (service *UserService) dispatchUserCreatedEvent(ctx context.Context, source string, user *entities.User) {
@@ -111,13 +148,9 @@ func (service *UserService) Update(ctx context.Context, source string, authUser 
 
 	ctxLogger := service.tracer.CtxLogger(service.logger, span)
 
-	user, isNew, err := service.repository.LoadOrStore(ctx, authUser)
+	user, _, err := service.loadOrStore(ctx, source, authUser)
 	if err != nil {
 		return nil, service.tracer.WrapErrorSpan(span, stacktrace.Propagatef(err, "could not get [%T] with from [%+#v]", user, authUser))
-	}
-
-	if isNew {
-		service.dispatchUserCreatedEvent(ctx, source, user)
 	}
 
 	user.Timezone = params.Timezone.String()

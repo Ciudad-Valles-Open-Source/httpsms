@@ -47,6 +47,12 @@ These variables are read by the Go API server at runtime. They must be supplied 
 | `GCP_PROJECT_ID`       | Yes      | —       | Firebase project ID. Also used as the Google Cloud project identifier.                    |
 | `FIREBASE_CREDENTIALS` | Yes      | —       | Full content of the Firebase service account JSON file, provided as a single-line string. |
 
+### Account Approval (Administrators)
+
+| Variable       | Required | Default | Description |
+| -------------- | -------- | ------- | ----------- |
+| `ADMIN_EMAILS` | No       | —       | Lista de correos de administradores separados por comas; se comparan sin distinguir mayúsculas y sin espacios (p. ej. `admin@example.com,ops@example.com`). Si se define, se activa la **aprobación de cuentas**: cualquiera puede registrarse con Firebase, pero las cuentas nuevas quedan en `pending` y toda petición a la API hecha con ellas (token del panel, clave API de usuario o clave API de teléfono) se rechaza con `403` y `data.code` = `account_pending` (o `account_suspended`) hasta que un administrador la apruebe. `GET /v1/users/me` y `DELETE /v1/users/me` siguen funcionando para que un usuario pendiente vea su estado o elimine su cuenta. Una petición es de administrador **solo** si se hace desde el panel con un token de Firebase cuyo correo está en esta lista **y verificado** (`email_verified`); las claves API nunca dan permisos de administrador. Los administradores gestionan las cuentas con `/v1/admin/users`. Las cuentas que ya existían antes de definir la variable siguen `active`. Si está vacía, el registro es abierto (toda cuenta queda activa al instante) y la API registra una advertencia al iniciar. Los cambios de estado se aplican de inmediato en la instancia de la API que los procesa; con varias réplicas, las demás pueden tardar hasta 5 segundos en verlos. Si SMTP está configurado, se avisa por correo a los administradores cuando una cuenta nueva espera aprobación y al usuario cuando es aprobada. |
+
 ### Event Queue (System User)
 
 These variables configure the internal system user that drives the asynchronous event queue.

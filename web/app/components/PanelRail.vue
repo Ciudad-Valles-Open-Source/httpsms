@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import { mdiBookOpenVariant, mdiDownload, mdiLogout } from '@mdi/js'
+import type { PanelNavItem } from '~/composables/usePanelNav'
 
 const appStore = useAppStore()
 const phonesStore = usePhonesStore()
-const { items, isActive } = usePanelNav()
+const { items, isActive, badgeFor } = usePanelNav()
 const logout = useLogout()
+const { t } = useI18n()
+
+function itemLabel(item: PanelNavItem): string {
+  const badge = badgeFor(item)
+  const label = t(item.label)
+  return badge
+    ? `${label} · ${t('components.messageThreadHeader.pendingUsers', { count: badge })}`
+    : label
+}
 </script>
 
 <template>
@@ -16,13 +26,13 @@ const logout = useLogout()
         v-for="item in items"
         :key="item.name"
         location="end"
-        :text="$t(item.label)"
+        :text="itemLabel(item)"
       >
         <template #activator="{ props: tooltipProps }">
           <VBtn
             v-bind="tooltipProps"
             :to="{ name: item.name }"
-            :aria-label="$t(item.label)"
+            :aria-label="itemLabel(item)"
             :active="isActive(item)"
             :color="isActive(item) ? 'primary' : undefined"
             :variant="isActive(item) ? 'tonal' : 'text'"
@@ -30,7 +40,16 @@ const logout = useLogout()
             rounded="lg"
             class="panel-rail-btn"
           >
-            <VIcon :icon="item.icon" />
+            <VBadge
+              v-if="badgeFor(item)"
+              color="warning"
+              :content="badgeFor(item)"
+              offset-x="-4"
+              offset-y="-4"
+            >
+              <VIcon :icon="item.icon" />
+            </VBadge>
+            <VIcon v-else :icon="item.icon" />
           </VBtn>
         </template>
       </VTooltip>

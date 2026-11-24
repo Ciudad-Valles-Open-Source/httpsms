@@ -23,6 +23,7 @@ var spanishInfoDescription = "Usa tu teléfono Android para enviar y recibir men
 
 var spanishTags = map[string]string{
 	"3CXIntegration":     "Integración 3CX",
+	"Admin":              "Administración",
 	"Attachments":        "Adjuntos",
 	"Billing":            "Uso de mensajes",
 	"BulkSMS":            "SMS masivos",
@@ -40,6 +41,10 @@ var spanishTags = map[string]string{
 }
 
 var spanishOperations = map[string]translation{
+	"GET /admin/users":                 {"Listar cuentas de usuario", "Lista las cuentas de usuario, de la más reciente a la más antigua. Solo pueden llamar a este endpoint los administradores (un correo verificado incluido en ADMIN_EMAILS, con sesión iniciada en el panel web); las claves API se rechazan."},
+	"PUT /admin/users/{userID}/status": {"Aprobar o suspender una cuenta de usuario", "Cambia el estado de una cuenta de usuario a \"active\" (aprobar) o \"suspended\". Al aprobarla se registran approved_at y approved_by. Los administradores no pueden cambiar su propia cuenta ni la de otro administrador. Solo pueden llamar a este endpoint los administradores; las claves API se rechazan."},
+	"DELETE /admin/users/{userID}":     {"Eliminar una cuenta de usuario", "Elimina una cuenta de usuario junto con todos sus datos. Los administradores no pueden eliminar su propia cuenta ni la de otro administrador. Solo pueden llamar a este endpoint los administradores; las claves API se rechazan."},
+
 	"GET /attachments/{userID}/{messageID}/{attachmentIndex}/{filename}": {"Descargar un adjunto de mensaje", "Descarga un adjunto MMS a partir de los componentes de su ruta."},
 
 	"GET /billing/usage":         {"Obtener el uso de mensajes del mes actual", "Obtiene el resumen de mensajes enviados y recibidos por el usuario en el mes actual. El uso se registra solo con fines estadísticos; no hay límites."},
@@ -96,7 +101,7 @@ var spanishOperations = map[string]translation{
 	"PUT /send-schedules/{scheduleID}":    {"Actualizar un horario de envío", "Actualiza un horario de envío del usuario autenticado."},
 	"DELETE /send-schedules/{scheduleID}": {"Eliminar un horario de envío", "Elimina un horario de envío del usuario autenticado."},
 
-	"GET /users/me":                     {"Obtener el usuario actual", "Obtiene los datos del usuario autenticado."},
+	"GET /users/me":                     {"Obtener el usuario actual", "Obtiene los datos del usuario autenticado, incluidos el \"status\" de la cuenta (active, pending o suspended) e \"is_admin\". Este endpoint también funciona para cuentas pendientes y suspendidas."},
 	"PUT /users/me":                     {"Actualizar el usuario actual", "Actualiza los datos del usuario autenticado."},
 	"DELETE /users/me":                  {"Eliminar el usuario actual", "Elimina al usuario autenticado junto con todos sus datos."},
 	"DELETE /users/{userID}/api-keys":   {"Rotar la clave API del usuario", "Genera una nueva clave API para el usuario e invalida la actual, por ejemplo si se ha visto comprometida."},

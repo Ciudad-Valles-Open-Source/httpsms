@@ -45,6 +45,12 @@ These variables are read by the Go API server at runtime. They must be supplied 
 | `GCP_PROJECT_ID`       | Yes      | —       | Firebase project ID. Also used as the Google Cloud project identifier.                    |
 | `FIREBASE_CREDENTIALS` | Yes      | —       | Full content of the Firebase service account JSON file, provided as a single-line string. |
 
+### Account Approval (Administrators)
+
+| Variable       | Required | Default | Description |
+| -------------- | -------- | ------- | ----------- |
+| `ADMIN_EMAILS` | No       | —       | Comma-separated list of administrator emails, compared case-insensitively after trimming (e.g. `admin@example.com,ops@example.com`). When set, the **approval gate** is enabled: anyone can sign up with Firebase, but new accounts stay `pending` and every API request made with them (dashboard token, user API key or phone API key) is rejected with `403` and `data.code` = `account_pending` (or `account_suspended`) until an administrator approves them. `GET /v1/users/me` and `DELETE /v1/users/me` keep working so a pending user can see their status or delete their account. A request is an administrator request **only** when it is signed in on the dashboard with a Firebase ID token whose email is listed here **and verified** (`email_verified`); API keys never grant admin rights. Administrators manage accounts with `/v1/admin/users`. Accounts that existed before the variable was set stay `active`. When empty, registrations are open (every account is active immediately) and the API logs a warning at startup. Status changes apply immediately on the API instance that handled them; when running several API replicas, other replicas may take up to 5 seconds to see the change. If SMTP is configured, administrators are emailed when a new account waits for approval and users are emailed when approved. |
+
 ### Event Queue (System User)
 
 These variables configure the internal system user that drives the asynchronous event queue.

@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"fmt"
+	"github.com/NdoleStudio/httpsms/pkg/entities"
 	"strings"
 
 	"github.com/NdoleStudio/httpsms/pkg/repositories"
@@ -26,7 +27,7 @@ func PhoneAPIKeyAuth(logger telemetry.Logger, tracer telemetry.Tracer, repositor
 
 		authUser, err := repository.LoadAuthContext(ctx, apiKey)
 		if err != nil {
-			ctxLogger.Error(stacktrace.Propagatef(err, "cannot load user with phone api key [%s]", apiKey))
+			ctxLogger.Error(stacktrace.Propagatef(err, "cannot load user with phone api key [%s]", entities.SecretHint(apiKey)))
 			return c.Next()
 		}
 

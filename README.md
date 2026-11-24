@@ -144,6 +144,7 @@ The full self-hosting documentation is organized in the [`docs/`](./docs) direct
 | [docs/ci.md](./docs/ci.md) | GitHub Actions CI: what it checks, required secrets and how to release the APK |
 | [docs/secrets.md](./docs/secrets.md) | Handling secrets: what never to commit, Coolify, GitHub Secrets and the pre-commit scanner |
 | [docs/realtime.md](./docs/realtime.md) | Real-time updates with Soketi: setup, alphanumeric `SOKETI_KEY` and troubleshooting |
+| [docs/admin.md](./docs/admin.md) | Account approval: `ADMIN_EMAILS`, approving/suspending users and security notes |
 
 ### Quick start (local development)
 
