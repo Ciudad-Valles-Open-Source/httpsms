@@ -5,6 +5,12 @@ import { mdiCheck, mdiInformation } from '@mdi/js'
 const { lgAndUp } = useDisplay()
 const notificationsStore = useNotificationsStore()
 
+const { t } = useI18n()
+// API responses and some stores send English text; show it translated.
+const message = computed(() =>
+  translateNotice(notificationsStore.notification.message, t),
+)
+
 const notificationActive = computed({
   get: () => notificationsStore.notification.active,
   set: () => notificationsStore.disableNotification(),
@@ -29,7 +35,7 @@ const notificationActive = computed({
       :color="notificationsStore.notification.type"
       :icon="mdiInformation"
     />
-    {{ notificationsStore.notification.message }}
+    {{ message }}
     <template #actions>
       <v-btn
         v-if="lgAndUp"
