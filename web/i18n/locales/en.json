@@ -94,7 +94,9 @@
       "filterAll": "All",
       "filterUnread": "Unread",
       "filterError": "The message thread filter could not be updated",
-      "documentation": "Documentation"
+      "documentation": "Documentation",
+      "administration": "Administration",
+      "pendingUsers": "{count} accounts pending approval"
     },
     "redirectPromptPopover": {
       "skipNextTime": "Skip this page next time?",
@@ -475,6 +477,84 @@
       "joinUsers": "⚡Free, open source and self-hosted: your messages stay on your own server.",
       "metaTitle": "Log in to your account - httpSMS",
       "metaDescription": "Log in to httpSMS to send and receive SMS messages through your own Android phone with a simple HTTP API."
+    },
+    "accountPending": {
+      "metaTitle": "Account status - httpSMS",
+      "pendingTitle": "Your account is pending approval",
+      "pendingBody": "Thanks for signing up. An administrator must approve your account before you can use the dashboard. Check back later or refresh the status once you have been notified.",
+      "suspendedTitle": "Your account has been suspended",
+      "suspendedBody": "An administrator has suspended your account, so you cannot use the dashboard or the API. If you think this is a mistake, contact the administrator.",
+      "signedInAs": "Signed in as",
+      "refresh": "Refresh status",
+      "stillPending": "Your account is still pending approval",
+      "stillSuspended": "Your account is still suspended",
+      "refreshError": "We could not check your account status. Please try again.",
+      "logout": "Log out",
+      "deleteAccount": "Delete my account"
+    },
+    "adminUsers": {
+      "metaTitle": "User administration - httpSMS",
+      "title": "Administration",
+      "heading": "Users",
+      "description": "Approve new accounts, suspend or reactivate existing accounts and delete accounts together with all their data.",
+      "back": "Back",
+      "filters": {
+        "pending": "Pending",
+        "active": "Active",
+        "suspended": "Suspended",
+        "all": "All"
+      },
+      "searchLabel": "Search by email",
+      "columns": {
+        "email": "Email",
+        "status": "Status",
+        "created": "Signed up",
+        "approved": "Approved",
+        "phones": "Phones",
+        "actions": "Actions"
+      },
+      "status": {
+        "pending": "Pending",
+        "active": "Active",
+        "suspended": "Suspended"
+      },
+      "adminBadge": "Admin",
+      "youBadge": "You",
+      "protectedHint": "Cannot be changed",
+      "createdOn": "Signed up on {date}",
+      "approvedOn": "Approved on {date}",
+      "approvedBy": "by {name}",
+      "phonesCount": "Phones: {count}",
+      "actions": {
+        "approve": "Approve",
+        "suspend": "Suspend",
+        "reactivate": "Reactivate",
+        "delete": "Delete"
+      },
+      "confirm": {
+        "suspendTitle": "Suspend this account?",
+        "suspendBody": "{email} will no longer be able to use the dashboard or the API until you reactivate the account.",
+        "deleteTitle": "Delete this account?",
+        "deleteBody": "The account {email} will be permanently deleted together with all its phones, messages and other data. This action cannot be undone.",
+        "cancel": "Cancel"
+      },
+      "success": {
+        "approve": "Approved {email}",
+        "suspend": "Suspended {email}",
+        "reactivate": "Reactivated {email}",
+        "delete": "Deleted {email}"
+      },
+      "actionError": "The action could not be completed. Please try again.",
+      "loadError": "We could not load the list of users.",
+      "retry": "Retry",
+      "loadMore": "Load more",
+      "empty": {
+        "pending": "No accounts are waiting for approval.",
+        "active": "There are no active accounts.",
+        "suspended": "There are no suspended accounts.",
+        "all": "There are no registered accounts.",
+        "search": "No accounts match \"{query}\"."
+      }
     }
   },
   "settings": {

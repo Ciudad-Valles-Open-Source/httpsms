@@ -1,5 +1,44 @@
 basePath: /v1
 definitions:
+  entities.AdminUser:
+    properties:
+      approved_at:
+        example: "2022-06-05T14:26:02.302718+03:00"
+        type: string
+      approved_by:
+        example: admin@email.com
+        type: string
+      created_at:
+        example: "2022-06-05T14:26:02.302718+03:00"
+        type: string
+      email:
+        example: name@email.com
+        type: string
+      id:
+        example: WB7DRDWrJZRGbYrv2CKGkqbzvqdC
+        type: string
+      is_admin:
+        example: false
+        type: boolean
+      phones_count:
+        example: 1
+        type: integer
+      status:
+        allOf:
+        - $ref: '#/definitions/entities.UserStatus'
+        example: pending
+      updated_at:
+        example: "2022-06-05T14:26:10.303278+03:00"
+        type: string
+    required:
+    - created_at
+    - email
+    - id
+    - is_admin
+    - phones_count
+    - status
+    - updated_at
+    type: object
   entities.BillingUsage:
     properties:
       created_at:
@@ -559,6 +598,12 @@ definitions:
       api_key:
         example: x-api-key
         type: string
+      approved_at:
+        example: "2022-06-05T14:26:02.302718+03:00"
+        type: string
+      approved_by:
+        example: admin@email.com
+        type: string
       created_at:
         example: "2022-06-05T14:26:02.302718+03:00"
         type: string
@@ -580,6 +625,10 @@ definitions:
       notification_webhook_enabled:
         example: true
         type: boolean
+      status:
+        allOf:
+        - $ref: '#/definitions/entities.UserStatus'
+        example: active
       subscription_ends_at:
         example: "2022-06-05T14:26:02.302718+03:00"
         type: string
@@ -611,11 +660,22 @@ definitions:
     - notification_message_status_enabled
     - notification_newsletter_enabled
     - notification_webhook_enabled
+    - status
     - subscription_id
     - subscription_name
     - timezone
     - updated_at
     type: object
+  entities.UserStatus:
+    enum:
+    - active
+    - pending
+    - suspended
+    type: string
+    x-enum-varnames:
+    - UserStatusActive
+    - UserStatusPending
+    - UserStatusSuspended
   entities.Webhook:
     properties:
       created_at:
@@ -658,6 +718,14 @@ definitions:
     - updated_at
     - url
     - user_id
+    type: object
+  requests.AdminUserStatusUpdate:
+    properties:
+      status:
+        example: active
+        type: string
+    required:
+    - status
     type: object
   requests.ContactItem:
     properties:
@@ -1127,6 +1195,38 @@ definitions:
     - signing_key
     - url
     type: object
+  responses.AdminUserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/entities.AdminUser'
+      message:
+        example: Request handled successfully
+        type: string
+      status:
+        example: success
+        type: string
+    required:
+    - data
+    - message
+    - status
+    type: object
+  responses.AdminUsersResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/entities.AdminUser'
+        type: array
+      message:
+        example: Request handled successfully
+        type: string
+      status:
+        example: success
+        type: string
+    required:
+    - data
+    - message
+    - status
+    type: object
   responses.BadRequest:
     properties:
       data:
@@ -1248,6 +1348,103 @@ definitions:
     - status
     - total
     type: object
+  responses.CurrentUser:
+    properties:
+      active_phone_id:
+        example: 32343a19-da5e-4b1b-a767-3298a73703cb
+        type: string
+      api_key:
+        example: x-api-key
+        type: string
+      approved_at:
+        example: "2022-06-05T14:26:02.302718+03:00"
+        type: string
+      approved_by:
+        example: admin@email.com
+        type: string
+      created_at:
+        example: "2022-06-05T14:26:02.302718+03:00"
+        type: string
+      email:
+        example: name@email.com
+        type: string
+      id:
+        example: WB7DRDWrJZRGbYrv2CKGkqbzvqdC
+        type: string
+      is_admin:
+        description: IsAdmin is true only when the request uses a verified Firebase
+          ID token whose email is in ADMIN_EMAILS
+        example: false
+        type: boolean
+      notification_heartbeat_enabled:
+        example: true
+        type: boolean
+      notification_message_status_enabled:
+        example: true
+        type: boolean
+      notification_newsletter_enabled:
+        example: true
+        type: boolean
+      notification_webhook_enabled:
+        example: true
+        type: boolean
+      status:
+        allOf:
+        - $ref: '#/definitions/entities.UserStatus'
+        example: active
+      subscription_ends_at:
+        example: "2022-06-05T14:26:02.302718+03:00"
+        type: string
+      subscription_id:
+        example: 8f9c71b8-b84e-4417-8408-a62274f65a08
+        type: string
+      subscription_name:
+        allOf:
+        - $ref: '#/definitions/entities.SubscriptionName'
+        example: free
+      subscription_renews_at:
+        example: "2022-06-05T14:26:02.302718+03:00"
+        type: string
+      subscription_status:
+        example: on_trial
+        type: string
+      timezone:
+        example: Europe/Helsinki
+        type: string
+      updated_at:
+        example: "2022-06-05T14:26:10.303278+03:00"
+        type: string
+    required:
+    - api_key
+    - created_at
+    - email
+    - id
+    - is_admin
+    - notification_heartbeat_enabled
+    - notification_message_status_enabled
+    - notification_newsletter_enabled
+    - notification_webhook_enabled
+    - status
+    - subscription_id
+    - subscription_name
+    - timezone
+    - updated_at
+    type: object
+  responses.CurrentUserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/responses.CurrentUser'
+      message:
+        example: Request handled successfully
+        type: string
+      status:
+        example: success
+        type: string
+    required:
+    - data
+    - message
+    - status
+    type: object
   responses.DiscordResponse:
     properties:
       data:
@@ -1277,6 +1474,18 @@ definitions:
         type: string
     required:
     - data
+    - message
+    - status
+    type: object
+  responses.Forbidden:
+    properties:
+      message:
+        example: forbidden
+        type: string
+      status:
+        example: error
+        type: string
+    required:
     - message
     - status
     type: object
@@ -1604,6 +1813,172 @@ info:
   title: httpSMS API Reference
   version: "1.0"
 paths:
+  /admin/users:
+    get:
+      consumes:
+      - application/json
+      description: Lists the user accounts, newest first. Only administrators (a verified
+        email listed in ADMIN_EMAILS, signed in on the web dashboard) can call this
+        endpoint; API keys are rejected.
+      parameters:
+      - description: filter users by status
+        enum:
+        - pending
+        - active
+        - suspended
+        in: query
+        name: status
+        type: string
+      - description: filter users whose email contains query
+        in: query
+        name: query
+        type: string
+      - description: number of users to skip
+        in: query
+        minimum: 0
+        name: skip
+        type: integer
+      - description: number of users to return (default 20, capped at 100)
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.AdminUsersResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.BadRequest'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.Unauthorized'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/responses.Forbidden'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/responses.UnprocessableEntity'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.InternalServerError'
+      security:
+      - ApiKeyAuth: []
+      summary: List user accounts
+      tags:
+      - Admin
+  /admin/users/{userID}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a user account together with all its data. Administrators
+        can't delete their own account or another administrator's account. Only administrators
+        can call this endpoint; API keys are rejected.
+      parameters:
+      - default: WB7DRDWrJZRGbYrv2CKGkqbzvqdC
+        description: ID of the user
+        in: path
+        name: userID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/responses.NoContent'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.Unauthorized'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/responses.Forbidden'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.NotFound'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/responses.UnprocessableEntity'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.InternalServerError'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a user account
+      tags:
+      - Admin
+  /admin/users/{userID}/status:
+    put:
+      consumes:
+      - application/json
+      description: Sets the status of a user account to "active" (approve) or "suspended".
+        Approving stamps approved_at and approved_by. Administrators can't change
+        their own account or another administrator's account. Only administrators
+        can call this endpoint; API keys are rejected.
+      parameters:
+      - default: WB7DRDWrJZRGbYrv2CKGkqbzvqdC
+        description: ID of the user
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: New status of the user
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/requests.AdminUserStatusUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.AdminUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.BadRequest'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.Unauthorized'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/responses.Forbidden'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.NotFound'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/responses.UnprocessableEntity'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.InternalServerError'
+      security:
+      - ApiKeyAuth: []
+      summary: Approve or suspend a user account
+      tags:
+      - Admin
   /attachments/{userID}/{messageID}/{attachmentIndex}/{filename}:
     get:
       description: Download an MMS attachment by its path components
@@ -3641,14 +4016,16 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get details of the currently authenticated user
+      description: Get details of the currently authenticated user, including the
+        account "status" (active, pending or suspended) and "is_admin". This endpoint
+        works for pending and suspended accounts too.
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.UserResponse'
+            $ref: '#/definitions/responses.CurrentUserResponse'
         "400":
           description: Bad Request
           schema:

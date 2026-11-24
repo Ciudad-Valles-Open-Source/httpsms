@@ -303,17 +303,25 @@ export interface EntitiesPhoneAPIKey {
   user_id: string;
 }
 
+export type EntitiesUserStatus = "active" | "pending" | "suspended";
+
 export interface EntitiesUser {
   /** @example "32343a19-da5e-4b1b-a767-3298a73703cb" */
   active_phone_id?: string;
   /** @example "x-api-key" */
   api_key: string;
   /** @example "2022-06-05T14:26:02.302718+03:00" */
+  approved_at?: string | null;
+  /** @example "admin@email.com" */
+  approved_by?: string | null;
+  /** @example "2022-06-05T14:26:02.302718+03:00" */
   created_at: string;
   /** @example "name@email.com" */
   email: string;
   /** @example "WB7DRDWrJZRGbYrv2CKGkqbzvqdC" */
   id: string;
+  /** @example false */
+  is_admin: boolean;
   /** @example true */
   notification_heartbeat_enabled: boolean;
   /** @example true */
@@ -322,6 +330,8 @@ export interface EntitiesUser {
   notification_newsletter_enabled: boolean;
   /** @example true */
   notification_webhook_enabled: boolean;
+  /** @example "active" */
+  status: EntitiesUserStatus;
   /** @example "2022-06-05T14:26:02.302718+03:00" */
   subscription_ends_at?: string;
   /** @example "8f9c71b8-b84e-4417-8408-a62274f65a08" */

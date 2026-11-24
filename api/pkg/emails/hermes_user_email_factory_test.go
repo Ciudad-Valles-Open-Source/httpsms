@@ -83,3 +83,27 @@ func TestUsageLimitAlert_IncludesPercentBreakdownAndLimit(t *testing.T) {
 	assert.Contains(t, email.Text, "for a total of 18,000 out of your 20,000 message limit")
 	assert.Contains(t, email.HTML, "for a total of 18,000 out of your 20,000 message limit")
 }
+
+func TestAccountPendingApproval_LinksToAdminPage(t *testing.T) {
+	factory := testUserEmailFactory()
+	user := &entities.User{Email: "new@example.com", CreatedAt: time.Date(2026, 6, 19, 2, 0, 0, 0, time.UTC)}
+
+	email, err := factory.AccountPendingApproval("admin@example.com", user)
+
+	assert.NoError(t, err)
+	assert.Equal(t, "admin@example.com", email.ToEmail)
+	assert.Contains(t, email.Subject, "new@example.com")
+	assert.Contains(t, email.Text, "new@example.com")
+	assert.Contains(t, email.HTML, "https://sms.example.com/admin/users")
+}
+
+func TestAccountApproved_IsSentToTheUser(t *testing.T) {
+	factory := testUserEmailFactory()
+
+	email, err := factory.AccountApproved(&entities.User{Email: "new@example.com"})
+
+	assert.NoError(t, err)
+	assert.Equal(t, "new@example.com", email.ToEmail)
+	assert.Equal(t, "Your httpSMS account has been approved", email.Subject)
+	assert.Contains(t, email.HTML, "https://sms.example.com/")
+}

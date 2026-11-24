@@ -76,6 +76,7 @@ func (container *Container) SeedSystemUser(db *gorm.DB) {
 		Email:            email,
 		APIKey:           apiKey,
 		SubscriptionName: entities.SubscriptionNameFree,
+		Status:           entities.UserStatusActive,
 		CreatedAt:        now,
 		UpdatedAt:        now,
 	}

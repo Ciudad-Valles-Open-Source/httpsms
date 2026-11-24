@@ -17,8 +17,11 @@ import {
   mdiAccountMultiple,
   mdiCircle,
   mdiBookOpenVariant,
+  mdiShieldAccount,
 } from '@mdi/js'
 import type { EntitiesPhone } from '~~/shared/types/api'
+import { formatCountBadge } from '~/utils/admin-users'
+import { PENDING_COUNT_LIMIT } from '~/stores/admin'
 
 const { t } = useI18n()
 
@@ -32,6 +35,19 @@ const appStore = useAppStore()
 const notificationsStore = useNotificationsStore()
 const redirectPreferenceStore = useRedirectPreferenceStore()
 const { formatPhoneNumber, phoneCountry, humanizeTime } = useFilters()
+const adminStore = useAdminStore()
+
+// Administrators see how many accounts are waiting for approval.
+const pendingUsersBadge = computed(() =>
+  formatCountBadge(adminStore.pendingCount, PENDING_COUNT_LIMIT),
+)
+watch(
+  () => authStore.isAdmin,
+  (isAdmin) => {
+    if (isAdmin) adminStore.loadPendingCount().catch(console.error)
+  },
+  { immediate: true },
+)
 
 const selectedMenuItem = ref(-1)
 
@@ -76,6 +92,7 @@ async function logout() {
   authStore.resetState()
   phonesStore.resetState()
   threadsStore.resetState()
+  adminStore.resetState()
   redirectPreferenceStore.resetState()
   notificationsStore.addNotification({
     type: 'info',
@@ -270,6 +287,24 @@ async function filterThreads(unreadOnly: boolean) {
             <v-list-item-title>{{
               $t('components.messageThreadHeader.statistics')
             }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="authStore.isAdmin" :to="{ name: 'admin-users' }">
+            <template #prepend><v-icon :icon="mdiShieldAccount" /></template>
+            <v-list-item-title>{{
+              $t('components.messageThreadHeader.administration')
+            }}</v-list-item-title>
+            <template v-if="pendingUsersBadge" #append>
+              <v-badge
+                inline
+                color="warning"
+                :content="pendingUsersBadge"
+                :aria-label="
+                  $t('components.messageThreadHeader.pendingUsers', {
+                    count: pendingUsersBadge,
+                  })
+                "
+              />
+            </template>
           </v-list-item>
           <v-list-item @click.prevent="logout">
             <template #prepend><v-icon :icon="mdiLogout" /></template>

@@ -70,6 +70,8 @@ export default defineNuxtConfig({
       '/heartbeats',
       '/phone-api-keys',
       '/search-messages',
+      '/admin',
+      '/account-pending',
     ],
   },
 
@@ -86,6 +88,8 @@ export default defineNuxtConfig({
       '/phone-api-keys',
       '/search-messages',
       '/login',
+      '/admin/**',
+      '/account-pending',
     ],
   },
 
@@ -187,6 +191,8 @@ export default defineNuxtConfig({
     '/heartbeats/**': { robots: false },
     '/phone-api-keys': { robots: false },
     '/search-messages': { robots: false },
+    '/admin/**': { robots: false },
+    '/account-pending': { robots: false },
   },
 
   app: {

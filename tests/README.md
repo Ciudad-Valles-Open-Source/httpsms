@@ -72,6 +72,16 @@ uses the standard OpenTelemetry-instrumented Go HTTP transport.
 - [x] URL-backed heartbeat callback stores a heartbeat
 - [x] Adapter callback notification IDs are deduplicated in memory
 - [x] HTTPS certificate trust is exercised
+- [x] Account approval gate (`ADMIN_EMAILS` is set in `.env.test`): pending and
+      suspended users' API keys and phone API keys get `403` with
+      `data.code` `account_pending` / `account_suspended`, while
+      `GET`/`DELETE /v1/users/me` keep working and the system user can still
+      dispatch events
+- [x] Admin endpoints reject unauthenticated requests (`401`), user API keys
+      (`403`, even for an email listed in `ADMIN_EMAILS`), phone API keys, and
+      forged Firebase ID tokens
+- [ ] Admin approve/suspend/delete with a real admin session: needs a verified
+      Firebase ID token, which this stack cannot mint (see below)
 
 ## Prerequisites
 
@@ -155,6 +165,26 @@ versions across workflow file renames.
 | System API key | `system-user-api-key` |
 | User ID | `test-user-id` |
 | System user ID | `system-user-id` |
+| Admin email (`ADMIN_EMAILS`) | `admin@httpsms.test` |
+| Pending user / API key | `approval-pending-user-id` / `approval-pending-api-key` |
+| Suspended user / API key | `approval-suspended-user-id` / `approval-suspended-api-key` |
+| Pending user that deletes itself | `approval-pending-delete-api-key` |
+| Active user with the admin email | `approval-admin-email-user-id` / `approval-admin-email-api-key` |
+| Pending / suspended phone API keys | `pk_approval-pending-phone-api-key` / `pk_approval-suspended-phone-api-key` |
+
+Seeded users set `status` explicitly, so the shared test users stay `active`
+while the approval gate is on.
+
+### Why admin flows are not tested end to end
+
+Admin rights require a Firebase ID token with `email_verified: true`. The API
+uses `firebase.google.com/go` v3, which always downloads the token signing
+keys from `www.googleapis.com` and has no Auth emulator support, and the API
+container only trusts the throwaway test CA. No component of this stack can
+issue a token the API accepts, so the suite only checks that everything that is
+not a verified admin token is rejected. Covering the admin path would need a
+fake `www.googleapis.com` key endpoint signed by the test CA, or an API change
+that supports `FIREBASE_AUTH_EMULATOR_HOST`.
 
 Adapter tests create a unique gateway UUID, phone number, phone API key, and
 callback path per test. See [`seed.sql`](./seed.sql) for shared seed data.
@@ -174,6 +204,7 @@ tests/
 │   └── emulator_test.go
 ├── wiremock/
 │   └── mappings/
+├── account_approval_integration_test.go
 ├── adapter_integration_test.go
 ├── integration_test.go
 ├── helpers_test.go

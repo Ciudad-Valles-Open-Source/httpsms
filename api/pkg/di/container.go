@@ -99,6 +99,8 @@ type Container struct {
 	phoneRistrettoCache   *ristretto.Cache[string, *entities.Phone]
 	contactRistrettoCache *ristretto.Cache[string, services.ContactCacheEntry]
 	inMemoryCache         cache.Cache
+	userStatusCache       *repositories.UserStatusCache
+	adminPolicy           *config.AdminPolicy
 }
 
 // NewLiteContainer creates a Container without any routes or listeners
@@ -117,6 +119,7 @@ func NewContainer(projectID string, version string) (container *Container) {
 	}
 
 	container.InitializeTraceProvider()
+	container.logAdminPolicy()
 
 	container.RegisterMessageListeners()
 	container.RegisterMessageRoutes()
@@ -162,6 +165,9 @@ func NewContainer(projectID string, version string) (container *Container) {
 
 	container.RegisterMarketingListeners()
 	container.RegisterWebsocketListeners()
+
+	container.RegisterAdminRoutes()
+	container.RegisterAdminListeners()
 
 	// this has to be last since it registers the /* route
 	container.RegisterSwaggerRoutes()
@@ -224,10 +230,92 @@ func (container *Container) PhoneAPIKeyMiddleware() fiber.Handler {
 	return middlewares.PhoneAPIKeyAuth(container.Logger(), container.Tracer(), container.PhoneAPIKeyRepository())
 }
 
-// AuthenticatedMiddleware creates a new instance of middlewares.Authenticated
+// AuthenticatedMiddleware creates the middleware used by every authenticated route: it checks
+// that the request is authenticated and enforces the administrator approval gate (ADMIN_EMAILS).
 func (container *Container) AuthenticatedMiddleware() fiber.Handler {
-	container.logger.Debug("creating middlewares.Authenticated")
-	return middlewares.Authenticated(container.Tracer())
+	container.logger.Debug("creating middlewares.AuthenticatedAndApproved")
+	return middlewares.AuthenticatedAndApproved(container.Logger(), container.Tracer(), container.AdminService())
+}
+
+// AdminPolicy returns the config.AdminPolicy built from ADMIN_EMAILS
+func (container *Container) AdminPolicy() *config.AdminPolicy {
+	if container.adminPolicy != nil {
+		return container.adminPolicy
+	}
+	container.adminPolicy = config.AdminPolicyFromEnv()
+	return container.adminPolicy
+}
+
+func (container *Container) logAdminPolicy() {
+	policy := container.AdminPolicy()
+	if !policy.Enabled() {
+		container.logger.Warn(stacktrace.NewError("ADMIN_EMAILS is empty: registrations are OPEN and every account that signs in is active immediately. Set ADMIN_EMAILS to require an administrator's approval for new accounts."))
+		return
+	}
+	container.logger.Info(fmt.Sprintf("account approval is enabled: new accounts stay pending until one of the [%d] administrators in ADMIN_EMAILS approves them", len(policy.Emails())))
+}
+
+// AdminService creates a new instance of services.AdminService
+func (container *Container) AdminService() (service *services.AdminService) {
+	container.logger.Debug(fmt.Sprintf("creating %T", service))
+	return services.NewAdminService(
+		container.Logger(),
+		container.Tracer(),
+		container.AdminPolicy(),
+		container.UserRepository(),
+		container.UserService(),
+		container.Mailer(),
+		container.UserEmailFactory(),
+		container.EventDispatcher(),
+		strings.TrimSpace(os.Getenv("SMTP_HOST")) != "",
+		func() entities.UserID {
+			return entities.UserID(strings.TrimSpace(os.Getenv("EVENTS_QUEUE_USER_ID")))
+		},
+	)
+}
+
+// AdminHandler creates a new instance of handlers.AdminHandler
+func (container *Container) AdminHandler() (h *handlers.AdminHandler) {
+	container.logger.Debug(fmt.Sprintf("creating %T", h))
+	return handlers.NewAdminHandler(
+		container.Logger(),
+		container.Tracer(),
+		validators.NewAdminHandlerValidator(container.Logger(), container.Tracer()),
+		container.AdminService(),
+	)
+}
+
+// RegisterAdminRoutes registers routes for the /v1/admin prefix. Only administrators can call them.
+func (container *Container) RegisterAdminRoutes() {
+	container.logger.Debug(fmt.Sprintf("registering %T routes", &handlers.AdminHandler{}))
+	container.AdminHandler().RegisterRoutes(
+		container.App(),
+		middlewares.Authenticated(container.Tracer()),
+		middlewares.RequireAdmin(container.Tracer(), container.AdminService()),
+	)
+}
+
+// RegisterAdminListeners registers event listeners for listeners.AdminListener
+func (container *Container) RegisterAdminListeners() {
+	container.logger.Debug(fmt.Sprintf("registering listeners for %T", listeners.AdminListener{}))
+	_, routes := listeners.NewAdminListener(
+		container.Logger(),
+		container.Tracer(),
+		container.AdminService(),
+	)
+
+	for event, handler := range routes {
+		container.EventDispatcher().Subscribe(event, handler)
+	}
+}
+
+// UserStatusCache creates the in-memory *repositories.UserStatusCache used by the approval gate
+func (container *Container) UserStatusCache() *repositories.UserStatusCache {
+	if container.userStatusCache != nil {
+		return container.userStatusCache
+	}
+	container.userStatusCache = repositories.NewUserStatusCache(repositories.UserStatusCacheTTL)
+	return container.userStatusCache
 }
 
 // Logger creates a new instance of telemetry.Logger
@@ -384,6 +472,11 @@ ALTER TABLE discords ADD CONSTRAINT IF NOT EXISTS uni_discords_server_id CHECK (
 
 	if err = db.AutoMigrate(&entities.User{}); err != nil {
 		container.logger.Fatal(stacktrace.Propagatef(err, "cannot migrate %T", &entities.User{}))
+	}
+
+	// Accounts created before the approval gate existed stay active.
+	if err = db.Exec("UPDATE users SET status = ? WHERE status IS NULL OR status = ''", entities.UserStatusActive).Error; err != nil {
+		container.logger.Fatal(stacktrace.Propagatef(err, "cannot set the default status of existing users"))
 	}
 
 	if err = db.AutoMigrate(&entities.MessageSendSchedule{}); err != nil {
@@ -1129,6 +1222,7 @@ func (container *Container) UserService() (service *services.UserService) {
 		container.UserEmailFactory(),
 		container.EventDispatcher(),
 		container.FirebaseAuthClient(),
+		container.AdminPolicy(),
 	)
 }
 
@@ -1332,6 +1426,7 @@ func (container *Container) DiscordHandler() (handler *handlers.DiscordHandler) 
 		container.MessageService(),
 		container.BillingService(),
 		container.MessageHandlerValidator(),
+		container.AdminService(),
 	)
 }
 
@@ -1850,6 +1945,7 @@ func (container *Container) UserRepository() repositories.UserRepository {
 		container.Logger(),
 		container.Tracer(),
 		container.UserRistrettoCache(),
+		container.UserStatusCache(),
 		container.DB(),
 	)
 }

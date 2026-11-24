@@ -15,6 +15,249 @@
     },
     "basePath": "/v1",
     "paths": {
+        "/admin/users": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Lists the user accounts, newest first. Only administrators (a verified email listed in ADMIN_EMAILS, signed in on the web dashboard) can call this endpoint; API keys are rejected.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "List user accounts",
+                "parameters": [
+                    {
+                        "enum": [
+                            "pending",
+                            "active",
+                            "suspended"
+                        ],
+                        "type": "string",
+                        "description": "filter users by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "filter users whose email contains query",
+                        "name": "query",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "description": "number of users to skip",
+                        "name": "skip",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "number of users to return (default 20, capped at 100)",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.AdminUsersResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.BadRequest"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Unauthorized"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Forbidden"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/responses.UnprocessableEntity"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.InternalServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users/{userID}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Deletes a user account together with all its data. Administrators can't delete their own account or another administrator's account. Only administrators can call this endpoint; API keys are rejected.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Delete a user account",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "WB7DRDWrJZRGbYrv2CKGkqbzvqdC",
+                        "description": "ID of the user",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/responses.NoContent"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Unauthorized"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.NotFound"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/responses.UnprocessableEntity"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.InternalServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users/{userID}/status": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Sets the status of a user account to \"active\" (approve) or \"suspended\". Approving stamps approved_at and approved_by. Administrators can't change their own account or another administrator's account. Only administrators can call this endpoint; API keys are rejected.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Approve or suspend a user account",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "WB7DRDWrJZRGbYrv2CKGkqbzvqdC",
+                        "description": "ID of the user",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New status of the user",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.AdminUserStatusUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.AdminUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.BadRequest"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Unauthorized"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/responses.Forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.NotFound"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/responses.UnprocessableEntity"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.InternalServerError"
+                        }
+                    }
+                }
+            }
+        },
         "/attachments/{userID}/{messageID}/{attachmentIndex}/{filename}": {
             "get": {
                 "description": "Download an MMS attachment by its path components",
@@ -2935,7 +3178,7 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get details of the currently authenticated user",
+                "description": "Get details of the currently authenticated user, including the account \"status\" (active, pending or suspended) and \"is_admin\". This endpoint works for pending and suspended accounts too.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2950,7 +3193,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.UserResponse"
+                            "$ref": "#/definitions/responses.CurrentUserResponse"
                         }
                     },
                     "400": {
@@ -3481,6 +3724,60 @@
         }
     },
     "definitions": {
+        "entities.AdminUser": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "email",
+                "id",
+                "is_admin",
+                "phones_count",
+                "status",
+                "updated_at"
+            ],
+            "properties": {
+                "approved_at": {
+                    "type": "string",
+                    "example": "2022-06-05T14:26:02.302718+03:00"
+                },
+                "approved_by": {
+                    "type": "string",
+                    "example": "admin@email.com"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2022-06-05T14:26:02.302718+03:00"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "name@email.com"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "WB7DRDWrJZRGbYrv2CKGkqbzvqdC"
+                },
+                "is_admin": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "phones_count": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "status": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entities.UserStatus"
+                        }
+                    ],
+                    "example": "pending"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2022-06-05T14:26:10.303278+03:00"
+                }
+            }
+        },
         "entities.BillingUsage": {
             "type": "object",
             "required": [
@@ -4204,6 +4501,7 @@
                 "notification_message_status_enabled",
                 "notification_newsletter_enabled",
                 "notification_webhook_enabled",
+                "status",
                 "subscription_id",
                 "subscription_name",
                 "timezone",
@@ -4217,6 +4515,14 @@
                 "api_key": {
                     "type": "string",
                     "example": "x-api-key"
+                },
+                "approved_at": {
+                    "type": "string",
+                    "example": "2022-06-05T14:26:02.302718+03:00"
+                },
+                "approved_by": {
+                    "type": "string",
+                    "example": "admin@email.com"
                 },
                 "created_at": {
                     "type": "string",
@@ -4245,6 +4551,14 @@
                 "notification_webhook_enabled": {
                     "type": "boolean",
                     "example": true
+                },
+                "status": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entities.UserStatus"
+                        }
+                    ],
+                    "example": "active"
                 },
                 "subscription_ends_at": {
                     "type": "string",
@@ -4279,6 +4593,19 @@
                     "example": "2022-06-05T14:26:10.303278+03:00"
                 }
             }
+        },
+        "entities.UserStatus": {
+            "type": "string",
+            "enum": [
+                "active",
+                "pending",
+                "suspended"
+            ],
+            "x-enum-varnames": [
+                "UserStatusActive",
+                "UserStatusPending",
+                "UserStatusSuspended"
+            ]
         },
         "entities.Webhook": {
             "type": "object",
@@ -4335,6 +4662,18 @@
                 "user_id": {
                     "type": "string",
                     "example": "WB7DRDWrJZRGbYrv2CKGkqbzvqdC"
+                }
+            }
+        },
+        "requests.AdminUserStatusUpdate": {
+            "type": "object",
+            "required": [
+                "status"
+            ],
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "active"
                 }
             }
         },
@@ -4947,6 +5286,51 @@
                 }
             }
         },
+        "responses.AdminUserResponse": {
+            "type": "object",
+            "required": [
+                "data",
+                "message",
+                "status"
+            ],
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/entities.AdminUser"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Request handled successfully"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "success"
+                }
+            }
+        },
+        "responses.AdminUsersResponse": {
+            "type": "object",
+            "required": [
+                "data",
+                "message",
+                "status"
+            ],
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.AdminUser"
+                    }
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Request handled successfully"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "success"
+                }
+            }
+        },
         "responses.BadRequest": {
             "type": "object",
             "required": [
@@ -5113,6 +5497,137 @@
                 }
             }
         },
+        "responses.CurrentUser": {
+            "type": "object",
+            "required": [
+                "api_key",
+                "created_at",
+                "email",
+                "id",
+                "is_admin",
+                "notification_heartbeat_enabled",
+                "notification_message_status_enabled",
+                "notification_newsletter_enabled",
+                "notification_webhook_enabled",
+                "status",
+                "subscription_id",
+                "subscription_name",
+                "timezone",
+                "updated_at"
+            ],
+            "properties": {
+                "active_phone_id": {
+                    "type": "string",
+                    "example": "32343a19-da5e-4b1b-a767-3298a73703cb"
+                },
+                "api_key": {
+                    "type": "string",
+                    "example": "x-api-key"
+                },
+                "approved_at": {
+                    "type": "string",
+                    "example": "2022-06-05T14:26:02.302718+03:00"
+                },
+                "approved_by": {
+                    "type": "string",
+                    "example": "admin@email.com"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2022-06-05T14:26:02.302718+03:00"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "name@email.com"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "WB7DRDWrJZRGbYrv2CKGkqbzvqdC"
+                },
+                "is_admin": {
+                    "description": "IsAdmin is true only when the request uses a verified Firebase ID token whose email is in ADMIN_EMAILS",
+                    "type": "boolean",
+                    "example": false
+                },
+                "notification_heartbeat_enabled": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "notification_message_status_enabled": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "notification_newsletter_enabled": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "notification_webhook_enabled": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "status": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entities.UserStatus"
+                        }
+                    ],
+                    "example": "active"
+                },
+                "subscription_ends_at": {
+                    "type": "string",
+                    "example": "2022-06-05T14:26:02.302718+03:00"
+                },
+                "subscription_id": {
+                    "type": "string",
+                    "example": "8f9c71b8-b84e-4417-8408-a62274f65a08"
+                },
+                "subscription_name": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entities.SubscriptionName"
+                        }
+                    ],
+                    "example": "free"
+                },
+                "subscription_renews_at": {
+                    "type": "string",
+                    "example": "2022-06-05T14:26:02.302718+03:00"
+                },
+                "subscription_status": {
+                    "type": "string",
+                    "example": "on_trial"
+                },
+                "timezone": {
+                    "type": "string",
+                    "example": "Europe/Helsinki"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2022-06-05T14:26:10.303278+03:00"
+                }
+            }
+        },
+        "responses.CurrentUserResponse": {
+            "type": "object",
+            "required": [
+                "data",
+                "message",
+                "status"
+            ],
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/responses.CurrentUser"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Request handled successfully"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "success"
+                }
+            }
+        },
         "responses.DiscordResponse": {
             "type": "object",
             "required": [
@@ -5155,6 +5670,23 @@
                 "status": {
                     "type": "string",
                     "example": "success"
+                }
+            }
+        },
+        "responses.Forbidden": {
+            "type": "object",
+            "required": [
+                "message",
+                "status"
+            ],
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "forbidden"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "error"
                 }
             }
         },

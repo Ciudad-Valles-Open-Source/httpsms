@@ -1,7 +1,13 @@
 import { defineStore } from 'pinia'
+import { computed } from 'vue'
 import type { User as FirebaseUser } from 'firebase/auth'
 import { setAuthHeader, setApiKey } from '../composables/useApi'
 import type { EntitiesUser } from '~~/shared/types/api'
+import {
+  isAccountBlocked,
+  statusFromBlockedCode,
+  type AccountBlockedCode,
+} from '../utils/account-status'
 
 export interface AuthUser {
   email: string | null
@@ -15,6 +21,20 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<EntitiesUser | null>(null)
   const { apiFetch } = useApi()
   let sessionVersion = 0
+
+  const isAdmin = computed(() => user.value?.is_admin === true)
+  const accountBlocked = computed(() => isAccountBlocked(user.value))
+
+  // Called when the API rejects a request because the account is not active,
+  // so the guards see the new status without waiting for a reload.
+  function markAccountBlocked(code: AccountBlockedCode) {
+    if (!user.value) return
+    user.value = {
+      ...user.value,
+      status: statusFromBlockedCode(code),
+      is_admin: false,
+    }
+  }
 
   function clearCredentials() {
     sessionVersion++
@@ -121,6 +141,9 @@ export const useAuthStore = defineStore('auth', () => {
     authStateChanged,
     authUser,
     user,
+    isAdmin,
+    accountBlocked,
+    markAccountBlocked,
     setAuthUserAction,
     onAuthStateChanged,
     onIdTokenChanged,

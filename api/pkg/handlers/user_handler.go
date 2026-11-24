@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/NdoleStudio/httpsms/pkg/requests"
+	"github.com/NdoleStudio/httpsms/pkg/responses"
 	"github.com/NdoleStudio/httpsms/pkg/validators"
 	"github.com/davecgh/go-spew/spew"
 
@@ -48,12 +49,12 @@ func (h *UserHandler) RegisterRoutes(router fiber.Router, middlewares ...fiber.H
 
 // Show returns an entities.User
 // @Summary      Get current user
-// @Description  Get details of the currently authenticated user
+// @Description  Get details of the currently authenticated user, including the account "status" (active, pending or suspended) and "is_admin". This endpoint works for pending and suspended accounts too.
 // @Security	 ApiKeyAuth
 // @Tags         Users
 // @Accept       json
 // @Produce      json
-// @Success      200 	{object}		responses.UserResponse
+// @Success      200 	{object}		responses.CurrentUserResponse
 // @Failure      400	{object}		responses.BadRequest
 // @Failure 	 401    {object}		responses.Unauthorized
 // @Failure      422	{object}		responses.UnprocessableEntity
@@ -70,7 +71,10 @@ func (h *UserHandler) Show(c fiber.Ctx) error {
 		return h.responseInternalServerError(c)
 	}
 
-	return h.responseOK(c, "user fetched successfully", user)
+	return h.responseOK(c, "user fetched successfully", responses.CurrentUser{
+		User:    *user,
+		IsAdmin: h.service.IsAdmin(authUser),
+	})
 }
 
 // Update an entities.User

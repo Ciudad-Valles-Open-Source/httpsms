@@ -94,7 +94,9 @@
       "filterAll": "Todos",
       "filterUnread": "No leídos",
       "filterError": "No se pudo actualizar el filtro de conversaciones",
-      "documentation": "Documentación"
+      "documentation": "Documentación",
+      "administration": "Administración",
+      "pendingUsers": "{count} cuentas pendientes de aprobación"
     },
     "redirectPromptPopover": {
       "skipNextTime": "¿Omitir esta página la próxima vez?",
@@ -475,6 +477,84 @@
       "joinUsers": "⚡Gratis, de código abierto y autoalojado: tus mensajes se quedan en tu propio servidor.",
       "metaTitle": "Inicia sesión en tu cuenta - httpSMS",
       "metaDescription": "Inicia sesión en httpSMS para enviar y recibir mensajes SMS a través de tu propio teléfono Android con una sencilla API HTTP."
+    },
+    "accountPending": {
+      "metaTitle": "Estado de la cuenta - httpSMS",
+      "pendingTitle": "Tu cuenta está pendiente de aprobación",
+      "pendingBody": "Gracias por registrarte. Un administrador debe aprobar tu cuenta antes de que puedas usar el panel. Vuelve a intentarlo más tarde o actualiza el estado cuando te hayan avisado.",
+      "suspendedTitle": "Tu cuenta ha sido suspendida",
+      "suspendedBody": "Un administrador ha suspendido tu cuenta, por lo que no puedes usar el panel ni la API. Si crees que es un error, contacta con el administrador.",
+      "signedInAs": "Sesión iniciada como",
+      "refresh": "Actualizar estado",
+      "stillPending": "Tu cuenta sigue pendiente de aprobación",
+      "stillSuspended": "Tu cuenta sigue suspendida",
+      "refreshError": "No se pudo comprobar el estado de tu cuenta. Inténtalo de nuevo.",
+      "logout": "Cerrar sesión",
+      "deleteAccount": "Eliminar mi cuenta"
+    },
+    "adminUsers": {
+      "metaTitle": "Administración de usuarios - httpSMS",
+      "title": "Administración",
+      "heading": "Usuarios",
+      "description": "Aprueba las cuentas nuevas, suspende o reactiva cuentas existentes y elimina cuentas junto con todos sus datos.",
+      "back": "Volver",
+      "filters": {
+        "pending": "Pendientes",
+        "active": "Activos",
+        "suspended": "Suspendidos",
+        "all": "Todos"
+      },
+      "searchLabel": "Buscar por correo electrónico",
+      "columns": {
+        "email": "Correo electrónico",
+        "status": "Estado",
+        "created": "Registro",
+        "approved": "Aprobación",
+        "phones": "Teléfonos",
+        "actions": "Acciones"
+      },
+      "status": {
+        "pending": "Pendiente",
+        "active": "Activo",
+        "suspended": "Suspendido"
+      },
+      "adminBadge": "Admin",
+      "youBadge": "Tú",
+      "protectedHint": "No se puede modificar",
+      "createdOn": "Registrado el {date}",
+      "approvedOn": "Aprobado el {date}",
+      "approvedBy": "por {name}",
+      "phonesCount": "Teléfonos: {count}",
+      "actions": {
+        "approve": "Aprobar",
+        "suspend": "Suspender",
+        "reactivate": "Reactivar",
+        "delete": "Eliminar"
+      },
+      "confirm": {
+        "suspendTitle": "¿Suspender esta cuenta?",
+        "suspendBody": "{email} ya no podrá usar el panel ni la API hasta que reactives la cuenta.",
+        "deleteTitle": "¿Eliminar esta cuenta?",
+        "deleteBody": "Se eliminará permanentemente la cuenta {email} junto con todos sus teléfonos, mensajes y demás datos. Esta acción no se puede deshacer.",
+        "cancel": "Cancelar"
+      },
+      "success": {
+        "approve": "Se aprobó la cuenta {email}",
+        "suspend": "Se suspendió la cuenta {email}",
+        "reactivate": "Se reactivó la cuenta {email}",
+        "delete": "Se eliminó la cuenta {email}"
+      },
+      "actionError": "No se pudo completar la acción. Inténtalo de nuevo.",
+      "loadError": "No se pudo cargar la lista de usuarios.",
+      "retry": "Reintentar",
+      "loadMore": "Cargar más",
+      "empty": {
+        "pending": "No hay cuentas pendientes de aprobación.",
+        "active": "No hay cuentas activas.",
+        "suspended": "No hay cuentas suspendidas.",
+        "all": "No hay cuentas registradas.",
+        "search": "Ninguna cuenta coincide con \"{query}\"."
+      }
     }
   },
   "settings": {

@@ -70,6 +70,30 @@ const SubscriptionName200KMonthly = SubscriptionName("200k-monthly")
 // SubscriptionName20KYearly represents a yearly 20k subscription
 const SubscriptionName20KYearly = SubscriptionName("20k-yearly")
 
+// UserStatus is the approval status of a user account
+type UserStatus string
+
+const (
+	// UserStatusActive is an approved account which can use the API
+	UserStatusActive = UserStatus("active")
+
+	// UserStatusPending is a new account waiting for an administrator's approval
+	UserStatusPending = UserStatus("pending")
+
+	// UserStatusSuspended is an account which an administrator has blocked
+	UserStatusSuspended = UserStatus("suspended")
+)
+
+// String returns the string representation of a UserStatus
+func (status UserStatus) String() string {
+	return string(status)
+}
+
+// IsValid checks if the status is one of the known statuses
+func (status UserStatus) IsValid() bool {
+	return status == UserStatusActive || status == UserStatusPending || status == UserStatusSuspended
+}
+
 // User stores information about a user
 type User struct {
 	ID                               UserID           `json:"id" gorm:"primaryKey;type:string;" example:"WB7DRDWrJZRGbYrv2CKGkqbzvqdC"`
@@ -86,8 +110,16 @@ type User struct {
 	NotificationWebhookEnabled       bool             `json:"notification_webhook_enabled" gorm:"default:true" example:"true"`
 	NotificationHeartbeatEnabled     bool             `json:"notification_heartbeat_enabled" gorm:"default:true" example:"true"`
 	NotificationNewsletterEnabled    bool             `json:"notification_newsletter_enabled" gorm:"default:true" example:"true"`
+	Status                           UserStatus       `json:"status" gorm:"type:string;default:active;index" example:"active"`
+	ApprovedAt                       *time.Time       `json:"approved_at" example:"2022-06-05T14:26:02.302718+03:00" validate:"optional"`
+	ApprovedBy                       *string          `json:"approved_by" example:"admin@email.com" validate:"optional"`
 	CreatedAt                        time.Time        `json:"created_at" example:"2022-06-05T14:26:02.302718+03:00"`
 	UpdatedAt                        time.Time        `json:"updated_at" example:"2022-06-05T14:26:10.303278+03:00"`
+}
+
+// IsActive checks if the account has been approved and is not suspended
+func (user User) IsActive() bool {
+	return user.Status == UserStatusActive
 }
 
 // IsOnProPlan checks if a user is on the pro plan

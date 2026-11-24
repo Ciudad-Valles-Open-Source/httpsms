@@ -19,4 +19,10 @@ type UserEmailFactory interface {
 
 	// APIKeyRotated sends an email when the API key is rotated
 	APIKeyRotated(email string, timestamp time.Time, timezone string) (*Email, error)
+
+	// AccountPendingApproval is sent to an administrator when a new account waits for approval
+	AccountPendingApproval(adminEmail string, user *entities.User) (*Email, error)
+
+	// AccountApproved is sent to a user when an administrator approves their account
+	AccountApproved(user *entities.User) (*Email, error)
 }

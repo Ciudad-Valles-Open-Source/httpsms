@@ -121,7 +121,7 @@ func (repository *gormPhoneAPIKeyRepository) LoadAuthContext(ctx context.Context
 	}
 
 	if err != nil {
-		return entities.AuthContext{}, repository.tracer.WrapErrorSpan(span, stacktrace.Propagatef(err, "cannot load phone api key [%s]", apiKey))
+		return entities.AuthContext{}, repository.tracer.WrapErrorSpan(span, stacktrace.Propagatef(err, "cannot load phone api key [%s]", entities.SecretHint(apiKey)))
 	}
 
 	authUser := entities.AuthContext{
