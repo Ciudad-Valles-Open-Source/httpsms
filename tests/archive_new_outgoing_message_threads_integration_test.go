@@ -35,6 +35,20 @@ func updatePhoneThreadSettings(ctx context.Context, t *testing.T, phone testPhon
 	return response.Data
 }
 
+// waitForThreadStatus waits until the thread with contact reaches the given status.
+func waitForThreadStatus(ctx context.Context, t *testing.T, owner, contact string, archived bool, status string, timeout time.Duration) {
+	t.Helper()
+	deadline := time.Now().Add(timeout)
+	for time.Now().Before(deadline) {
+		thread := findThreadByContact(fetchThreads(ctx, t, owner, archived), contact)
+		if thread != nil && thread.Status == status {
+			return
+		}
+		time.Sleep(250 * time.Millisecond)
+	}
+	require.Failf(t, "thread status not reached", "thread %s -> %s did not reach status %q within %s", owner, contact, status, timeout)
+}
+
 func sendThreadMessage(ctx context.Context, t *testing.T, phone testPhone, contact, content string) {
 	t.Helper()
 
@@ -143,6 +157,11 @@ func TestArchiveNewOutgoingMessageThreadsReplyRespectsUnarchiveSetting(t *testin
 			contact := randomPhoneNumber()
 			sendThreadMessage(ctx, t, phone, contact, "Outgoing starts archived")
 			require.NotNil(t, waitForThread(ctx, t, phone.PhoneNumber, contact, true, "Outgoing starts archived", 20*time.Second))
+			// An outgoing message updates its thread twice: "pending" when the API accepts it and
+			// "scheduled" (timestamped with the send time) once the push is queued. Wait for the second
+			// update before replying; otherwise it can be processed after the reply and, being newer,
+			// legitimately become the thread's last message.
+			waitForThreadStatus(ctx, t, phone.PhoneNumber, contact, true, "scheduled", 20*time.Second)
 
 			receiveInbound(ctx, t, phone.PhoneAPIKey, contact, phone.PhoneNumber, "Incoming reply", time.Now())
 

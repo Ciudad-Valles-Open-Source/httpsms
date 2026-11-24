@@ -23,6 +23,7 @@ type integrationThread struct {
 	IsArchived         bool    `json:"is_archived"`
 	UnreadCount        uint    `json:"unread_count"`
 	LastMessageContent *string `json:"last_message_content"`
+	Status             string  `json:"status"`
 }
 
 // setUnarchiveThread flips the per-phone unarchive_thread flag via a raw PUT
