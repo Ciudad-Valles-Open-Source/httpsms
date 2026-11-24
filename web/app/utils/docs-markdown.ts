@@ -3,10 +3,23 @@
 // The content is written by us (web/docs-content), so raw HTML is still
 // disabled (`html: false`) but no further sanitizing is done.
 
+import {
+  mdiCodeJson,
+  mdiConsole,
+  mdiLanguageCsharp,
+  mdiLanguageGo,
+  mdiLanguageJava,
+  mdiLanguageJavascript,
+  mdiLanguagePhp,
+  mdiLanguagePython,
+  mdiLanguageTypescript,
+  mdiPowershell,
+} from '@mdi/js'
 import markdownIt, { type MarkdownIt, type Token } from 'markdown-it'
 import hljs from 'highlight.js/lib/core'
 import bash from 'highlight.js/lib/languages/bash'
 import csharp from 'highlight.js/lib/languages/csharp'
+import dart from 'highlight.js/lib/languages/dart'
 import go from 'highlight.js/lib/languages/go'
 import http from 'highlight.js/lib/languages/http'
 import java from 'highlight.js/lib/languages/java'
@@ -23,6 +36,7 @@ import yaml from 'highlight.js/lib/languages/yaml'
 const HIGHLIGHT_LANGUAGES = {
   bash,
   csharp,
+  dart,
   go,
   http,
   java,
@@ -137,16 +151,66 @@ function createRenderer(): MarkdownIt {
     html: false,
     linkify: true,
     typographer: false,
-    highlight(code: string, lang: string): string {
-      const language = lang && hljs.getLanguage(lang) ? lang : null
-      const body = language
-        ? hljs.highlight(code, { language, ignoreIllegals: true }).value
-        : md.utils.escapeHtml(code)
-      const label = lang ? ` data-lang="${md.utils.escapeHtml(lang)}"` : ''
-      const className = language ? ` language-${language}` : ''
-      return `<pre class="docs-code"${label}><code class="hljs${className}">${body}</code></pre>`
-    },
   })
+
+  // Fenced code renders as the landing page's "code window": three dots and
+  // a language tab. Consecutive fences (e.g. the same request in cURL,
+  // JavaScript and Python) share one window with a tab per language; the
+  // docs page switches tabs through [data-code-tab] (see pages/docs).
+  md.core.ruler.push('docs_code_groups', (state) => {
+    const tokens = state.tokens
+    let start = 0
+    while (start < tokens.length) {
+      if (tokens[start]!.type !== 'fence') {
+        start++
+        continue
+      }
+      let end = start
+      while (tokens[end + 1]?.type === 'fence') end++
+      for (let i = start; i <= end; i++) {
+        tokens[i]!.meta = {
+          ...tokens[i]!.meta,
+          codeGroup: { index: i - start, last: i === end },
+        }
+      }
+      start = end + 1
+    }
+  })
+
+  md.renderer.rules.fence = (tokens, index) => {
+    const token = tokens[index]!
+    const lang = token.info.trim().split(/\s+/)[0] ?? ''
+    const group = token.meta?.codeGroup as
+      { index: number; last: boolean } | undefined
+    const position = group?.index ?? 0
+    const language = lang && hljs.getLanguage(lang) ? lang : null
+    const body = language
+      ? hljs.highlight(token.content, { language, ignoreIllegals: true }).value
+      : md.utils.escapeHtml(token.content)
+    const className = language ? ` language-${language}` : ''
+    const hidden = position === 0 ? '' : ' hidden'
+    const panel = `<pre class="docs-code code-window-panel" data-code-panel="${position}" data-lang="${md.utils.escapeHtml(lang)}"${hidden}><code class="hljs${className}">${body}</code></pre>`
+
+    let open = ''
+    if (position === 0) {
+      const members: Token[] = []
+      for (let i = index; tokens[i]?.type === 'fence'; i++) {
+        members.push(tokens[i]!)
+      }
+      const tabs = members
+        .map((member, i) => {
+          const memberLang = member.info.trim().split(/\s+/)[0] ?? ''
+          return codeTab(memberLang, i, members.length > 1, md)
+        })
+        .join('')
+      open =
+        '<div class="code-window">' +
+        '<div class="code-window-bar"><span></span><span></span><span></span></div>' +
+        `<div class="code-window-tabs" role="tablist">${tabs}</div>`
+    }
+    const close = !group || group.last ? '</div>' : ''
+    return `${open}${panel}${close}`
+  }
 
   // Heading anchors (h2+ get a "#" link) and callout variants for blockquotes.
   md.core.ruler.push('docs_decorations', (state) => {
@@ -211,6 +275,70 @@ function createRenderer(): MarkdownIt {
     `${self.renderToken(tokens, index, options)}</div>`
 
   return md
+}
+
+interface CodeLanguage {
+  label: string
+  /** Single-colour Material Design icon path, painted with `color`. */
+  icon?: string
+  color?: string
+  /** Full-colour logo markup (24×24 viewBox) for brands without an mdi icon. */
+  svg?: string
+}
+
+// Dart's multi-colour mark, simplified to flat polygons.
+const DART_LOGO =
+  '<svg viewBox="0 0 1024 1024" aria-hidden="true">' +
+  '<path fill="#0081C6" d="M215 213 10 520l20 80 118 120 74 27z"/>' +
+  '<path fill="#00D2B8" d="m215 213 310-205 75 12 125 125 25 73z"/>' +
+  '<path fill="#00D2B8" d="m215 213 660 660-128 59-525-185z"/>' +
+  '<path fill="#0081C6" d="m215 213 535 5 185 525-60 130z"/>' +
+  '<path fill="#00A8E1" d="m750 218 105 52 165 168v390l-145 45 60-130z"/>' +
+  '<path fill="#55DDCA" d="m222 747 53 103 175 172h380l45-149-128 59z"/>' +
+  '</svg>'
+
+// Same icons and colors as the landing page's code window.
+const CODE_LANGUAGES: Record<string, CodeLanguage> = {
+  bash: { label: 'cURL', icon: mdiPowershell, color: '#4f8ef7' },
+  shell: { label: 'Shell', icon: mdiConsole, color: '#4f8ef7' },
+  javascript: {
+    label: 'JavaScript',
+    icon: mdiLanguageJavascript,
+    color: '#efd81d',
+  },
+  typescript: {
+    label: 'TypeScript',
+    icon: mdiLanguageTypescript,
+    color: '#3178c6',
+  },
+  python: { label: 'Python', icon: mdiLanguagePython, color: '#ffffff' },
+  php: { label: 'PHP', icon: mdiLanguagePhp, color: '#777bb3' },
+  go: { label: 'Go', icon: mdiLanguageGo, color: '#00aed8' },
+  java: { label: 'Java', icon: mdiLanguageJava, color: '#0c89c7' },
+  csharp: { label: 'C#', icon: mdiLanguageCsharp, color: '#a179dc' },
+  dart: { label: 'Dart', svg: DART_LOGO },
+  json: { label: 'JSON', icon: mdiCodeJson, color: '#f5a623' },
+}
+
+function codeTab(
+  lang: string,
+  index: number,
+  interactive: boolean,
+  md: MarkdownIt,
+): string {
+  const known = CODE_LANGUAGES[lang]
+  const label = md.utils.escapeHtml(
+    known?.label ?? (lang && lang !== 'text' ? lang.toUpperCase() : 'Text'),
+  )
+  let icon = ''
+  if (known?.svg) icon = known.svg
+  else if (known?.icon) {
+    icon = `<svg viewBox="0 0 24 24" aria-hidden="true" style="color:${known.color}"><path fill="currentColor" d="${known.icon}"/></svg>`
+  }
+  const active = index === 0
+  const classes = `code-window-tab${active ? ' is-active' : ''}`
+  if (!interactive) return `<span class="${classes}">${icon}${label}</span>`
+  return `<button type="button" role="tab" class="${classes}" data-code-tab="${index}" aria-selected="${active}">${icon}${label}</button>`
 }
 
 let renderer: MarkdownIt | null = null
