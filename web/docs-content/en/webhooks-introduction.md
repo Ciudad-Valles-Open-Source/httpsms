@@ -216,7 +216,51 @@ def httpsms_webhook():
     return "", 200
 ```
 
-> **Note:** for simplicity these examples skip the `aud` check. To enable it, pass your exact URL (`audience` in Node, `audience=` in PyJWT) and remove `verify_aud: False`.
+### Dart (Shelf) example
+
+```dart
+// dart pub add shelf shelf_router dart_jsonwebtoken
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:shelf/shelf.dart';
+import 'package:shelf/shelf_io.dart' as io;
+import 'package:shelf_router/shelf_router.dart';
+
+final signingKey = Platform.environment['HTTPSMS_WEBHOOK_SIGNING_KEY']!;
+// Must match JWT_ISSUER on your server (default: slug of APP_NAME, e.g. httpsms)
+final issuer = Platform.environment['HTTPSMS_JWT_ISSUER'] ?? 'httpsms';
+
+Future<Response> httpsmsWebhook(Request request) async {
+  final token = (request.headers['authorization'] ?? '')
+      .replaceFirst(RegExp('^Bearer '), '');
+
+  try {
+    final jwt = JWT.verify(token, SecretKey(signingKey), issuer: issuer);
+    if (jwt.header?['alg'] != 'HS256') {
+      return Response.unauthorized('invalid signature');
+    }
+  } on JWTException {
+    return Response.unauthorized('invalid signature');
+  }
+
+  final event = jsonDecode(await request.readAsString()) as Map<String, dynamic>;
+  if (event['type'] == 'message.phone.received') {
+    final data = event['data'] as Map<String, dynamic>;
+    print('SMS from ${data['contact']}: ${data['content']}');
+  }
+
+  return Response.ok('');
+}
+
+Future<void> main() async {
+  final router = Router()..post('/webhooks/httpsms', httpsmsWebhook);
+  await io.serve(router.call, InternetAddress.anyIPv4, 3000);
+}
+```
+
+> **Note:** for simplicity these examples skip the `aud` check. To enable it, pass your exact URL (`audience` in Node, `audience=` in PyJWT, `audience:` in Dart) and remove `verify_aud: False`.
 
 ## Responses, timeouts and retries
 
