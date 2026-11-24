@@ -1,109 +1,100 @@
-# Registro de cambios
+# CHANGELOG
 
-Todos los cambios importantes de este proyecto se documentan en este archivo.
+*🌎 [Leer en Español](CHANGELOG_ES.md)*
 
-El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
-y el proyecto sigue el [Versionado Semántico](https://semver.org/lang/es/):
-
-- **MAYOR** (`X.0.0`): cambios que rompen la compatibilidad (API, webhooks, configuración o app).
-- **MENOR** (`2.X.0`): funciones nuevas compatibles con la versión anterior.
-- **PARCHE** (`2.1.X`): correcciones compatibles.
-
-Este repositorio es un fork autoalojado y 100 % gratuito de
-[NdoleStudio/httpsms](https://github.com/NdoleStudio/httpsms). La numeración
-continúa después de la última versión del proyecto original (`v1.2.1`).
-
-## [Sin publicar]
+This repository is a 100% free, self-hosted fork of
+[NdoleStudio/httpsms](https://github.com/NdoleStudio/httpsms). Versioning
+continues after the last release of the original project (`v1.2.1`).
 
 ## [2.1.0] - 2026-11-24
 
-### Agregado
+### Added
 
-- **Aprobación de cuentas y panel de administración.** Con la variable
-  `ADMIN_EMAILS`, las cuentas nuevas quedan pendientes hasta que un
-  administrador las aprueba en `/admin/users` (aprobar, suspender, reactivar o
-  borrar). Las cuentas pendientes o suspendidas no pueden usar el panel, la API
-  ni sus claves de teléfono. Los administradores deben iniciar sesión con un
-  correo verificado y las claves API nunca dan permisos de administrador.
-  Opcionalmente avisa por correo a los administradores y al usuario aprobado.
-  Ver [docs/admin_ES.md](docs/admin_ES.md).
-- Página `/account-pending` para cuentas pendientes o suspendidas.
-- `GET /v1/users/me` incluye `status` e `is_admin`; nuevos endpoints
-  `/v1/admin/users` documentados en Swagger (inglés y español).
-- **Rediseño completo de la interfaz**, alineado con los demás productos
-  Arquos: tipografía Plus Jakarta Sans, tarjetas, insignias, paleta azul y temas
-  claro y oscuro. El panel tiene barra de navegación lateral en escritorio,
-  lista y vista de conversaciones renovadas (se corrigieron los mensajes salientes
-  que se cortaban a la derecha), estados de carga y vacíos, y Ajustes por
-  secciones. El sitio público tiene nueva cabecera con menú móvil, portada, login,
-  docs y páginas de error. Las tablas se convierten en tarjetas en el teléfono.
-- Selector de apariencia en el panel (modo claro u oscuro, y paleta).
-- El tema de Swagger usa la misma paleta que el panel.
+- **Account approval and admin panel.** With the `ADMIN_EMAILS` variable, new
+  accounts stay pending until an administrator approves them in `/admin/users`
+  (approve, suspend, reactivate, or delete). Pending or suspended accounts
+  cannot use the dashboard, the API, or their phone keys. Administrators must
+  sign in with a verified email, and API keys never grant admin permissions.
+  Optionally notifies administrators and the approved user by email. See
+  [docs/admin.md](docs/admin.md).
+- `/account-pending` page for pending or suspended accounts.
+- `GET /v1/users/me` includes `status` and `is_admin`; new `/v1/admin/users`
+  endpoints documented in Swagger (English and Spanish).
+- **Complete UI redesign**, aligned with the other Arquos products: Plus Jakarta
+  Sans typography, cards, badges, blue palette, and light/dark themes. The
+  dashboard features a desktop sidebar navigation, redesigned conversation list
+  and thread view (fixing outgoing messages getting clipped on the right),
+  loading and empty states, and sectioned Settings. The public site has a new
+  header with a mobile menu, landing page, login, docs, and error pages. Tables
+  turn into cards on mobile.
+- Appearance selector in the dashboard (light or dark mode, and palette).
+- Swagger theme matches the dashboard palette.
 
-### Cambiado
+### Changed
 
-- El inicio de sesión ofrece solo **Google** y **correo electrónico**. Se quitó
-  GitHub, que nunca estuvo habilitado en Firebase en esta instalación, por lo que
-  no afecta a ninguna cuenta existente.
-- Si el navegador bloquea la ventana emergente de Google, el inicio de sesión
-  continúa por redirección.
+- Sign-in offers only **Google** and **email**. Removed GitHub, which was never
+  enabled in Firebase on this installation, so no existing accounts are
+  affected.
+- If the browser blocks the Google sign-in popup, authentication falls back to a
+  redirect flow.
 
-### Corregido
+### Fixed
 
-- Los administradores perdían sus permisos porque la identidad de la clave API
-  reemplazaba a la sesión de Firebase cuando el panel enviaba ambas.
-- Los errores del inicio de sesión no se mostraban: ahora hay mensajes claros para
-  ventanas bloqueadas, dominios no autorizados y métodos desactivados en Firebase.
-- El workflow de releases fallaba al buscar pruebas unitarias de `release`.
+- Administrators lost their permissions because the API key identity overrode
+  the Firebase session when the dashboard sent both.
+- Sign-in errors were not displayed: clear messages are now shown for blocked
+  popups, unauthorized domains, and disabled sign-in methods in Firebase.
+- The release workflow failed when looking for `release` unit tests.
 
-### Seguridad
+### Security
 
-- La API ya no escribe en sus registros los tokens ni las claves API completas
-  (solo `****` y los últimos 4 caracteres).
+- The API no longer logs full tokens or API keys (only `****` and the last 4
+  characters).
 
 ## [2.0.0] - 2026-11-24
 
-Primera versión independiente del fork, basada en el original `v1.2.1` con sus
-parches de seguridad y actualizaciones de dependencias.
+First standalone release of the fork, based on the original `v1.2.1` with its
+security patches and dependency updates.
 
-### Agregado
+### Added
 
-- Documentación propia en `/docs` (español e inglés) y Swagger en `/index.html`
-  y `/es/index.html` con tema oscuro y traducción completa.
-- Filtro de conversaciones **Todos / No leídos** y mensajes de hasta 2048
-  caracteres.
-- Tiempo real con Soketi funcionando (una sola conexión WebSocket compartida).
-- App Android: URL del servidor configurable al compilar y desde la app, QR que
-  incluye servidor y clave, y soporte de `http://` con advertencia.
-- Política de privacidad y Términos propios del fork.
-- CI propio en GitHub Actions y publicación del APK firmado como release.
-- Escáner de secretos en el pre-commit y en el CI, y guía de manejo de secretos.
-- Variables `JWT_ISSUER` y `OTEL_SERVICE_NAME`.
-- Incluye el trabajo previo del fork: traducción al español, guía de
-  autoalojamiento con Docker y Coolify, y configuración del servidor en la app.
+- Self-hosted documentation at `/docs` (Spanish and English) and Swagger at
+  `/index.html` and `/es/index.html` with a dark theme and full translation.
+- **All / Unread** conversation filter and messages up to 2048 characters.
+- Working real-time updates with Soketi (single shared WebSocket connection).
+- Android app: configurable server URL at build time and from the app, login QR
+  code including server and key, and `http://` support with a warning.
+- Fork-specific Privacy Policy and Terms of Service.
+- Independent GitHub Actions CI and signed APK publication as a release.
+- Secret scanner in pre-commit and CI, plus a secrets management guide.
+- `JWT_ISSUER` and `OTEL_SERVICE_NAME` environment variables.
+- Includes previous fork work: Spanish translation, Docker and Coolify
+  self-hosting guide, and server configuration in the app.
 
-### Cambiado
+### Changed
 
-- **Incompatible:** se eliminaron los planes de pago, los límites y los
-  endpoints de suscripción y Lemon Squeezy; todo es gratuito y sin límites.
-- **Incompatible:** el emisor (`iss`) de los JWT de webhooks y notificaciones es
-  `JWT_ISSUER` (por defecto `APP_NAME` normalizado) en lugar de
-  `api.httpsms.com`.
-- **Incompatible:** el QR de inicio de sesión usa el formato
-  `httpsms://login?server=…&key=…` (la app sigue aceptando los QR anteriores).
-- `SOKETI_KEY` debe ser alfanumérica.
-- PostgreSQL y Redis ya no se publican en el host (solo red interna de Docker).
-- Sin dependencias del servicio alojado: sin enlaces ni recursos de httpsms.com,
-  sin Microsoft Clarity, Sentry ni Axiom del proyecto original.
+- **Breaking:** removed paid plans, limits, subscription endpoints, and Lemon
+  Squeezy; everything is free with no limits.
+- **Breaking:** the issuer (`iss`) of webhook and notification JWTs is
+  `JWT_ISSUER` (defaults to normalized `APP_NAME`) instead of `api.httpsms.com`.
+- **Breaking:** the login QR code uses the `httpsms://login?server=…&key=…`
+  format (the app still accepts previous QR codes).
+- `SOKETI_KEY` must be alphanumeric.
+- PostgreSQL and Redis are no longer exposed on the host (Docker internal
+  network only).
+- No dependencies on the hosted service: removed links and assets from
+  httpsms.com, as well as Microsoft Clarity, Sentry, and Axiom from the original
+  project.
 
-### Corregido
+### Fixed
 
-- `PUT /v1/phones` ya no borra el token FCM, el horario de envío ni la respuesta
-  automática cuando no se envían en la petición.
-- El monitor de heartbeat se reinicia cuando expira el historial.
-- Vulnerabilidades XSS en textos con nombres de contactos, horarios y números.
-- Pruebas intermitentes de contactos y de archivado de conversaciones.
+- `PUT /v1/phones` no longer clears the FCM token, sending schedule, or
+  auto-reply when omitted from the request.
+- The heartbeat monitor restarts when history expires.
+- XSS vulnerabilities in text containing contact names, schedules, and phone
+  numbers.
+- Flaky tests for contacts and conversation archiving.
 
-[Sin publicar]: https://github.com/Ciudad-Valles-Open-Source/httpsms/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/Ciudad-Valles-Open-Source/httpsms/compare/v2.1.0...HEAD
 [2.1.0]: https://github.com/Ciudad-Valles-Open-Source/httpsms/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/Ciudad-Valles-Open-Source/httpsms/releases/tag/v2.0.0
