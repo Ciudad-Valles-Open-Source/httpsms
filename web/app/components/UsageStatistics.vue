@@ -76,7 +76,7 @@ defineProps<{
     <p class="text-medium-emphasis">
       {{ $t('pages.billing.usageHistoryDesc') }}
     </p>
-    <VTable class="stack-table" density="comfortable">
+    <VTable v-fit-table class="stack-table" density="comfortable">
       <thead>
         <tr class="text-uppercase text-medium-emphasis">
           <th class="text-left">{{ $t('pages.billing.thStartDate') }}</th>
