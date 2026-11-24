@@ -12,17 +12,19 @@ import {
 } from '../utils/filters'
 import { capitalize } from '../utils/capitalize'
 
+// Dates, durations and numbers follow the app language, not the browser's.
 export function useFilters() {
+  const locale = () => useNuxtApp().$i18n.locale.value
   return {
     formatPhoneNumber,
     phoneCountry,
-    formatTimestamp,
+    formatTimestamp: (value: string) => formatTimestamp(value, locale()),
     formatMoney,
-    formatDecimal,
+    formatDecimal: (value: string | number) => formatDecimal(value, locale()),
     formatBillingPeriod,
-    humanizeTimeShort,
+    humanizeTimeShort: (date: string) => humanizeTimeShort(date, locale()),
     formatBillingPeriodDateOrdinal,
-    humanizeTime,
+    humanizeTime: (value: string) => humanizeTime(value, locale()),
     startsWithLetter,
     capitalize,
   }
