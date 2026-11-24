@@ -36,8 +36,8 @@ export default defineNuxtConfig({
       strictMessage: false,
     },
     locales: [
-      { code: 'en', name: 'English', file: 'en.json' },
-      { code: 'es', name: 'Español', file: 'es.json' },
+      { code: 'en', name: 'English', files: ['en.json', 'vuetify-en.ts'] },
+      { code: 'es', name: 'Español', files: ['es.json', 'vuetify-es.ts'] },
     ],
     defaultLocale: 'en',
     lazy: true,
