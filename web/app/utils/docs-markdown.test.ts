@@ -107,9 +107,26 @@ test('renderDocMarkdown', async (t) => {
   await t.test('highlights fenced code', () => {
     assert.match(
       doc.html,
-      /<pre class="docs-code" data-lang="bash"><code class="hljs language-bash">/,
+      /<pre class="docs-code code-window-panel" data-code-panel="0" data-lang="bash"><code class="hljs language-bash">/,
     )
     assert.match(doc.html, /hljs-string/)
+  })
+
+  await t.test('groups consecutive fences into one code window', () => {
+    const grouped = renderDocMarkdown(
+      '# T\n\n```bash\ncurl x\n```\n\n```python\nprint(1)\n```\n\nText\n\n```json\n{}\n```\n',
+    )
+    assert.equal(grouped.html.match(/<div class="code-window">/g)?.length, 2)
+    assert.match(
+      grouped.html,
+      /<button type="button" role="tab" class="code-window-tab is-active" data-code-tab="0" aria-selected="true">.*cURL<\/button><button[^>]*data-code-tab="1" aria-selected="false">.*Python<\/button>/,
+    )
+    assert.match(grouped.html, /data-code-panel="1" data-lang="python" hidden>/)
+    // A lone fence gets a static label, not a clickable tab.
+    assert.match(
+      grouped.html,
+      /<span class="code-window-tab is-active">.*JSON<\/span>/,
+    )
   })
 
   await t.test('marks callouts, wraps tables and handles links', () => {
