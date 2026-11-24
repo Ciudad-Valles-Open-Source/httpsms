@@ -450,104 +450,108 @@ body {
   }
 }
 
-@media (width <= 600px) {
-  .v-application .v-data-table:has(.v-data-table__tr--mobile) {
-    border: 0;
-    background: transparent;
-  }
-
-  .v-application .v-data-table .v-data-table__tr--mobile {
-    display: block;
-    margin-bottom: 0.75rem;
-    padding: 0.35rem 1rem;
-    border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
-    border-radius: 0.9rem;
-    background: rgb(var(--v-theme-surface));
-  }
-
-  .v-application .v-data-table .v-data-table__tr--mobile > td {
-    border: 0 !important;
-  }
-
-  .v-application .v-data-table .v-data-table__tr--mobile > td + td {
-    border-top: 1px dashed rgb(var(--v-border-color), var(--v-border-opacity)) !important;
-  }
+.v-application .v-data-table:has(.v-data-table__tr--mobile) {
+  border: 0;
+  background: transparent;
 }
 
-/* ── Tables become lists of cards on phones ─────────────────────────────────
- * Add `stack-table` to a VTable and a `data-label` to each cell: below 600px
- * every row turns into a card with "label: value" lines. VDataTable uses
- * Vuetify's own mobile mode (see the defaults in nuxt.config.ts). */
+.v-application .v-data-table .v-data-table__tr--mobile {
+  display: block;
+  margin-bottom: 0.75rem;
+  padding: 0.35rem 1rem;
+  border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 0.9rem;
+  background: rgb(var(--v-theme-surface));
+}
 
-@media (width <= 600px) {
-  .v-application .v-table.stack-table {
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    overflow: visible;
-  }
+.v-application .v-data-table .v-data-table__tr--mobile > td {
+  border: 0 !important;
+  overflow-wrap: anywhere;
+}
 
-  .v-application .v-table.stack-table > .v-table__wrapper {
-    overflow: visible;
-  }
+.v-application .v-data-table .v-data-table__tr--mobile > td + td {
+  border-top: 1px dashed rgb(var(--v-border-color), var(--v-border-opacity)) !important;
+}
 
-  .v-application .v-table.stack-table thead {
-    display: none;
-  }
+/* ── Tables become lists of cards when they don't fit ──────────────────────
+ * Add `stack-table` and `v-fit-table` to a VTable and a `data-label` to each
+ * cell: whenever the columns don't fit the available width (any screen size)
+ * the directive adds `is-stacked` and every row turns into a card with
+ * "label: value" lines. VDataTable uses Vuetify's mobile mode, driven by
+ * useTableFit(). */
 
-  .v-application .v-table.stack-table table,
-  .v-application .v-table.stack-table tbody,
-  .v-application .v-table.stack-table tr,
-  .v-application .v-table.stack-table td {
-    display: block;
-    width: 100%;
-  }
+.v-application .v-table.stack-table.is-stacked {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
 
-  .v-application .v-table.stack-table tbody > tr {
-    margin-bottom: 0.75rem;
-    padding: 0.35rem 1rem;
-    border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
-    border-radius: 0.9rem;
-    background: rgb(var(--v-theme-surface));
-  }
+.v-application .v-table.stack-table.is-stacked > .v-table__wrapper {
+  overflow: visible;
+}
 
-  .v-application .v-table.stack-table tbody > tr > td {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    height: auto !important;
-    min-height: 2.5rem;
-    padding: 0.5rem 0 !important;
-    border: 0 !important;
-    text-align: right !important;
-    vertical-align: middle !important;
-  }
+.v-application .v-table.stack-table.is-stacked thead {
+  display: none;
+}
 
-  .v-application .v-table.stack-table tbody > tr > td + td {
-    border-top: 1px dashed rgb(var(--v-border-color), var(--v-border-opacity)) !important;
-  }
+.v-application .v-table.stack-table.is-stacked table,
+.v-application .v-table.stack-table.is-stacked tbody,
+.v-application .v-table.stack-table.is-stacked tr,
+.v-application .v-table.stack-table.is-stacked td {
+  display: block;
+  width: 100%;
+}
 
-  .v-application .v-table.stack-table tbody > tr > td[data-label]::before {
-    content: attr(data-label);
-    flex-shrink: 0;
-    max-width: 45%;
-    color: rgb(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-align: left;
-    text-transform: uppercase;
-  }
+.v-application .v-table.stack-table.is-stacked tbody > tr {
+  margin-bottom: 0.75rem;
+  padding: 0.35rem 1rem;
+  border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 0.9rem;
+  background: rgb(var(--v-theme-surface));
+}
 
-  .v-application .v-table.stack-table tbody > tr > td[colspan] {
-    justify-content: center;
-    text-align: center !important;
-  }
+.v-application .v-table.stack-table.is-stacked tbody > tr > td {
+  overflow-wrap: anywhere;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: auto !important;
+  min-height: 2.5rem;
+  padding: 0.5rem 0 !important;
+  border: 0 !important;
+  text-align: right !important;
+  vertical-align: middle !important;
+}
 
-  .v-application .v-table.stack-table tbody > tr > td ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
+.v-application .v-table.stack-table.is-stacked tbody > tr > td + td {
+  border-top: 1px dashed rgb(var(--v-border-color), var(--v-border-opacity)) !important;
+}
+
+.v-application
+  .v-table.stack-table.is-stacked
+  tbody
+  > tr
+  > td[data-label]::before {
+  content: attr(data-label);
+  flex-shrink: 0;
+  max-width: 45%;
+  color: rgb(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.v-application .v-table.stack-table.is-stacked tbody > tr > td[colspan] {
+  justify-content: center;
+  text-align: center !important;
+}
+
+.v-application .v-table.stack-table.is-stacked tbody > tr > td ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
