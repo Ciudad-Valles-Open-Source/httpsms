@@ -828,7 +828,7 @@ onMounted(async () => {
       </VAppBar>
       <VContainer class="pt-6 px-0 px-sm-4">
         <VRow>
-          <VCol cols="12" md="10" offset-md="1" xl="8" offset-xl="2">
+          <VCol cols="12">
             <!-- Profile -->
             <div v-if="firebaseUser" class="panel-section profile-card">
               <VAvatar
@@ -1039,7 +1039,11 @@ onMounted(async () => {
                   indeterminate
                 />
               </div>
-              <VTable v-else-if="webhooks.length" class="stack-table mb-4">
+              <VTable
+                v-else-if="webhooks.length"
+                v-fit-table
+                class="stack-table mb-4"
+              >
                 <thead>
                   <tr class="text-uppercase text-title-medium">
                     <th v-if="xlAndUp" class="text-left">
@@ -1131,7 +1135,11 @@ onMounted(async () => {
                   indeterminate
                 />
               </div>
-              <VTable v-else-if="discords.length" class="stack-table mb-4">
+              <VTable
+                v-else-if="discords.length"
+                v-fit-table
+                class="stack-table mb-4"
+              >
                 <thead>
                   <tr class="text-uppercase text-title-medium">
                     <th class="text-left">{{ $t('settings.name') }}</th>
@@ -1189,7 +1197,11 @@ onMounted(async () => {
                 class="text-medium-emphasis"
                 v-html="$t('settings.phones_desc')"
               ></p>
-              <VTable class="stack-table mb-4" density="comfortable">
+              <VTable
+                v-fit-table
+                class="stack-table mb-4"
+                density="comfortable"
+              >
                 <thead>
                   <tr class="text-uppercase text-medium-emphasis">
                     <th v-if="xlAndUp" class="text-left">
@@ -1274,7 +1286,11 @@ onMounted(async () => {
                   indeterminate
                 />
               </div>
-              <VTable class="stack-table mb-4" density="comfortable">
+              <VTable
+                v-fit-table
+                class="stack-table mb-4"
+                density="comfortable"
+              >
                 <thead>
                   <tr class="text-uppercase text-medium-emphasis">
                     <th class="text-left">{{ $t('settings.name') }}</th>

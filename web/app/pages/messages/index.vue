@@ -134,7 +134,7 @@ onMounted(async () => {
       </VAppBar>
       <VContainer>
         <VRow>
-          <VCol cols="12" md="8" offset-md="2" xl="6" offset-xl="3">
+          <VCol cols="12">
             <p class="mb-8 mt-0" v-html="$t('pages.messages.description')"></p>
             <form>
               <v-phone-input

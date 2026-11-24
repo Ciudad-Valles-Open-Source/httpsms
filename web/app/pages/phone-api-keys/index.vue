@@ -266,7 +266,7 @@ onBeforeUnmount(() => unbindRealtime())
       </VAppBar>
       <VContainer class="pt-0">
         <VRow>
-          <VCol cols="12" md="9" offset-md="1" xl="8" offset-xl="2">
+          <VCol cols="12">
             <div class="d-flex align-center flex-wrap mt-3 mb-4">
               <VProgressCircular
                 v-if="loading"
@@ -302,6 +302,7 @@ onBeforeUnmount(() => unbindRealtime())
               v-html="$t('pages.phoneApiKeys.description')"
             ></p>
             <VTable
+              v-fit-table
               class="stack-table mb-4 api-key-table"
               density="comfortable"
             >

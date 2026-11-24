@@ -45,7 +45,7 @@ onMounted(() => {
       </VAppBar>
       <VContainer>
         <VRow>
-          <VCol cols="12" md="9" offset-md="1" xl="8" offset-xl="2">
+          <VCol cols="12">
             <h4 class="text-headline-large mb-3 mt-0">
               {{ $t('pages.statistics.title') }}
             </h4>
