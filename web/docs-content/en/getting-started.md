@@ -89,7 +89,7 @@ To send an SMS, make a `POST` request to `{{API_BASE_URL}}/v1/messages/send` wit
 
 ### Examples
 
-Replace `YOUR_API_KEY` with your key and the numbers with your own.
+Replace `YOUR_API_KEY` with your key and the numbers with your own. For Go, the official `github.com/NdoleStudio/httpsms-go` SDK works with your server once you give it the base URL.
 
 ```bash
 curl -X POST '{{API_BASE_URL}}/v1/messages/send' \
@@ -154,8 +154,6 @@ $response = $client->post('{{API_BASE_URL}}/v1/messages/send', [
 echo $response->getBody();
 ```
 
-If you use Go, the official `github.com/NdoleStudio/httpsms-go` SDK works with your server once you give it the base URL:
-
 ```go
 package main
 
@@ -183,6 +181,29 @@ func main() {
 	}
 
 	fmt.Println(message.Data.ID)
+}
+```
+
+```dart
+// dart pub add dio
+// In a Flutter app, never ship your API key: call your own backend instead.
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+
+Future<void> main() async {
+  final dio = Dio(BaseOptions(
+    baseUrl: '{{API_BASE_URL}}',
+    headers: {'x-api-key': Platform.environment['HTTPSMS_API_KEY']},
+  ));
+
+  final response = await dio.post('/v1/messages/send', data: {
+    'from': '+18005550199',
+    'to': '+18005550100',
+    'content': 'Hello, this is my first SMS with httpSMS',
+  });
+
+  print(response.data);
 }
 ```
 
