@@ -28,8 +28,8 @@ A complete httpSMS deployment consists of four services:
 |---|---|---|---|
 | `api` | Built from `api/Dockerfile` | 8000 | Go/Fiber REST API and event processor |
 | `web` | Built from `web/Dockerfile` | 3000 | Nuxt SPA (served by nginx) |
-| `postgres` | `postgres:16-alpine` | 5432 | Primary relational database |
-| `redis` | `redis:7-alpine` | 6379 | Queue and cache backend |
+| `postgres` | `postgres:16-alpine` | 5432 (internal only) | Primary relational database |
+| `redis` | `redis:7-alpine` | 6379 (internal only) | Queue and cache backend |
 
 The API runs database migrations automatically on startup using GORM AutoMigrate. No manual schema management is required.
 

@@ -34,8 +34,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+    # Not published on the host: only reachable inside the Docker network
+    # (postgres:5432). For a local shell: docker compose exec postgres psql -U httpsms
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
@@ -52,8 +52,8 @@ services:
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
+    # Not published on the host: only reachable inside the Docker network
+    # (redis:6379). For a local shell: docker compose exec redis redis-cli
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
