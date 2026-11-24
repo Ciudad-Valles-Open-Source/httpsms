@@ -365,6 +365,8 @@ function getGeneralErrorMessage(
       return t('components.firebaseAuth.popupBlocked')
     case 'auth/unauthorized-domain':
       return t('components.firebaseAuth.unauthorizedDomain')
+    case 'auth/operation-not-allowed':
+      return t('components.firebaseAuth.providerDisabled')
     default:
       return fallback || t('components.firebaseAuth.unexpectedError')
   }

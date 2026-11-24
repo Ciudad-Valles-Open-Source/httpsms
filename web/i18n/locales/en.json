@@ -142,7 +142,8 @@
       "and": "and",
       "privacyPolicy": "Privacy Policy.",
       "popupBlocked": "Your browser blocked the sign-in window. Allow pop-ups for this site or sign in with email and password.",
-      "unauthorizedDomain": "This domain is not authorized for sign-in. The administrator must add it in Firebase → Authentication → Settings → Authorized domains."
+      "unauthorizedDomain": "This domain is not authorized for sign-in. The administrator must add it in Firebase → Authentication → Settings → Authorized domains.",
+      "providerDisabled": "This sign-in method is not enabled. The administrator must enable it in Firebase → Authentication → Sign-in method."
     },
     "fixedHeader": {
       "getStarted": "Get Started",

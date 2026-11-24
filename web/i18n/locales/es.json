@@ -142,7 +142,8 @@
       "and": "y",
       "privacyPolicy": "Política de Privacidad.",
       "popupBlocked": "Tu navegador bloqueó la ventana de inicio de sesión. Permite las ventanas emergentes para este sitio o inicia sesión con correo y contraseña.",
-      "unauthorizedDomain": "Este dominio no está autorizado para iniciar sesión. El administrador debe agregarlo en Firebase → Authentication → Settings → Authorized domains."
+      "unauthorizedDomain": "Este dominio no está autorizado para iniciar sesión. El administrador debe agregarlo en Firebase → Authentication → Settings → Authorized domains.",
+      "providerDisabled": "Este método de inicio de sesión no está activado. El administrador debe habilitarlo en Firebase → Authentication → Sign-in method."
     },
     "fixedHeader": {
       "getStarted": "Empezar",
