@@ -5,14 +5,13 @@ import {
   signInWithRedirect,
   getRedirectResult,
   GoogleAuthProvider,
-  GithubAuthProvider,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   updateProfile,
   deleteUser,
 } from 'firebase/auth'
-import { mdiGoogle, mdiGithub, mdiEmail } from '@mdi/js'
+import { mdiGoogle, mdiEmail } from '@mdi/js'
 import type { User as FirebaseUser } from 'firebase/auth'
 import { ErrorMessages } from '~/utils/errors'
 
@@ -41,7 +40,7 @@ const password = ref('')
 const generalError = ref('')
 const errorMessages = ref(new ErrorMessages())
 
-type LoginMethod = 'google' | 'github' | 'email'
+type LoginMethod = 'google' | 'email'
 const LAST_LOGIN_METHOD_KEY = 'httpsms_last_login_method'
 // Set before falling back to signInWithRedirect, so the login page knows to
 // finish the sign-in when the provider sends the user back.
@@ -56,7 +55,7 @@ const lastUsedMethod = ref<LoginMethod | null>(null)
 onMounted(() => {
   try {
     const stored = localStorage.getItem(LAST_LOGIN_METHOD_KEY)
-    if (stored === 'google' || stored === 'github' || stored === 'email') {
+    if (stored === 'google' || stored === 'email') {
       lastUsedMethod.value = stored
     }
   } catch (error) {
@@ -69,7 +68,7 @@ function readPendingRedirect(): LoginMethod | null {
   try {
     const pending = sessionStorage.getItem(PENDING_REDIRECT_KEY)
     sessionStorage.removeItem(PENDING_REDIRECT_KEY)
-    return pending === 'google' || pending === 'github' ? pending : null
+    return pending === 'google' ? pending : null
   } catch {
     return null
   }
@@ -90,10 +89,7 @@ async function completeRedirectSignIn() {
   }
 }
 
-async function socialSignIn(
-  provider: GoogleAuthProvider | GithubAuthProvider,
-  method: LoginMethod,
-) {
+async function socialSignIn(provider: GoogleAuthProvider, method: LoginMethod) {
   loading.value = true
   const auth = getAuth()
   try {
@@ -173,10 +169,6 @@ function validateLoginForm(): boolean {
 
 async function signInWithGoogle() {
   await socialSignIn(new GoogleAuthProvider(), 'google')
-}
-
-async function signInWithGithub() {
-  await socialSignIn(new GithubAuthProvider(), 'github')
 }
 
 async function submitEmail() {
@@ -396,30 +388,6 @@ function getGeneralErrorMessage(
       </v-chip>
       <v-icon color="red" :icon="mdiGoogle" class="mr-2" />
       {{ $t('components.firebaseAuth.continueGoogle') }}
-    </v-btn>
-
-    <v-btn
-      block
-      size="large"
-      variant="flat"
-      color="black"
-      class="mb-3 position-relative overflow-visible"
-      :loading="loading"
-      :disabled="loading"
-      @click="signInWithGithub"
-    >
-      <v-chip
-        v-if="lastUsedMethod === 'github'"
-        label
-        size="x-small"
-        color="primary"
-        variant="flat"
-        class="position-absolute last-used-chip"
-      >
-        {{ $t('components.firebaseAuth.lastUsed') }}
-      </v-chip>
-      <v-icon :icon="mdiGithub" class="mr-2" />
-      {{ $t('components.firebaseAuth.continueGithub') }}
     </v-btn>
 
     <v-btn

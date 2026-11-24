@@ -99,7 +99,6 @@ En la práctica:
 
 - **Inicio de sesión con Google:** Google ya entrega el correo verificado. Es la opción más sencilla para los administradores.
 - **Correo y contraseña:** hay que verificar el correo (con el enlace que envía Firebase) antes de tener permisos de administrador. Después de verificarlo, cierra sesión y vuelve a entrar para que el panel reciba un token nuevo con el correo verificado.
-- **GitHub:** Firebase no siempre marca como verificado el correo que llega de GitHub. No lo uses para la cuenta de administrador.
 
 Si inicias sesión con un correo de `ADMIN_EMAILS` que todavía no está verificado, la cuenta se trata como la de cualquier otro usuario (queda pendiente). En cuanto el correo esté verificado y vuelvas a iniciar sesión, tendrás acceso de administrador aunque la cuenta se haya creado como pendiente.
 
@@ -181,7 +180,7 @@ Mientras `ADMIN_EMAILS` siga vacía, el estado de las cuentas no tiene ningún e
 
 En la consola de Firebase, en **Authentication**:
 
-- **Sign-in method:** deja activados solo los métodos que realmente usas (Google, correo y contraseña, GitHub). Cada método extra es otra puerta de entrada.
+- **Sign-in method:** deja activados solo los métodos que realmente usas (Google y correo con contraseña; este fork no ofrece inicio de sesión con GitHub). Cada método extra es otra puerta de entrada.
 - **Correo y contraseña:** si lo usas, pide a tus usuarios que verifiquen su correo (el panel tiene un botón en **Settings** para reenviar el enlace de verificación). Para la cuenta de administrador, la verificación es obligatoria.
 - **Settings → User account linking:** mantén la opción por defecto, *Link accounts that use the same email* (una cuenta por correo). Evita que la misma dirección termine en varias cuentas con distintos proveedores.
 - **Settings → Authorized domains:** deja solo `localhost` (si desarrollas en local) y los dominios reales de tu panel.

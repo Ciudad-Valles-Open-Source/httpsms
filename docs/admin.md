@@ -99,7 +99,6 @@ In practice:
 
 - **Google sign-in:** Google already provides a verified email. It is the simplest option for administrators.
 - **Email and password:** the email has to be verified (through the link Firebase sends) before you get administrator rights. After verifying it, sign out and back in so the dashboard gets a fresh token with the verified email.
-- **GitHub:** Firebase does not always mark emails coming from GitHub as verified. Do not use it for the administrator account.
 
 If you sign in with an `ADMIN_EMAILS` address that is not verified yet, the account is treated like any other user (it stays pending). As soon as the email is verified and you sign in again, you get administrator access even if the account was created as pending.
 
@@ -181,7 +180,7 @@ While `ADMIN_EMAILS` stays empty, account status has no effect at all.
 
 In the Firebase console, under **Authentication**:
 
-- **Sign-in method:** keep only the providers you actually use (Google, email/password, GitHub). Every extra provider is another way in.
+- **Sign-in method:** keep only the providers you actually use (Google and email/password; this fork does not offer GitHub sign-in). Every extra provider is another way in.
 - **Email/password:** if you use it, ask your users to verify their email (the dashboard has a button under **Settings** to resend the verification link). For the administrator account, verification is mandatory.
 - **Settings → User account linking:** keep the default, *Link accounts that use the same email* (one account per email). It prevents the same address from ending up in several accounts with different providers.
 - **Settings → Authorized domains:** keep only `localhost` (if you develop locally) and your dashboard's real domains.
