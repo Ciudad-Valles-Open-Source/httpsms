@@ -62,6 +62,9 @@ const deleteDialog = ref(false)
 const importDialog = ref(false)
 const saving = ref(false)
 
+// Rows become cards whenever the columns don't fit.
+const { target: contactsTable, stacked: contactsStacked } = useTableFit()
+
 // Server-driven pagination state for VDataTableServer.
 const page = ref(1)
 const itemsPerPage = ref(10)
@@ -285,9 +288,11 @@ onBeforeUnmount(() => {
           />
 
           <VDataTableServer
+            ref="contactsTable"
             v-model:page="page"
             v-model:items-per-page="itemsPerPage"
             v-model:sort-by="sortBy"
+            :mobile="contactsStacked"
             :headers="headers"
             :header-props="{
               class: 'text-uppercase text-medium-emphasis',

@@ -132,7 +132,7 @@ onMounted(async () => {
       </VAppBar>
       <VContainer>
         <VRow>
-          <VCol cols="12" md="10" offset-md="1" xxl="8" offset-xxl="2">
+          <VCol cols="12">
             <h5 class="text-headline-large mb-3 mt-3">
               {{ $t('pages.bulkMessages.bulkMessages') }}
             </h5>
@@ -186,7 +186,7 @@ onMounted(async () => {
           </VCol>
         </VRow>
         <VRow class="mt-8">
-          <VCol cols="12" md="10" offset-md="1" xxl="8" offset-xxl="2">
+          <VCol cols="12">
             <h4 class="text-headline-large mb-3">
               {{ $t('pages.bulkMessages.historyTitle') }}
             </h4>
@@ -199,7 +199,12 @@ onMounted(async () => {
               indeterminate
               class="mb-4"
             />
-            <VTable v-else class="stack-table" density="comfortable">
+            <VTable
+              v-else
+              v-fit-table
+              class="stack-table"
+              density="comfortable"
+            >
               <thead>
                 <tr class="text-uppercase text-medium-emphasis">
                   <th class="text-left">

@@ -32,7 +32,8 @@ useHead({
   title: () => t('pages.adminUsers.metaTitle'),
 })
 
-const { mdAndUp } = useVDisplay()
+// The table becomes a list of cards whenever its columns don't fit.
+const { target: usersTable, stacked: usersStacked } = useTableFit()
 const authStore = useAuthStore()
 const adminStore = useAdminStore()
 const notificationsStore = useNotificationsStore()
@@ -194,7 +195,7 @@ onBeforeUnmount(() => {
       </VAppBar>
       <VContainer class="pt-6 px-sm-4">
         <VRow>
-          <VCol cols="12" xl="10" offset-xl="1">
+          <VCol cols="12">
             <header class="admin-header">
               <span class="icon-tile icon-tile-gradient">
                 <VIcon :icon="mdiShieldAccount" />
@@ -291,8 +292,8 @@ onBeforeUnmount(() => {
                 </p>
               </div>
 
-              <template v-else-if="adminStore.users.length">
-                <VTable v-if="mdAndUp" density="comfortable" class="mt-5">
+              <div v-else-if="adminStore.users.length" ref="usersTable">
+                <VTable v-if="!usersStacked" density="comfortable" class="mt-5">
                   <thead>
                     <tr>
                       <th>{{ $t('pages.adminUsers.columns.email') }}</th>
@@ -501,7 +502,7 @@ onBeforeUnmount(() => {
                     {{ $t('pages.adminUsers.loadMore') }}
                   </VBtn>
                 </div>
-              </template>
+              </div>
             </section>
           </VCol>
         </VRow>

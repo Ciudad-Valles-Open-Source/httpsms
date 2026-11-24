@@ -790,7 +790,17 @@ Console.WriteLine(await response.Content.ReadAsStringAsync());</code></pre>
 
 .feature-card-cta {
   align-self: flex-start;
+  max-width: 100%;
+  height: auto !important;
+  min-height: 36px;
   margin-top: 1rem;
+}
+
+/* Long labels wrap inside the card instead of overflowing it. */
+/* stylelint-disable-next-line selector-class-pattern -- Vuetify BEM class */
+.feature-card-cta :deep(.v-btn__content) {
+  white-space: normal;
+  text-align: left;
 }
 
 .step-card-num {

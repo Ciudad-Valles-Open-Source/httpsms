@@ -40,9 +40,31 @@ useSeoMeta({
   twitterCard: 'summary_large_image',
 })
 
+// Code windows with several languages: show the clicked tab's panel.
+function selectCodeTab(event: MouseEvent): boolean {
+  const tab = (event.target as HTMLElement | null)?.closest<HTMLElement>(
+    '[data-code-tab]',
+  )
+  const codeWindow = tab?.closest('.code-window')
+  if (!tab || !codeWindow) return false
+  const selected = tab.dataset.codeTab
+  codeWindow.querySelectorAll<HTMLElement>('[data-code-tab]').forEach((el) => {
+    const active = el.dataset.codeTab === selected
+    el.classList.toggle('is-active', active)
+    el.setAttribute('aria-selected', String(active))
+  })
+  codeWindow
+    .querySelectorAll<HTMLElement>('[data-code-panel]')
+    .forEach((el) => {
+      el.hidden = el.dataset.codePanel !== selected
+    })
+  return true
+}
+
 // Links inside the rendered Markdown are plain <a> tags: route internal ones
 // through the router so they don't reload the SPA.
 function onArticleClick(event: MouseEvent) {
+  if (selectCodeTab(event)) return
   if (
     event.defaultPrevented ||
     event.button !== 0 ||
@@ -261,27 +283,80 @@ onMounted(() => {
   color: rgb(var(--v-theme-on-surface));
 }
 
-.docs-article :deep(pre.docs-code) {
-  position: relative;
+.docs-article :deep(.code-window) {
+  margin: 1.25rem 0;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: var(--card-radius, 1rem);
+  background: #0d1117;
+  box-shadow: var(--card-shadow);
+}
+
+.docs-article :deep(.code-window-bar) {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.8rem 1rem 0.4rem;
+}
+
+.docs-article :deep(.code-window-bar span) {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 18%);
+}
+
+.docs-article :deep(.code-window-tabs) {
+  display: flex;
   overflow-x: auto;
-  padding: 1rem 1.25rem;
-  border-radius: 0.9rem;
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
+  scrollbar-width: none;
+}
+
+.docs-article :deep(.code-window-tab) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.1rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #e6edf3;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.docs-article :deep(button.code-window-tab) {
+  cursor: pointer;
+}
+
+.docs-article :deep(button.code-window-tab:hover) {
+  background: rgb(255 255 255 / 4%);
+}
+
+.docs-article :deep(.code-window-tab.is-active) {
+  border-bottom-color: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-primary));
+}
+
+.docs-article :deep(.code-window-tab svg) {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.docs-article :deep(pre.docs-code) {
+  margin: 0;
+  overflow-x: auto;
+  padding: 1.25rem 1.5rem;
   font-size: 0.875rem;
   line-height: 1.6;
   color: #e6edf3;
-  background: #0d1117;
-  border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+  background: transparent;
 }
 
-.docs-article :deep(pre.docs-code[data-lang])::before {
-  content: attr(data-lang);
-  position: absolute;
-  top: 0.35rem;
-  right: 0.75rem;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgb(var(--v-theme-on-surface), 0.45);
+.docs-article :deep(pre.docs-code[hidden]) {
+  display: none;
 }
 
 .docs-article :deep(pre.docs-code code) {

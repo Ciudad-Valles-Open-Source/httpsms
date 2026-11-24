@@ -18,6 +18,8 @@ useHead({
 
 const route = useRoute()
 const { mdAndDown, mdAndUp, lgAndUp } = useVDisplay()
+// Rows become cards whenever the columns don't fit.
+const { target: heartbeatsTable, stacked: heartbeatsStacked } = useTableFit()
 const authStore = useAuthStore()
 const phonesStore = usePhonesStore()
 const { formatPhoneNumber, formatTimestamp } = useFilters()
@@ -199,6 +201,8 @@ onMounted(async () => {
             />
             <VDataTable
               v-else
+              ref="heartbeatsTable"
+              :mobile="heartbeatsStacked"
               hover
               :headers="dataTableHeaders"
               :items="dataTableItems"
