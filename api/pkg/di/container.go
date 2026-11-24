@@ -1898,6 +1898,10 @@ func (container *Container) RegisterSwaggerRoutes() {
 			});
 		});` + languageSwitcher
 
+	// Swagger UI otherwise sends the spec URL to validator.swagger.io, which
+	// can't reach self-hosted or private servers and shows an "INVALID" badge.
+	const swaggerValidatorDisabled = "none"
+
 	// Especificación OpenAPI en español (debe registrarse antes de /es/*)
 	container.App().Get("/es/doc.json", func(c fiber.Ctx) error {
 		c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
@@ -1907,12 +1911,14 @@ func (container *Container) RegisterSwaggerRoutes() {
 	container.App().Get("/es/*", swagger.New(swagger.Config{
 		Title:        docs.SwaggerInfo.Title + " (ES)",
 		URL:          "/es/doc.json",
+		ValidatorUrl: swaggerValidatorDisabled,
 		CustomStyle:  template.CSS(docs.SwaggerThemeCSS),
 		CustomScript: template.JS(docs.SwaggerThemeScript + baseScript),
 	}))
 
 	container.App().Get("/*", swagger.New(swagger.Config{
 		Title:        docs.SwaggerInfo.Title,
+		ValidatorUrl: swaggerValidatorDisabled,
 		CustomStyle:  template.CSS(docs.SwaggerThemeCSS),
 		CustomScript: template.JS(docs.SwaggerThemeScript + baseScript),
 	}))
