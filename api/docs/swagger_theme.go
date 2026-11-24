@@ -3,12 +3,12 @@ package docs
 // Este archivo NO es generado por `swag init`.
 //
 // Tema oscuro para Swagger UI (servido en /index.html y /es/index.html) con la
-// misma paleta que el panel web (tema "dark" por defecto de Vuetify):
+// misma paleta azul que el panel web (tema "dark" de web/nuxt.config.ts):
 //
-//	fondo      #121212   superficie #212121   superficie clara #424242
-//	texto      #e6e6e6   texto sec. #b0b0b0   enlaces          #64b5f6
-//	primario   #2196f3   (botón "Execute" #1976d2 para contraste AA con blanco)
-//	GET #64b5f6 · POST #4caf50 · PUT #fb8c00 · PATCH #54b6b2 · DELETE #cf6679
+//	fondo      #0f111a   superficie #161a27   superficie clara #2a3146
+//	texto      #e3e8f4   texto sec. #aab4cc   enlaces          #4fd1ff
+//	primario   #5b8def   (botón "Execute" #435ebe para contraste AA con blanco)
+//	GET #5b8def · POST #34d399 · PUT #fbbf24 · PATCH #4fd1ff · DELETE #ff6b81
 //
 // Todas las reglas usan el prefijo "#swagger-ui .swagger-ui" (incluye un ID),
 // por lo que siempre ganan sobre swagger-ui.css (que solo usa clases) sin
@@ -23,32 +23,32 @@ package docs
 const SwaggerThemeCSS = `
 :root {
   color-scheme: dark;
-  --hs-bg: #121212;
-  --hs-surface: #212121;
-  --hs-surface-2: #1a1a1a;
-  --hs-surface-light: #424242;
-  --hs-code-bg: #0d0d0d;
-  --hs-border: rgba(255, 255, 255, 0.12);
-  --hs-border-strong: #6b6b6b;
-  --hs-text: #e6e6e6;
-  --hs-text-muted: #b0b0b0;
-  --hs-text-subtle: #9e9e9e;
-  --hs-link: #64b5f6;
-  --hs-link-hover: #90caf9;
-  --hs-primary: #2196f3;
-  --hs-primary-strong: #1976d2;
-  --hs-success: #66bb6a;
-  --hs-error: #cf6679;
-  --hs-error-text: #ef9a9a;
-  --hs-get: #64b5f6;
-  --hs-post: #4caf50;
-  --hs-put: #fb8c00;
-  --hs-patch: #54b6b2;
-  --hs-delete: #cf6679;
-  --hs-head: #b39ddb;
-  --hs-options: #90a4ae;
-  --hs-deprecated: #9e9e9e;
-  --hs-on-method: #121212;
+  --hs-bg: #0f111a;
+  --hs-surface: #161a27;
+  --hs-surface-2: #12151f;
+  --hs-surface-light: #2a3146;
+  --hs-code-bg: #0b0d14;
+  --hs-border: rgba(255, 255, 255, 0.1);
+  --hs-border-strong: #4a5370;
+  --hs-text: #e3e8f4;
+  --hs-text-muted: #aab4cc;
+  --hs-text-subtle: #8f9ab3;
+  --hs-link: #4fd1ff;
+  --hs-link-hover: #8fe2ff;
+  --hs-primary: #5b8def;
+  --hs-primary-strong: #435ebe;
+  --hs-success: #34d399;
+  --hs-error: #ff6b81;
+  --hs-error-text: #ff9aab;
+  --hs-get: #5b8def;
+  --hs-post: #34d399;
+  --hs-put: #fbbf24;
+  --hs-patch: #4fd1ff;
+  --hs-delete: #ff6b81;
+  --hs-head: #a78bfa;
+  --hs-options: #94a3b8;
+  --hs-deprecated: #8f9ab3;
+  --hs-on-method: #0f111a;
 }
 
 html,
@@ -59,7 +59,7 @@ body {
 }
 
 ::selection {
-  background: rgba(33, 150, 243, 0.4);
+  background: rgba(91, 141, 239, 0.4);
   color: #ffffff;
 }
 
@@ -79,7 +79,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #5a5a5a;
+  background: #3a4360;
 }
 
 /* ---------------------------------------------------------------- base ---- */
@@ -198,7 +198,7 @@ body {
 
 #swagger-ui .swagger-ui .prop-type,
 #swagger-ui .swagger-ui .json-schema-2020-12__attribute--primary {
-  color: #90caf9;
+  color: #8fe2ff;
 }
 
 #swagger-ui .swagger-ui .parameter__name.required span,
@@ -212,7 +212,7 @@ body {
 #swagger-ui .swagger-ui .renderedMarkdown code,
 #swagger-ui .swagger-ui .version-pragma__message code {
   background: rgba(255, 255, 255, 0.08);
-  color: #ce93d8;
+  color: #c4b5fd;
 }
 
 /* --------------------------------------------------------------- info ---- */
@@ -243,7 +243,7 @@ body {
 }
 
 #swagger-ui .swagger-ui .info .title small.version-stamp {
-  background-color: #2e7d32;
+  background-color: #13865a;
 }
 
 #swagger-ui .swagger-ui .info .title small pre {
@@ -293,8 +293,8 @@ body {
 }
 
 #swagger-ui .swagger-ui .btn.execute:hover {
-  background-color: #1565c0;
-  border-color: #1565c0;
+  background-color: #3a51a8;
+  border-color: #3a51a8;
 }
 
 #swagger-ui .swagger-ui .btn.cancel {
@@ -303,11 +303,11 @@ body {
 }
 
 #swagger-ui .swagger-ui .btn.cancel:hover {
-  background: rgba(207, 102, 121, 0.12);
+  background: rgba(255, 107, 129, 0.12);
 }
 
 #swagger-ui .swagger-ui button.invalid {
-  background: rgba(207, 102, 121, 0.15);
+  background: rgba(255, 107, 129, 0.15);
   border-color: var(--hs-error);
 }
 
@@ -318,7 +318,7 @@ body {
 }
 
 #swagger-ui .swagger-ui .copy-to-clipboard:active {
-  background: #5a5a5a;
+  background: #3a4360;
 }
 
 /* Iconos SVG que swagger-ui deja en negro (relleno por defecto). */
@@ -380,11 +380,11 @@ body {
 
 #swagger-ui .swagger-ui .auth-container code {
   background: rgba(255, 255, 255, 0.08);
-  color: #ce93d8;
+  color: #c4b5fd;
 }
 
 #swagger-ui .swagger-ui .auth-container .errors {
-  background: rgba(207, 102, 121, 0.15);
+  background: rgba(255, 107, 129, 0.15);
   color: var(--hs-error-text);
 }
 
@@ -424,8 +424,8 @@ body {
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-get {
-  background: rgba(100, 181, 246, 0.07);
-  border-color: rgba(100, 181, 246, 0.55);
+  background: rgba(91, 141, 239, 0.07);
+  border-color: rgba(91, 141, 239, 0.55);
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-get .opblock-summary-method,
@@ -434,12 +434,12 @@ body {
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-get .opblock-summary {
-  border-color: rgba(100, 181, 246, 0.55);
+  border-color: rgba(91, 141, 239, 0.55);
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-post {
-  background: rgba(76, 175, 80, 0.07);
-  border-color: rgba(76, 175, 80, 0.55);
+  background: rgba(52, 211, 153, 0.07);
+  border-color: rgba(52, 211, 153, 0.55);
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-post .opblock-summary-method,
@@ -448,12 +448,12 @@ body {
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-post .opblock-summary {
-  border-color: rgba(76, 175, 80, 0.55);
+  border-color: rgba(52, 211, 153, 0.55);
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-put {
-  background: rgba(251, 140, 0, 0.07);
-  border-color: rgba(251, 140, 0, 0.55);
+  background: rgba(251, 191, 36, 0.07);
+  border-color: rgba(251, 191, 36, 0.55);
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-put .opblock-summary-method,
@@ -462,12 +462,12 @@ body {
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-put .opblock-summary {
-  border-color: rgba(251, 140, 0, 0.55);
+  border-color: rgba(251, 191, 36, 0.55);
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-patch {
-  background: rgba(84, 182, 178, 0.07);
-  border-color: rgba(84, 182, 178, 0.55);
+  background: rgba(79, 209, 255, 0.07);
+  border-color: rgba(79, 209, 255, 0.55);
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-patch .opblock-summary-method,
@@ -476,12 +476,12 @@ body {
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-patch .opblock-summary {
-  border-color: rgba(84, 182, 178, 0.55);
+  border-color: rgba(79, 209, 255, 0.55);
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-delete {
-  background: rgba(207, 102, 121, 0.07);
-  border-color: rgba(207, 102, 121, 0.55);
+  background: rgba(255, 107, 129, 0.07);
+  border-color: rgba(255, 107, 129, 0.55);
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-delete .opblock-summary-method,
@@ -490,12 +490,12 @@ body {
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-delete .opblock-summary {
-  border-color: rgba(207, 102, 121, 0.55);
+  border-color: rgba(255, 107, 129, 0.55);
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-head {
-  background: rgba(179, 157, 219, 0.07);
-  border-color: rgba(179, 157, 219, 0.55);
+  background: rgba(167, 139, 250, 0.07);
+  border-color: rgba(167, 139, 250, 0.55);
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-head .opblock-summary-method,
@@ -504,12 +504,12 @@ body {
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-head .opblock-summary {
-  border-color: rgba(179, 157, 219, 0.55);
+  border-color: rgba(167, 139, 250, 0.55);
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-options {
-  background: rgba(144, 164, 174, 0.07);
-  border-color: rgba(144, 164, 174, 0.55);
+  background: rgba(148, 163, 184, 0.07);
+  border-color: rgba(148, 163, 184, 0.55);
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-options .opblock-summary-method,
@@ -518,12 +518,12 @@ body {
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-options .opblock-summary {
-  border-color: rgba(144, 164, 174, 0.55);
+  border-color: rgba(148, 163, 184, 0.55);
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-deprecated {
-  background: rgba(158, 158, 158, 0.06);
-  border-color: rgba(158, 158, 158, 0.45);
+  background: rgba(143, 154, 179, 0.06);
+  border-color: rgba(143, 154, 179, 0.45);
   opacity: 0.75;
 }
 
@@ -533,7 +533,7 @@ body {
 }
 
 #swagger-ui .swagger-ui .opblock.opblock-deprecated .opblock-summary {
-  border-color: rgba(158, 158, 158, 0.45);
+  border-color: rgba(143, 154, 179, 0.45);
 }
 
 /* Pestañas "Example Value | Model" y similares. */
@@ -557,7 +557,7 @@ body {
 }
 
 #swagger-ui .swagger-ui .response-control-media-type__accept-message {
-  color: #81c784;
+  color: #6ee7b7;
 }
 
 #swagger-ui .swagger-ui .response-control-media-type--accept-controller select {
@@ -627,7 +627,7 @@ body {
 #swagger-ui .swagger-ui input.invalid,
 #swagger-ui .swagger-ui select.invalid,
 #swagger-ui .swagger-ui textarea.invalid {
-  background-color: rgba(207, 102, 121, 0.15);
+  background-color: rgba(255, 107, 129, 0.15);
   border-color: var(--hs-error);
 }
 
@@ -685,7 +685,7 @@ body {
 
 /* -------------------------------------------- errores y carga ---- */
 #swagger-ui .swagger-ui .errors-wrapper {
-  background: rgba(207, 102, 121, 0.1);
+  background: rgba(255, 107, 129, 0.1);
   border-color: var(--hs-error);
 }
 
