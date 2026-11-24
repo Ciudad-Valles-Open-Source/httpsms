@@ -36,6 +36,16 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // Replaces the cached user with an API response. Only GET /v1/users/me is
+  // guaranteed to report is_admin, so keep the known value when a response
+  // (e.g. from an older API) leaves it out.
+  function setUser(next: EntitiesUser) {
+    user.value = {
+      ...next,
+      is_admin: next.is_admin ?? user.value?.is_admin ?? false,
+    }
+  }
+
   function clearCredentials() {
     sessionVersion++
     user.value = null
@@ -101,7 +111,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     if (session !== sessionVersion) return
     setApiKey(response.data.api_key)
-    user.value = response.data
+    setUser(response.data)
   }
 
   async function deleteUserAccount(): Promise<string> {
@@ -120,7 +130,7 @@ export const useAuthStore = defineStore('auth', () => {
       },
     )
     if (session === sessionVersion) {
-      user.value = response.data
+      setUser(response.data)
       setApiKey(response.data.api_key)
     }
     return response.data
@@ -144,6 +154,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAdmin,
     accountBlocked,
     markAccountBlocked,
+    setUser,
     setAuthUserAction,
     onAuthStateChanged,
     onIdTokenChanged,

@@ -21,6 +21,14 @@ func APIKeyAuth(logger telemetry.Logger, tracer telemetry.Tracer, userRepository
 
 		ctxLogger := tracer.CtxLogger(logger, span)
 
+		// A verified Firebase ID token (set by BearerAuth, which runs first) is the
+		// stronger credential: the dashboard sends both it and the user's API key,
+		// and replacing it with the API key identity would drop admin rights.
+		if existing, ok := c.Locals(ContextKeyAuthUserID).(entities.AuthContext); ok && existing.FirebaseIDToken {
+			span.AddEvent("request already authenticated with a firebase id token")
+			return c.Next()
+		}
+
 		apiKey := getAPIKeyFromRequest(c)
 		if len(apiKey) == 0 || apiKey == "undefined" || strings.HasPrefix(apiKey, "pk_") {
 			span.AddEvent(fmt.Sprintf("the request header has no primary [%s] header", authHeaderAPIKey))

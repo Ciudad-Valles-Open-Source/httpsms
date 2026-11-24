@@ -85,7 +85,7 @@ func (h *UserHandler) Show(c fiber.Ctx) error {
 // @Accept       json
 // @Produce      json
 // @Param        payload   	body 		requests.UserUpdate  			true 	"Payload of user details to update"
-// @Success      200 		{object}	responses.PhoneResponse
+// @Success      200 		{object}	responses.CurrentUserResponse
 // @Failure      400		{object}	responses.BadRequest
 // @Failure 	 401    	{object}	responses.Unauthorized
 // @Failure      422		{object}	responses.UnprocessableEntity
@@ -114,7 +114,10 @@ func (h *UserHandler) Update(c fiber.Ctx) error {
 		return h.responseInternalServerError(c)
 	}
 
-	return h.responseOK(c, "user updated successfully", user)
+	return h.responseOK(c, "user updated successfully", responses.CurrentUser{
+		User:    *user,
+		IsAdmin: h.service.IsAdmin(h.userFromContext(c)),
+	})
 }
 
 // Delete an entities.User
@@ -149,7 +152,7 @@ func (h *UserHandler) Delete(c fiber.Ctx) error {
 // @Produce      json
 // @Param 		 userID 	path		string 							true 	"ID of the user to update" 				default(32343a19-da5e-4b1b-a767-3298a73703ca)
 // @Param        payload   	body 		requests.UserNotificationUpdate	true 	"User notification details to update"
-// @Success      200 		{object}	responses.UserResponse
+// @Success      200 		{object}	responses.CurrentUserResponse
 // @Failure      400		{object}	responses.BadRequest
 // @Failure 	 401    	{object}	responses.Unauthorized
 // @Failure      422		{object}	responses.UnprocessableEntity
@@ -171,7 +174,10 @@ func (h *UserHandler) UpdateNotifications(c fiber.Ctx) error {
 		return h.responseInternalServerError(c)
 	}
 
-	return h.responseOK(c, "user notification settings updated successfully", user)
+	return h.responseOK(c, "user notification settings updated successfully", responses.CurrentUser{
+		User:    *user,
+		IsAdmin: h.service.IsAdmin(h.userFromContext(c)),
+	})
 }
 
 // DeleteAPIKey rotates the API Key for a user
@@ -182,7 +188,7 @@ func (h *UserHandler) UpdateNotifications(c fiber.Ctx) error {
 // @Accept       json
 // @Produce      json
 // @Param 		 userID 	path		string 							true 	"ID of the user to update" 	default(32343a19-da5e-4b1b-a767-3298a73703ca)
-// @Success      200 		{object}	responses.UserResponse
+// @Success      200 		{object}	responses.CurrentUserResponse
 // @Failure      400		{object}	responses.BadRequest
 // @Failure 	 401    	{object}	responses.Unauthorized
 // @Failure      422		{object}	responses.UnprocessableEntity
@@ -204,5 +210,8 @@ func (h *UserHandler) DeleteAPIKey(c fiber.Ctx) error {
 		return h.responseInternalServerError(c)
 	}
 
-	return h.responseOK(c, "API Key rotated successfully", user)
+	return h.responseOK(c, "API Key rotated successfully", responses.CurrentUser{
+		User:    *user,
+		IsAdmin: h.service.IsAdmin(h.userFromContext(c)),
+	})
 }

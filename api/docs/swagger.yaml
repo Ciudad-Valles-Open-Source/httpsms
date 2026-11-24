@@ -590,82 +590,6 @@ definitions:
     - SubscriptionName50KMonthly
     - SubscriptionName200KMonthly
     - SubscriptionName20KYearly
-  entities.User:
-    properties:
-      active_phone_id:
-        example: 32343a19-da5e-4b1b-a767-3298a73703cb
-        type: string
-      api_key:
-        example: x-api-key
-        type: string
-      approved_at:
-        example: "2022-06-05T14:26:02.302718+03:00"
-        type: string
-      approved_by:
-        example: admin@email.com
-        type: string
-      created_at:
-        example: "2022-06-05T14:26:02.302718+03:00"
-        type: string
-      email:
-        example: name@email.com
-        type: string
-      id:
-        example: WB7DRDWrJZRGbYrv2CKGkqbzvqdC
-        type: string
-      notification_heartbeat_enabled:
-        example: true
-        type: boolean
-      notification_message_status_enabled:
-        example: true
-        type: boolean
-      notification_newsletter_enabled:
-        example: true
-        type: boolean
-      notification_webhook_enabled:
-        example: true
-        type: boolean
-      status:
-        allOf:
-        - $ref: '#/definitions/entities.UserStatus'
-        example: active
-      subscription_ends_at:
-        example: "2022-06-05T14:26:02.302718+03:00"
-        type: string
-      subscription_id:
-        example: 8f9c71b8-b84e-4417-8408-a62274f65a08
-        type: string
-      subscription_name:
-        allOf:
-        - $ref: '#/definitions/entities.SubscriptionName'
-        example: free
-      subscription_renews_at:
-        example: "2022-06-05T14:26:02.302718+03:00"
-        type: string
-      subscription_status:
-        example: on_trial
-        type: string
-      timezone:
-        example: Europe/Helsinki
-        type: string
-      updated_at:
-        example: "2022-06-05T14:26:10.303278+03:00"
-        type: string
-    required:
-    - api_key
-    - created_at
-    - email
-    - id
-    - notification_heartbeat_enabled
-    - notification_message_status_enabled
-    - notification_newsletter_enabled
-    - notification_webhook_enabled
-    - status
-    - subscription_id
-    - subscription_name
-    - timezone
-    - updated_at
-    type: object
   entities.UserStatus:
     enum:
     - active
@@ -1746,21 +1670,6 @@ definitions:
         type: string
       status:
         example: error
-        type: string
-    required:
-    - data
-    - message
-    - status
-    type: object
-  responses.UserResponse:
-    properties:
-      data:
-        $ref: '#/definitions/entities.User'
-      message:
-        example: Request handled successfully
-        type: string
-      status:
-        example: success
         type: string
     required:
     - data
@@ -3919,7 +3828,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.UserResponse'
+            $ref: '#/definitions/responses.CurrentUserResponse'
         "400":
           description: Bad Request
           schema:
@@ -3965,7 +3874,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.UserResponse'
+            $ref: '#/definitions/responses.CurrentUserResponse'
         "400":
           description: Bad Request
           schema:
@@ -4064,7 +3973,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.PhoneResponse'
+            $ref: '#/definitions/responses.CurrentUserResponse'
         "400":
           description: Bad Request
           schema:

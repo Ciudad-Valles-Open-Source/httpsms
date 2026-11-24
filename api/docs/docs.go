@@ -3261,7 +3261,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.PhoneResponse"
+                            "$ref": "#/definitions/responses.CurrentUserResponse"
                         }
                     },
                     "400": {
@@ -3361,7 +3361,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.UserResponse"
+                            "$ref": "#/definitions/responses.CurrentUserResponse"
                         }
                     },
                     "400": {
@@ -3432,7 +3432,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.UserResponse"
+                            "$ref": "#/definitions/responses.CurrentUserResponse"
                         }
                     },
                     "400": {
@@ -4496,110 +4496,6 @@ const docTemplate = `{
                 "SubscriptionName200KMonthly",
                 "SubscriptionName20KYearly"
             ]
-        },
-        "entities.User": {
-            "type": "object",
-            "required": [
-                "api_key",
-                "created_at",
-                "email",
-                "id",
-                "notification_heartbeat_enabled",
-                "notification_message_status_enabled",
-                "notification_newsletter_enabled",
-                "notification_webhook_enabled",
-                "status",
-                "subscription_id",
-                "subscription_name",
-                "timezone",
-                "updated_at"
-            ],
-            "properties": {
-                "active_phone_id": {
-                    "type": "string",
-                    "example": "32343a19-da5e-4b1b-a767-3298a73703cb"
-                },
-                "api_key": {
-                    "type": "string",
-                    "example": "x-api-key"
-                },
-                "approved_at": {
-                    "type": "string",
-                    "example": "2022-06-05T14:26:02.302718+03:00"
-                },
-                "approved_by": {
-                    "type": "string",
-                    "example": "admin@email.com"
-                },
-                "created_at": {
-                    "type": "string",
-                    "example": "2022-06-05T14:26:02.302718+03:00"
-                },
-                "email": {
-                    "type": "string",
-                    "example": "name@email.com"
-                },
-                "id": {
-                    "type": "string",
-                    "example": "WB7DRDWrJZRGbYrv2CKGkqbzvqdC"
-                },
-                "notification_heartbeat_enabled": {
-                    "type": "boolean",
-                    "example": true
-                },
-                "notification_message_status_enabled": {
-                    "type": "boolean",
-                    "example": true
-                },
-                "notification_newsletter_enabled": {
-                    "type": "boolean",
-                    "example": true
-                },
-                "notification_webhook_enabled": {
-                    "type": "boolean",
-                    "example": true
-                },
-                "status": {
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/entities.UserStatus"
-                        }
-                    ],
-                    "example": "active"
-                },
-                "subscription_ends_at": {
-                    "type": "string",
-                    "example": "2022-06-05T14:26:02.302718+03:00"
-                },
-                "subscription_id": {
-                    "type": "string",
-                    "example": "8f9c71b8-b84e-4417-8408-a62274f65a08"
-                },
-                "subscription_name": {
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/entities.SubscriptionName"
-                        }
-                    ],
-                    "example": "free"
-                },
-                "subscription_renews_at": {
-                    "type": "string",
-                    "example": "2022-06-05T14:26:02.302718+03:00"
-                },
-                "subscription_status": {
-                    "type": "string",
-                    "example": "on_trial"
-                },
-                "timezone": {
-                    "type": "string",
-                    "example": "Europe/Helsinki"
-                },
-                "updated_at": {
-                    "type": "string",
-                    "example": "2022-06-05T14:26:10.303278+03:00"
-                }
-            }
         },
         "entities.UserStatus": {
             "type": "string",
@@ -6064,27 +5960,6 @@ const docTemplate = `{
                 "status": {
                     "type": "string",
                     "example": "error"
-                }
-            }
-        },
-        "responses.UserResponse": {
-            "type": "object",
-            "required": [
-                "data",
-                "message",
-                "status"
-            ],
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/entities.User"
-                },
-                "message": {
-                    "type": "string",
-                    "example": "Request handled successfully"
-                },
-                "status": {
-                    "type": "string",
-                    "example": "success"
                 }
             }
         },

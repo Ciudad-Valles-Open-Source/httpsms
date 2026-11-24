@@ -214,7 +214,7 @@ export const useBillingStore = defineStore('billing', () => {
         body: payload,
       },
     )
-    authStore.user = response.data
+    authStore.setUser(response.data)
   }
 
   return {
