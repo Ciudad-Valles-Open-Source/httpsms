@@ -122,7 +122,6 @@ async function deleteUserAccount() {
 
 <template>
   <VContainer class="fill-height d-flex align-center justify-center">
-    <AppToast />
     <VRow align="center" justify="center">
       <VCol cols="12" sm="10" md="7" lg="5" xl="4">
         <div class="text-center mb-6">

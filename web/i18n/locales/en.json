@@ -140,7 +140,9 @@
       "byContinuing": "By continuing, you are indicating that you accept our",
       "termsOfService": "Terms of Service",
       "and": "and",
-      "privacyPolicy": "Privacy Policy."
+      "privacyPolicy": "Privacy Policy.",
+      "popupBlocked": "Your browser blocked the sign-in window. Allow pop-ups for this site or sign in with email and password.",
+      "unauthorizedDomain": "This domain is not authorized for sign-in. The administrator must add it in Firebase → Authentication → Settings → Authorized domains."
     },
     "fixedHeader": {
       "getStarted": "Get Started",

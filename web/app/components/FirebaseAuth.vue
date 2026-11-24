@@ -2,6 +2,8 @@
 import {
   getAuth,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   GithubAuthProvider,
   signInWithEmailAndPassword,
@@ -41,6 +43,14 @@ const errorMessages = ref(new ErrorMessages())
 
 type LoginMethod = 'google' | 'github' | 'email'
 const LAST_LOGIN_METHOD_KEY = 'httpsms_last_login_method'
+// Set before falling back to signInWithRedirect, so the login page knows to
+// finish the sign-in when the provider sends the user back.
+const PENDING_REDIRECT_KEY = 'httpsms_pending_redirect_login'
+// Popups are blocked or unsupported (popup blockers, embedded browsers…).
+const POPUP_UNAVAILABLE_CODES = [
+  'auth/popup-blocked',
+  'auth/operation-not-supported-in-this-environment',
+]
 const lastUsedMethod = ref<LoginMethod | null>(null)
 
 onMounted(() => {
@@ -52,7 +62,65 @@ onMounted(() => {
   } catch (error) {
     console.error(error)
   }
+  void completeRedirectSignIn()
 })
+
+function readPendingRedirect(): LoginMethod | null {
+  try {
+    const pending = sessionStorage.getItem(PENDING_REDIRECT_KEY)
+    sessionStorage.removeItem(PENDING_REDIRECT_KEY)
+    return pending === 'google' || pending === 'github' ? pending : null
+  } catch {
+    return null
+  }
+}
+
+// Finishes a sign-in that fell back to a full-page redirect.
+async function completeRedirectSignIn() {
+  const method = readPendingRedirect()
+  if (!method) return
+  loading.value = true
+  try {
+    const result = await getRedirectResult(getAuth())
+    if (result?.user) onSuccess(result.user, method)
+  } catch (error: unknown) {
+    handleError(error, true)
+  } finally {
+    loading.value = false
+  }
+}
+
+async function socialSignIn(
+  provider: GoogleAuthProvider | GithubAuthProvider,
+  method: LoginMethod,
+) {
+  loading.value = true
+  const auth = getAuth()
+  try {
+    const result = await signInWithPopup(auth, provider)
+    onSuccess(result.user, method)
+  } catch (error: unknown) {
+    const code = (error as { code?: string }).code || ''
+    if (!POPUP_UNAVAILABLE_CODES.includes(code)) {
+      handleError(error, true)
+      return
+    }
+    // The browser blocked the popup: sign in with a full-page redirect instead.
+    try {
+      sessionStorage.setItem(PENDING_REDIRECT_KEY, method)
+      await signInWithRedirect(auth, provider)
+    } catch (redirectError: unknown) {
+      try {
+        sessionStorage.removeItem(PENDING_REDIRECT_KEY)
+      } catch {
+        // ignore storage errors
+      }
+      handleError(redirectError, true)
+    }
+  } finally {
+    loading.value = false
+  }
+}
 
 function clearErrors() {
   errorMessages.value = new ErrorMessages()
@@ -104,29 +172,11 @@ function validateLoginForm(): boolean {
 }
 
 async function signInWithGoogle() {
-  loading.value = true
-  try {
-    const auth = getAuth()
-    const result = await signInWithPopup(auth, new GoogleAuthProvider())
-    onSuccess(result.user, 'google')
-  } catch (error: unknown) {
-    handleError(error, true)
-  } finally {
-    loading.value = false
-  }
+  await socialSignIn(new GoogleAuthProvider(), 'google')
 }
 
 async function signInWithGithub() {
-  loading.value = true
-  try {
-    const auth = getAuth()
-    const result = await signInWithPopup(auth, new GithubAuthProvider())
-    onSuccess(result.user, 'github')
-  } catch (error: unknown) {
-    handleError(error, true)
-  } finally {
-    loading.value = false
-  }
+  await socialSignIn(new GithubAuthProvider(), 'github')
 }
 
 async function submitEmail() {
@@ -310,6 +360,11 @@ function getGeneralErrorMessage(
       return t('components.firebaseAuth.tooManyRequests')
     case 'auth/network-request-failed':
       return t('components.firebaseAuth.networkError')
+    case 'auth/popup-blocked':
+    case 'auth/operation-not-supported-in-this-environment':
+      return t('components.firebaseAuth.popupBlocked')
+    case 'auth/unauthorized-domain':
+      return t('components.firebaseAuth.unauthorizedDomain')
     default:
       return fallback || t('components.firebaseAuth.unexpectedError')
   }
