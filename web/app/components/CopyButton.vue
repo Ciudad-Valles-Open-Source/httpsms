@@ -30,7 +30,10 @@ async function copy() {
   disabled.value = true
   await navigator.clipboard.writeText(props.value)
   notificationsStore.addNotification({
-    message: props.notificationText === 'Copied' ? t('components.copyButton.copied') : props.notificationText,
+    message:
+      props.notificationText === 'Copied'
+        ? t('components.copyButton.copied')
+        : props.notificationText,
     type: 'success',
   })
   setTimeout(() => {

@@ -11,10 +11,6 @@ updates:
     cooldown:
       default-days: 3
     open-pull-requests-limit: 10
-    reviewers:
-      - AchoArnold
-    assignees:
-      - AchoArnold
     commit-message:
       prefix: fix
       prefix-development: chore
@@ -26,10 +22,6 @@ updates:
       interval: monthly
       time: "00:00"
     open-pull-requests-limit: 10
-    reviewers:
-      - AchoArnold
-    assignees:
-      - AchoArnold
     commit-message:
       prefix: fix
       prefix-development: chore
@@ -41,10 +33,17 @@ updates:
       interval: monthly
       time: "00:00"
     open-pull-requests-limit: 10
-    reviewers:
-      - AchoArnold
-    assignees:
-      - AchoArnold
+    commit-message:
+      prefix: fix
+      prefix-development: chore
+      include: scope
+  # Fetch and update latest Android (Gradle) packages
+  - package-ecosystem: gradle
+    directory: "/android"
+    schedule:
+      interval: monthly
+      time: "00:00"
+    open-pull-requests-limit: 10
     commit-message:
       prefix: fix
       prefix-development: chore

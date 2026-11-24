@@ -1,0 +1,125 @@
+name: Release Android App
+
+# Builds the signed release APK and publishes it as HttpSms.apk on a GitHub
+# Release, so .../releases/latest/download/HttpSms.apk (the dashboard's
+# default download link) always points to the newest version.
+#
+# Run it by pushing a tag:   git tag v1.0.0 && git push origin v1.0.0
+# or manually from the Actions tab (it then needs an existing tag name).
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   GOOGLE_SERVICES_JSON_B64   base64 of android/app/google-services.json
+#   ANDROID_KEYSTORE_B64       base64 of your release keystore (.jks)
+#   ANDROID_KEYSTORE_PASSWORD  keystore password
+#   ANDROID_KEY_ALIAS          key alias inside the keystore
+#   ANDROID_KEY_PASSWORD       key password
+# Optional secrets: HTTPSMS_SENTRY_DSN, HTTPSMS_LOGS_URL, HTTPSMS_LOGS_TOKEN
+# Optional variable: HTTPSMS_DEFAULT_SERVER_URL (e.g. https://api.your-domain.com)
+# Details: docs/ci_ES.md / docs/ci.md
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to build and publish (e.g. v1.0.0)"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  android-release:
+    name: Build and Publish APK
+    runs-on: ubuntu-26.04
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - name: Set Up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Check Required Secrets
+        env:
+          GOOGLE_SERVICES_JSON_B64: ${{ secrets.GOOGLE_SERVICES_JSON_B64 }}
+          ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          missing=0
+          for name in GOOGLE_SERVICES_JSON_B64 ANDROID_KEYSTORE_B64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing repository secret $name (see docs/ci.md)"
+              missing=1
+            fi
+          done
+          exit $missing
+
+      # Files are written to ignored paths and deleted at the end of the job.
+      - name: Restore Firebase Config and Signing Key
+        working-directory: ./android
+        env:
+          GOOGLE_SERVICES_JSON_B64: ${{ secrets.GOOGLE_SERVICES_JSON_B64 }}
+          ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$GOOGLE_SERVICES_JSON_B64" | base64 -d > app/google-services.json
+          echo "$ANDROID_KEYSTORE_B64" | base64 -d > app/release.jks
+          {
+            echo "storeFile=release.jks"
+            echo "storePassword=$ANDROID_KEYSTORE_PASSWORD"
+            echo "keyAlias=$ANDROID_KEY_ALIAS"
+            echo "keyPassword=$ANDROID_KEY_PASSWORD"
+          } > key.properties
+
+      - name: Build Release APK
+        working-directory: ./android
+        env:
+          HTTPSMS_DEFAULT_SERVER_URL: ${{ vars.HTTPSMS_DEFAULT_SERVER_URL }}
+          HTTPSMS_SENTRY_DSN: ${{ secrets.HTTPSMS_SENTRY_DSN }}
+          HTTPSMS_LOGS_URL: ${{ secrets.HTTPSMS_LOGS_URL }}
+          HTTPSMS_LOGS_TOKEN: ${{ secrets.HTTPSMS_LOGS_TOKEN }}
+        run: ./gradlew --no-daemon :app:testReleaseUnitTest :app:assembleRelease
+
+      - name: Collect APK
+        run: |
+          apk=$(find android/app/build/outputs/apk/release -name '*.apk' ! -name '*unsigned*' | head -n 1)
+          if [ -z "$apk" ]; then
+            echo "::error::No signed release APK was produced"
+            exit 1
+          fi
+          cp "$apk" HttpSms.apk
+          sha256sum HttpSms.apk | tee HttpSms.apk.sha256
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" HttpSms.apk HttpSms.apk.sha256 --clobber
+          else
+            gh release create "$TAG" HttpSms.apk HttpSms.apk.sha256 --title "$TAG" --generate-notes --verify-tag
+          fi
+
+      - name: Remove Signing Material
+        if: always()
+        working-directory: ./android
+        run: rm -f app/google-services.json app/release.jks key.properties

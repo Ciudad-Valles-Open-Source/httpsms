@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { escapeHtml } from '~/utils/escape-html'
 import {
   mdiArrowLeft,
   mdiAccountCircle,
@@ -1957,7 +1958,7 @@ onMounted(async () => {
           ><span
             v-html="
               $t('settings.delete_schedule_confirm', {
-                name: activeSchedule.name,
+                name: escapeHtml(activeSchedule.name),
               })
             "
         /></VCardText>

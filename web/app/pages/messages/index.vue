@@ -94,7 +94,10 @@ async function sendMessage() {
       errors.value = newErrors
     } else {
       notificationsStore.addNotification({
-        message: getApiErrorMessage(err, t('pages.messages.defaultErrorSending')),
+        message: getApiErrorMessage(
+          err,
+          t('pages.messages.defaultErrorSending'),
+        ),
         type: 'error',
       })
     }
@@ -132,8 +135,7 @@ onMounted(async () => {
       <VContainer>
         <VRow>
           <VCol cols="12" md="8" offset-md="2" xl="6" offset-xl="3">
-            <p class="mb-8 mt-0" v-html="$t('pages.messages.description')">
-            </p>
+            <p class="mb-8 mt-0" v-html="$t('pages.messages.description')"></p>
             <form>
               <v-phone-input
                 v-model="formPhoneNumber"

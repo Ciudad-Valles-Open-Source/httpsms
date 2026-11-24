@@ -25,7 +25,9 @@ const { lgAndUp, mdAndDown } = useDisplay()
             :to="{ name: 'login' }"
           >
             {{ $t('components.fixedHeader.getStarted') }}
-            <span v-if="lgAndUp">&nbsp;{{ $t('components.fixedHeader.forFree') }}</span>
+            <span v-if="lgAndUp"
+              >&nbsp;{{ $t('components.fixedHeader.forFree') }}</span
+            >
           </v-btn>
         </v-col>
       </v-row>

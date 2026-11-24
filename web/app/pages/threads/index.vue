@@ -11,7 +11,6 @@ const { lgAndUp } = useVDisplay()
 const authStore = useAuthStore()
 const phonesStore = usePhonesStore()
 const threadsStore = useThreadsStore()
-const { t } = useI18n()
 
 onMounted(async () => {
   await authStore.loadUser()
@@ -37,8 +36,13 @@ onMounted(async () => {
           :src="'/img/person-texting.svg'"
         />
         <div class="text-center">
-          <h3 class="text-headline-medium mt-4 mb-0">{{ $t('threads.select_message') }}</h3>
-          <p class="text-medium-emphasis mt-0" v-html="$t('threads.discord_help_desc')"></p>
+          <h3 class="text-headline-medium mt-4 mb-0">
+            {{ $t('threads.select_message') }}
+          </h3>
+          <p
+            class="text-medium-emphasis mt-0"
+            v-html="$t('threads.discord_help_desc')"
+          ></p>
         </div>
       </div>
     </VRow>

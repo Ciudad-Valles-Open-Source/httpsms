@@ -1,4 +1,10 @@
-name: CI/CD
+name: CI
+
+# Checks every push to main and every pull request. Nothing is deployed from
+# here: Coolify deploys the app from the repository. Android releases are built
+# by release.yaml when a v* tag is pushed.
+#
+# Secrets/variables used (all optional for CI): see docs/ci_ES.md / docs/ci.md.
 
 on:
   push:
@@ -12,12 +18,74 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-cd-${{ github.ref }}
-  cancel-in-progress: false
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  secrets:
+    name: Secret Scan
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Scan Commits for Secrets
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_AFTER: ${{ github.sha }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            range="$PR_BASE..$PR_HEAD"
+          elif [ -n "$PUSH_BEFORE" ] && [ "$PUSH_BEFORE" != "0000000000000000000000000000000000000000" ] \
+            && git cat-file -e "$PUSH_BEFORE^{commit}" 2>/dev/null; then
+            range="$PUSH_BEFORE..$PUSH_AFTER"
+          else
+            range="$PUSH_AFTER~1..$PUSH_AFTER"
+          fi
+          echo "Scanning $range"
+          bash scripts/check-secrets.sh --range "$range"
+
+  api:
+    name: API (Go)
+    runs-on: ubuntu-26.04
+    defaults:
+      run:
+        working-directory: ./api
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Set Up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: api/go.mod
+          cache-dependency-path: api/go.sum
+
+      - name: Check Formatting
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "::error::Run gofmt on these files:"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Build
+        run: go build ./...
+
+      - name: Unit Tests
+        run: go test ./...
+
   integration-tests:
-    name: Run Integration Tests
+    name: Integration Tests
     runs-on: ubuntu-26.04
     steps:
       - name: Checkout Code
@@ -26,15 +94,16 @@ jobs:
       - name: Set Up Go
         uses: actions/setup-go@v7
         with:
-          go-version: stable
+          go-version-file: api/go.mod
           cache-dependency-path: |
             api/go.sum
             tests/go.sum
 
+      # Throw-away credentials generated on the fly for the Firebase emulator.
       - name: Generate Firebase Credentials
         run: |
           bash tests/generate-firebase-credentials.sh tests/firebase-credentials.json
-          echo "FIREBASE_CREDENTIALS=$(jq -c . tests/firebase-credentials.json)" >> $GITHUB_ENV
+          echo "FIREBASE_CREDENTIALS=$(jq -c . tests/firebase-credentials.json)" >> "$GITHUB_ENV"
 
       - name: Generate Adapter Certificates
         run: bash tests/generate-adapter-certificates.sh tests/certs
@@ -52,12 +121,11 @@ jobs:
               echo "MongoDB is healthy!"
               break
             fi
-            if [ $i -eq 20 ]; then
+            if [ "$i" -eq 20 ]; then
               echo "MongoDB failed to become healthy"
               docker compose logs mongodb
               exit 1
             fi
-            echo "MongoDB attempt $i/20 - waiting 3s..."
             sleep 3
           done
 
@@ -67,19 +135,17 @@ jobs:
               echo "API is healthy!"
               break
             fi
-            if [ $i -eq 40 ]; then
+            if [ "$i" -eq 40 ]; then
               echo "API failed to become healthy"
               docker compose logs api
               exit 1
             fi
-            echo "Attempt $i/40 - waiting 5s..."
             sleep 5
           done
 
       - name: Seed Database
         working-directory: ./tests
         run: |
-          echo "Waiting for seed container to finish..."
           SEED_CONTAINER_ID=$(docker compose ps --all --quiet seed)
           if [ -z "$SEED_CONTAINER_ID" ]; then
             echo "::error::Seed container not found"
@@ -105,58 +171,15 @@ jobs:
       - name: Collect Service Logs on Failure
         if: failure()
         working-directory: ./tests
-        run: |
-          docker compose logs --tail 200
+        run: docker compose logs --tail 200
 
       - name: Stop Services
         if: always()
         working-directory: ./tests
         run: docker compose down -v
 
-  deploy-api:
-    name: Deploy API
-    runs-on: ubuntu-26.04
-    needs: integration-tests
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    timeout-minutes: 60
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v3
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-
-      - name: Set Up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v3
-
-      - name: Build and Deploy API
-        run: |
-          BUILD_ID=$(gcloud builds triggers run api-httpsms-com \
-            --region=global \
-            --project=httpsms-86c51 \
-            --sha=${{ github.sha }} \
-            --substitutions=_VERSION=${{ github.run_id }} \
-            --format="value(metadata.build.id)")
-          echo -e "Cloud Build: \033[34mhttps://console.cloud.google.com/cloud-build/builds/$BUILD_ID?project=httpsms-86c51\033[0m"
-          echo ""
-          echo "Polling Cloud Build Status..."
-          while true; do
-            STATUS=$(gcloud builds describe "$BUILD_ID" --region=global --project=httpsms-86c51 --format="value(status)")
-            LOCAL_TIME=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
-            echo -e "  \033[90m${LOCAL_TIME}\033[0m status=\033[36m${STATUS}\033[0m"
-            case "$STATUS" in
-              SUCCESS) echo -e "\033[32mBuild succeeded!\033[0m"; exit 0 ;;
-              FAILURE|TIMEOUT|CANCELLED|EXPIRED|INTERNAL_ERROR) echo -e "\033[31mBuild failed with status: $STATUS\033[0m"; exit 1 ;;
-            esac
-            sleep 30
-          done
-
-  build-web:
-    name: Build Web
-    needs: integration-tests
+  web:
+    name: Web (Nuxt)
     runs-on: ubuntu-26.04
     defaults:
       run:
@@ -165,96 +188,106 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v7
 
-      - name: Set Up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: "24.18"
-
       - name: Set Up pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: 11.11.0
+          version: 12.9.1
 
-      - name: Install Web Dependencies
-        run: pnpm install --trust-lockfile
+      - name: Set Up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24.18"
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
 
-      - name: Lint Web
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
         run: pnpm lint
 
-      - name: Run Web Tests
+      - name: Unit Tests
         run: pnpm test
 
-      - name: Build Web
-        run: mv .env.production .env && pnpm run generate
+      # Public build-time values only (no secrets). Optional repository
+      # variables let you build with your real domain.
+      - name: Generate Static Site
+        env:
+          API_BASE_URL: ${{ vars.API_BASE_URL || 'https://api.example.com' }}
+          APP_URL: ${{ vars.APP_URL || 'https://example.com' }}
+          APP_ENV: production
+        run: pnpm run generate
 
-      - name: Upload Web Build
-        uses: actions/upload-artifact@v7
-        with:
-          name: web-build
-          path: web/.output/public
-          include-hidden-files: true
-          if-no-files-found: error
-          retention-days: 1
-
-  deploy-web-cloudflare:
-    name: Deploy Web to Cloudflare
-    needs: [deploy-api, build-web]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  android:
+    name: Android App
     runs-on: ubuntu-26.04
-    permissions:
-      contents: read
-      deployments: write
+    defaults:
+      run:
+        working-directory: ./android
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
 
-      - name: Set Up Node.js
-        uses: actions/setup-node@v7
+      - name: Set Up Java
+        uses: actions/setup-java@v5
         with:
-          node-version: "24.18"
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
 
-      - name: Download Web Build
-        uses: actions/download-artifact@v8
-        with:
-          name: web-build
-          path: web/.output/public
+      # Uses your real google-services.json when the GOOGLE_SERVICES_JSON_B64
+      # secret exists (it is not available to pull requests from forks);
+      # otherwise a placeholder that is only good enough to compile.
+      - name: Provide google-services.json
+        env:
+          GOOGLE_SERVICES_JSON_B64: ${{ secrets.GOOGLE_SERVICES_JSON_B64 }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON_B64" ]; then
+            echo "$GOOGLE_SERVICES_JSON_B64" | base64 -d > app/google-services.json
+            echo "Using google-services.json from secrets"
+          else
+            echo "::notice::GOOGLE_SERVICES_JSON_B64 not set, using a compile-only placeholder"
+            cat > app/google-services.json <<'JSON'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "ci-placeholder",
+              "storage_bucket": "ci-placeholder.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+                  "android_client_info": { "package_name": "com.nerus.httpsms" }
+                },
+                "oauth_client": [],
+                "api_key": [{ "current_key": "ci-placeholder" }],
+                "services": { "appinvite_service": { "other_platform_oauth_client": [] } }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          JSON
+          fi
 
-      - name: Deploy Web to Cloudflare
-        uses: cloudflare/wrangler-action@v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy web/.output/public --project-name=httpsms
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and Test
+        env:
+          HTTPSMS_DEFAULT_SERVER_URL: ${{ vars.HTTPSMS_DEFAULT_SERVER_URL }}
+        run: ./gradlew --no-daemon :app:testDebugUnitTest :app:assembleDebug
 
-  deploy-web-firebase:
-    name: Deploy Web to Firebase
-    needs: [deploy-api, build-web]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Remove google-services.json
+        if: always()
+        run: rm -f app/google-services.json
+
+  docker:
+    name: Docker Images
     runs-on: ubuntu-26.04
-    permissions:
-      contents: read
-      pull-requests: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
 
-      - name: Set Up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: "24.18"
+      - name: Build API Image
+        run: docker build --build-arg GIT_COMMIT=${{ github.sha }} -t httpsms-api:ci ./api
 
-      - name: Download Web Build
-        uses: actions/download-artifact@v8
-        with:
-          name: web-build
-          path: web/.output/public
-
-      - name: Deploy Web to Firebase
-        uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a
-        with:
-          repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          channelId: live
-          entryPoint: "./web"
-          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_HTTPSMS_86C51 }}"
-          projectId: httpsms-86c51
+      - name: Build Web Image
+        run: docker build -t httpsms-web:ci ./web

@@ -54,6 +54,9 @@ type notificationRecord struct {
 	Authorization string            `json:"authorization,omitempty"`
 }
 
+// expectedJWTIssuer is the JWT_ISSUER configured for the API in .env.test.
+const expectedJWTIssuer = "httpsms-test"
+
 func newAPIClient() *httpsms.Client {
 	return httpsms.New(
 		httpsms.WithBaseURL(apiBaseURL),
@@ -577,7 +580,7 @@ func assertWebhookJWT(t *testing.T, request wmJournal.Request, signingKey string
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	require.True(t, ok, "cannot parse claims")
-	require.Equal(t, "api.httpsms.com", claims["iss"], "issuer mismatch")
+	require.Equal(t, expectedJWTIssuer, claims["iss"], "issuer mismatch")
 	require.NotEmpty(t, claims["sub"], "subject mismatch")
 
 	exp, err := claims.GetExpirationTime()
@@ -610,7 +613,7 @@ func assertAdapterNotificationJWT(t *testing.T, record notificationRecord, phone
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	require.True(t, ok, "cannot parse claims")
-	require.Equal(t, "api.httpsms.com", claims["iss"], "issuer mismatch")
+	require.Equal(t, expectedJWTIssuer, claims["iss"], "issuer mismatch")
 	require.Empty(t, claims["sub"], "phone ID must not be embedded in a claim since it is also the signing secret")
 
 	exp, err := claims.GetExpirationTime()

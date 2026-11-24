@@ -83,6 +83,7 @@ services:
       - "9092:9092"
     environment:
       API_BASE_URL: http://api:8000
+      JWT_ISSUER: httpsms-test # must match JWT_ISSUER in .env.test
       ADAPTER_TLS_CERT: /certs/server.pem
       ADAPTER_TLS_KEY: /certs/server-key.pem
     volumes:

@@ -307,6 +307,11 @@ func (service *HeartbeatService) Monitor(ctx context.Context, params *HeartbeatM
 	heartbeat, err := service.repository.Last(ctx, params.UserID, params.Owner)
 	if stacktrace.GetCode(err) == repositories.ErrCodeNotFound {
 		ctxLogger.Info(fmt.Sprintf("heartbeat history does not exist for userID [%s] and owner [%s], stopping check", params.UserID, params.Owner))
+		// Clear the scheduled check so the next heartbeat restarts monitoring (see entities.HeartbeatMonitor.RequiresCheck).
+		if err = service.monitorRepository.UpdateQueueID(ctx, monitor.ID, ""); err != nil {
+			ctxLogger.Error(stacktrace.Propagatef(err, "cannot clear queue ID for heartbeat monitor [%s]", monitor.ID))
+		}
+		monitor.QueueID = ""
 		return nil
 	}
 	if err != nil {

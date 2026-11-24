@@ -34,12 +34,15 @@ interface HeartbeatTableItem {
   interval: number
 }
 
-const dataTableHeaders = computed(() => [
-  { title: t('pages.heartbeats.thId'), key: 'id', sortable: false },
-  { title: t('pages.heartbeats.thPhone'), key: 'owner', sortable: false },
-  { title: t('pages.heartbeats.thReceived'), key: 'timestamp' },
-  { title: t('pages.heartbeats.thInterval'), key: 'interval' },
-] as const)
+const dataTableHeaders = computed(
+  () =>
+    [
+      { title: t('pages.heartbeats.thId'), key: 'id', sortable: false },
+      { title: t('pages.heartbeats.thPhone'), key: 'owner', sortable: false },
+      { title: t('pages.heartbeats.thReceived'), key: 'timestamp' },
+      { title: t('pages.heartbeats.thInterval'), key: 'interval' },
+    ] as const,
+)
 
 function getDiff(a: string, b: string): number {
   return new Date(a).getTime() - new Date(b).getTime()
@@ -172,8 +175,7 @@ onMounted(async () => {
       <VContainer>
         <VRow>
           <VCol cols="12" class="mt-n4">
-            <p v-html="$t('pages.heartbeats.desc1')">
-            </p>
+            <p v-html="$t('pages.heartbeats.desc1')"></p>
             <p>
               {{ $t('pages.heartbeats.desc2') }}
             </p>

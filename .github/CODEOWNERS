@@ -1,2 +1,4 @@
-# Require review/approval for any changes to GitHub Actions workflows
-/.github/workflows/ @AchoArnold
+# Code owners are asked to review changes to the matching paths.
+# Add your GitHub username or team, e.g.:
+#   /.github/workflows/ @your-github-username
+#   /scripts/check-secrets.sh @your-github-username

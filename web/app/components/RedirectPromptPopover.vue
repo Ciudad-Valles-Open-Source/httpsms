@@ -50,7 +50,8 @@ const menuOpen = computed({
       </v-list-item>
       <v-list-item class="text-primary" @click="redirectStore.enable()">
         <v-list-item-title
-          >{{ $t('components.redirectPromptPopover.alwaysOpenDashboard') }} <v-icon end :icon="mdiArrowRight" size="small"
+          >{{ $t('components.redirectPromptPopover.alwaysOpenDashboard') }}
+          <v-icon end :icon="mdiArrowRight" size="small"
         /></v-list-item-title>
       </v-list-item>
     </v-list>

@@ -14,7 +14,9 @@ defineProps<{
 <template>
   <div>
     <!-- Overview -->
-    <h4 v-if="!hideTitle" class="text-headline-large mb-3 mt-8">{{ $t('pages.billing.overview') }}</h4>
+    <h4 v-if="!hideTitle" class="text-headline-large mb-3 mt-8">
+      {{ $t('pages.billing.overview') }}
+    </h4>
     <p class="text-medium-emphasis">
       {{ $t('pages.billing.overviewDesc') }}
       <v-code v-if="billingStore.billingUsage" class="font-weight-bold">
@@ -26,21 +28,18 @@ defineProps<{
       <v-code v-if="billingStore.billingUsage" class="font-weight-bold">
         <BillingDateOrdinal
           :value="billingStore.billingUsage.end_timestamp"
-        />
-      </v-code>.
+        /> </v-code
+      >.
     </p>
     <VRow v-if="billingStore.billingUsage">
       <VCol cols="12" md="6">
-        <VAlert
-          type="info"
-          variant="tonal"
-          :icon="mdiCallMade"
-          prominent
-        >
+        <VAlert type="info" variant="tonal" :icon="mdiCallMade" prominent>
           <h2 class="text-headline-large my-0">
             {{ formatDecimal(billingStore.billingUsage.sent_messages) }}
           </h2>
-          <p class="text-medium-emphasis mt-n1">{{ $t('pages.billing.messagesSent') }}</p>
+          <p class="text-medium-emphasis mt-n1">
+            {{ $t('pages.billing.messagesSent') }}
+          </p>
         </VAlert>
       </VCol>
       <VCol cols="12" md="6">
@@ -53,13 +52,17 @@ defineProps<{
           <h2 class="text-headline-large font-weight-bold my-0">
             {{ formatDecimal(billingStore.billingUsage.received_messages) }}
           </h2>
-          <p class="text-medium-emphasis mt-n1">{{ $t('pages.billing.messagesReceived') }}</p>
+          <p class="text-medium-emphasis mt-n1">
+            {{ $t('pages.billing.messagesReceived') }}
+          </p>
         </VAlert>
       </VCol>
     </VRow>
 
     <!-- Usage History -->
-    <h4 class="text-headline-large mb-3 mt-8">{{ $t('pages.billing.usageHistory') }}</h4>
+    <h4 class="text-headline-large mb-3 mt-8">
+      {{ $t('pages.billing.usageHistory') }}
+    </h4>
     <p class="text-medium-emphasis">
       {{ $t('pages.billing.usageHistoryDesc') }}
     </p>

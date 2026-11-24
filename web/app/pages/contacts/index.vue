@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { escapeHtml } from '~/utils/escape-html'
 import {
   mdiAccountGroupOutline,
   mdiAccountPlus,
@@ -33,11 +34,20 @@ const { t } = useI18n()
 
 const headers = computed(() => [
   { title: t('pages.contacts.thName'), key: 'name', sortable: true },
-  { title: t('pages.contacts.thPhoneNumbers'), key: 'phone_numbers', sortable: false },
+  {
+    title: t('pages.contacts.thPhoneNumbers'),
+    key: 'phone_numbers',
+    sortable: false,
+  },
   { title: t('pages.contacts.thEmails'), key: 'emails', sortable: false },
   { title: t('pages.contacts.thCreated'), key: 'created_at', sortable: false },
   { title: t('pages.contacts.thUpdated'), key: 'updated_at', sortable: true },
-  { title: t('pages.contacts.thActions'), key: 'actions', sortable: false, align: 'end' as const },
+  {
+    title: t('pages.contacts.thActions'),
+    key: 'actions',
+    sortable: false,
+    align: 'end' as const,
+  },
 ])
 
 const itemsPerPageOptions = [
@@ -211,7 +221,11 @@ onBeforeUnmount(() => {
 <template>
   <VContainer fluid class="px-0 pt-0">
     <VAppBar>
-      <VBtn icon to="/threads" :aria-label="$t('pages.contacts.ariaBackToMessages')">
+      <VBtn
+        icon
+        to="/threads"
+        :aria-label="$t('pages.contacts.ariaBackToMessages')"
+      >
         <VIcon :icon="mdiArrowLeft" />
       </VBtn>
       <VToolbarTitle>{{ $t('pages.contacts.titleContacts') }}</VToolbarTitle>
@@ -228,7 +242,9 @@ onBeforeUnmount(() => {
       <VRow>
         <VCol cols="12">
           <div class="d-flex align-center">
-            <h1 class="text-display-large mb-1">{{ $t('pages.contacts.titleContacts') }}</h1>
+            <h1 class="text-display-large mb-1">
+              {{ $t('pages.contacts.titleContacts') }}
+            </h1>
             <VSpacer />
             <div class="mt-12">
               <VBtn
@@ -250,8 +266,10 @@ onBeforeUnmount(() => {
               </VBtn>
             </div>
           </div>
-          <p class="text-medium-emphasis mb-6" v-html="$t('pages.contacts.description')">
-          </p>
+          <p
+            class="text-medium-emphasis mb-6"
+            v-html="$t('pages.contacts.description')"
+          ></p>
 
           <VTextField
             v-model="searchTerm"
@@ -428,7 +446,15 @@ onBeforeUnmount(() => {
             @click="deleteDialog = false"
           />
         </VCardTitle>
-        <VCardText class="mt-n2 text-medium-emphasis" v-html="$t('pages.contacts.deleteConfirmText').replace('{name}', pendingDelete?.name || '')">
+        <VCardText class="mt-n2 text-medium-emphasis">
+          <span
+            v-html="
+              $t('pages.contacts.deleteConfirmText').replace(
+                '{name}',
+                escapeHtml(pendingDelete?.name),
+              )
+            "
+          />
         </VCardText>
         <VCardActions class="mb-2">
           <VBtn
@@ -465,8 +491,10 @@ onBeforeUnmount(() => {
           />
         </VCardTitle>
         <VCardText>
-          <p class="mb-4 mt-n2 text-medium-emphasis" v-html="$t('pages.contacts.importDialogDesc')">
-          </p>
+          <p
+            class="mb-4 mt-n2 text-medium-emphasis"
+            v-html="$t('pages.contacts.importDialogDesc')"
+          ></p>
           <VFileInput
             v-model="importFile"
             :label="$t('pages.contacts.csvFileLabel')"
@@ -485,7 +513,9 @@ onBeforeUnmount(() => {
             class="mt-4"
             :icon="mdiAlertCircleOutline"
           >
-            <p class="font-weight-medium mb-1">{{ $t('pages.contacts.importErrorTitle') }}</p>
+            <p class="font-weight-medium mb-1">
+              {{ $t('pages.contacts.importErrorTitle') }}
+            </p>
             <ul class="pl-4 mb-0">
               <li v-for="message in importErrors" :key="message">
                 {{ message }}

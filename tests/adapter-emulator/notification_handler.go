@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -13,8 +14,16 @@ import (
 const maxCallbackBodyBytes = 1024 * 1024
 
 // notificationJWTIssuer must match the issuer the httpSMS API signs adapter notification
-// tokens with (see api/pkg/services/http_notification_sender.go).
-const notificationJWTIssuer = "api.httpsms.com"
+// tokens with: the API's JWT_ISSUER, or by default the slug of APP_NAME
+// (see api/pkg/config/identity.go). The emulator reads the same JWT_ISSUER.
+var notificationJWTIssuer = jwtIssuerFromEnv()
+
+func jwtIssuerFromEnv() string {
+	if issuer := strings.TrimSpace(os.Getenv("JWT_ISSUER")); issuer != "" {
+		return issuer
+	}
+	return "httpsms"
+}
 
 type callbackEnvelope struct {
 	Message struct {

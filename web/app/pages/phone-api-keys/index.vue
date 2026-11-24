@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { escapeHtml } from '~/utils/escape-html'
 import { mdiArrowLeft, mdiPlus, mdiDelete, mdiEye } from '@mdi/js'
 import QRCode from 'qrcode'
 import { bindRealtimeEvents } from '~/composables/useRealtime'
@@ -494,7 +495,7 @@ onBeforeUnmount(() => unbindRealtime())
             v-html="
               $t('pages.phoneApiKeys.dialogRemoveSubtitle').replace(
                 '{phoneNumber}',
-                formatPhoneNumber(activePhoneNumber),
+                escapeHtml(formatPhoneNumber(activePhoneNumber)),
               )
             "
           />

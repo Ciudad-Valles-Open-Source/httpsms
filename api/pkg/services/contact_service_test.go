@@ -268,6 +268,10 @@ func newContactCache(t *testing.T) *ristretto.Cache[string, ContactCacheEntry] {
 		MaxCost:     100,
 		NumCounters: 1_000,
 		BufferItems: 64,
+		// Count only the explicit cost (1 per entry). Ristretto otherwise adds the
+		// internal size of each item, so a few entries exceed MaxCost and get
+		// evicted at random, which made tests that expect a cache hit flaky.
+		IgnoreInternalCost: true,
 	})
 	require.NoError(t, err)
 	t.Cleanup(contactCache.Close)

@@ -14,10 +14,20 @@
 # False positive? Add the marker  secret-scan: ignore  on that line (in a
 # comment), or use a placeholder such as YOUR_API_KEY / changeme / <value>.
 # Run manually:  bash scripts/check-secrets.sh
+# In CI (scan every commit of a push/PR):
+#   bash scripts/check-secrets.sh --range <base>..<head>
 # =============================================================================
 set -euo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
+
+# Default: what is staged for the next commit. --range A..B: changes between
+# two commits (used by CI).
+diff_args=(--cached)
+if [ "${1:-}" = "--range" ]; then
+  [ -n "${2:-}" ] || { echo "usage: $0 [--range <base>..<head>]" >&2; exit 2; }
+  diff_args=("$2")
+fi
 
 red() { printf '\033[31m%s\033[0m\n' "$*"; }
 found=0
@@ -31,62 +41,62 @@ while IFS= read -r file; do
     red "✖ Sensitive file staged: $file"
     found=1
   fi
-done < <(git diff --cached --name-only --diff-filter=ACMR)
+done < <(git diff "${diff_args[@]}" --name-only --diff-filter=ACMR)
 
 # ── 2. Secret patterns in added lines ───────────────────────────────────────
-patterns=(
-  'AIza[0-9A-Za-z_-]{35}'                                    # Google / Firebase API key
-  '-----BEGIN ([A-Z]+ )?PRIVATE KEY-----'                    # PEM private key
-  '"private_key"[[:space:]]*:[[:space:]]*"-----BEGIN'        # service account JSON
-  'gh[pousr]_[0-9A-Za-z]{36,}'                               # GitHub token
-  'github_pat_[0-9A-Za-z_]{40,}'                             # GitHub fine-grained token
-  'xox[abposr]-[0-9A-Za-z-]{10,}'                            # Slack token
-  '(sk|rk)_live_[0-9A-Za-z]{16,}'                            # Stripe live key
-  'AKIA[0-9A-Z]{16}'                                         # AWS access key id
-  'https://[0-9a-f]{32}@[a-z0-9.-]*ingest[a-z0-9.-]*sentry\.io' # Sentry DSN
-  'xaat-[0-9a-f-]{20,}'                                      # Axiom token
-  'eyJ[0-9A-Za-z_-]{10,}\.eyJ[0-9A-Za-z_-]{10,}\.[0-9A-Za-z_-]{10,}' # JWT
-)
+# One Perl pass over the whole diff (fast even for huge diffs such as merges).
+scan_content() {
+  perl -ne '
+    BEGIN {
+      @patterns = (
+        qr/AIza[0-9A-Za-z_-]{35}/,                                      # Google / Firebase API key
+        qr/-----BEGIN (?:[A-Z]+ )?PRIVATE KEY-----/,                    # PEM private key
+        qr/"private_key"\s*:\s*"-----BEGIN/,                            # service account JSON
+        qr/gh[pousr]_[0-9A-Za-z]{36,}/,                                 # GitHub token
+        qr/github_pat_[0-9A-Za-z_]{40,}/,                               # GitHub fine-grained token
+        qr/xox[abposr]-[0-9A-Za-z-]{10,}/,                              # Slack token
+        qr/(?:sk|rk)_live_[0-9A-Za-z]{16,}/,                            # Stripe live key
+        qr/AKIA[0-9A-Z]{16}/,                                           # AWS access key id
+        qr{https://[0-9a-f]{32}\@[a-z0-9.-]*ingest[a-z0-9.-]*sentry\.io}, # Sentry DSN
+        qr/xaat-[0-9a-f-]{20,}/,                                        # Axiom token
+        qr/eyJ[0-9A-Za-z_-]{10,}\.eyJ[0-9A-Za-z_-]{10,}\.[0-9A-Za-z_-]{10,}/, # JWT
+      );
+      # Secret-looking variable names in .env-style files (KEY=value) …
+      $env_var = qr/^\+\s*(?:export\s+)?[A-Z0-9_]*(?:SECRET|PASSWORD|PASSWD|TOKEN|API_KEY|PRIVATE_KEY|CREDENTIALS|DSN)[A-Z0-9_]*\s*=\s*["\x27]?[^"\x27\s#]/;
+      # … unless the value is clearly a placeholder / local default.
+      $placeholder = qr/=\s*["\x27]?(?:\$\{|<|your|tu_|changeme|change_me|example|placeholder|xxx|test|app-(?:key|secret|id)|system|secret$|password$|dev$|local)/i;
+      $bad = 0;
+      sub mask { my $s = substr(shift, 0, 80); $s =~ s/([A-Za-z0-9_-]{6})[A-Za-z0-9_.-]{6,}/$1.../g; return $s; }
+    }
+    if (/^\+\+\+ b\/(.*)$/) { $file = $1; next; }
+    next if /^(?:\+\+\+|---)/;
+    next unless /^\+/;
+    next if /secret-scan: ignore/;
+    chomp;
+    my $line = substr($_, 1);
+    for my $re (@patterns) {
+      if ($line =~ $re) {
+        print "\e[31m[secret] Possible secret in $file:\e[0m\n    " . mask($line) . "\n";
+        $bad = 1;
+        last;
+      }
+    }
+    if ($file =~ m{(?:^|/)\.env|\.env(?:\.|$)} && $_ =~ $env_var && $_ !~ $placeholder) {
+      (my $shown = $line) =~ s/=.*/=.../;
+      print "\e[31m[secret] Secret value in env file $file:\e[0m\n    $shown\n";
+      $bad = 1;
+    }
+    END { exit $bad }
+  '
+}
 
-# Secret-looking variable names in .env-style files (KEY=value).
-env_secret_var='^\+[[:space:]]*(export[[:space:]]+)?[A-Z0-9_]*(SECRET|PASSWORD|PASSWD|TOKEN|API_KEY|PRIVATE_KEY|CREDENTIALS|DSN)[A-Z0-9_]*[[:space:]]*=[[:space:]]*["'"'"']?[^"'"'"'[:space:]#]'
-# Values that are clearly placeholders / local defaults.
-placeholder='=[[:space:]]*["'"'"']?(\$\{|<|your|tu_|changeme|change_me|example|placeholder|xxx|test|app-(key|secret|id)|system|secret$|password$|dev$|local)'
-
-current_file=''
-while IFS= read -r line; do
-  case "$line" in
-    '+++ b/'*) current_file="${line#+++ b/}"; continue ;;
-    '+++ '*|'---'*) continue ;;
-    '+'*) ;;
-    *) continue ;;
-  esac
-  printf '%s' "$line" | grep -q 'secret-scan: ignore' && continue
-
-  for re in "${patterns[@]}"; do
-    if printf '%s' "$line" | grep -Eq -- "$re"; then
-      red "✖ Possible secret in $current_file:"
-      printf '    %s\n' "$(printf '%s' "${line:1}" | cut -c1-80 | sed -E 's/([A-Za-z0-9_-]{6})[A-Za-z0-9_.-]{6,}/\1…/g')"
-      found=1
-      break
-    fi
-  done
-
-  case "$current_file" in
-    *.env|*.env.*|.env*|*/.env*)
-      if printf '%s' "$line" | grep -Eq -- "$env_secret_var" &&
-        ! printf '%s' "$line" | grep -Eiq -- "$placeholder"; then
-        red "✖ Secret value in env file $current_file:"
-        printf '    %s\n' "$(printf '%s' "${line:1}" | sed -E 's/=.*/=…/')"
-        found=1
-      fi
-      ;;
-  esac
-done < <(git diff --cached -U0 --no-color --diff-filter=ACMR)
+if ! git diff "${diff_args[@]}" -U0 --no-color --diff-filter=ACMR | scan_content; then
+  found=1
+fi
 
 if [ "$found" -ne 0 ]; then
   echo
-  red "Commit blocked: secrets must not be committed."
+  red "Blocked: secrets must not be committed."
   echo "Put real values in .env (ignored by git), Coolify environment variables"
   echo "or GitHub Actions secrets. See docs/secrets.md (docs/secrets_ES.md)."
   echo "If it is a false positive, add the comment marker: secret-scan: ignore"
