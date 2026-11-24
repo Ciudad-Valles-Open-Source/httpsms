@@ -5,7 +5,9 @@ import {
   differenceInMinutes,
   differenceInDays,
   differenceInHours,
+  type Locale,
 } from 'date-fns'
+import { enUS, es } from 'date-fns/locale'
 import { parsePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js'
 
 export function formatPhoneNumber(value: string): string {
@@ -31,8 +33,13 @@ export function phoneCountry(value: string): string {
   return 'Earth'
 }
 
-export function formatTimestamp(value: string): string {
-  return new Date(value).toLocaleString()
+/** date-fns locale for an app locale code (`es`, `en`). */
+export function dateFnsLocale(locale = 'en'): Locale {
+  return locale.startsWith('es') ? es : enUS
+}
+
+export function formatTimestamp(value: string, locale?: string): string {
+  return new Date(value).toLocaleString(locale)
 }
 
 export function formatMoney(value: string | number): string {
@@ -42,8 +49,11 @@ export function formatMoney(value: string | number): string {
   }).format(typeof value === 'string' ? parseInt(value) : value)
 }
 
-export function formatDecimal(value: string | number): string {
-  return new Intl.NumberFormat('en-US', {
+export function formatDecimal(
+  value: string | number,
+  locale = 'en-US',
+): string {
+  return new Intl.NumberFormat(locale, {
     style: 'decimal',
   }).format(typeof value === 'string' ? parseInt(value) : value)
 }
@@ -99,27 +109,30 @@ export function formatBillingPeriodDateOrdinalParts(
   return { leading: `${month} ${day}`, suffix, trailing: ` ${year}` }
 }
 
-export function humanizeTime(value: string): string {
+export function humanizeTime(value: string, locale = 'en'): string {
   const durations = intervalToDuration({
     start: new Date(value),
     end: new Date(),
   })
-  return formatDuration(durations)
+  return formatDuration(durations, { locale: dateFnsLocale(locale) })
 }
 
 export function startsWithLetter(value: string): boolean {
   return /^[a-zA-Z]/.test(value)
 }
 
-export function humanizeTimeShort(date: string) {
+/** "2 minutes ago" / "hace 2 minutos", in the given locale. */
+export function humanizeTimeShort(date: string, locale = 'en'): string {
   const now = new Date()
-  const seconds = differenceInSeconds(now, new Date(date))
-  const minutes = differenceInMinutes(now, new Date(date))
-  const hours = differenceInHours(now, new Date(date))
-  const days = differenceInDays(now, new Date(date))
+  const then = new Date(date)
+  const relative = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
+  const seconds = differenceInSeconds(now, then)
+  const minutes = differenceInMinutes(now, then)
+  const hours = differenceInHours(now, then)
+  const days = differenceInDays(now, then)
 
-  if (seconds < 60) return 'just now'
-  if (minutes < 60) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`
-  if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`
-  return `${days} day${days !== 1 ? 's' : ''} ago`
+  if (seconds < 60) return relative.format(0, 'second')
+  if (minutes < 60) return relative.format(-minutes, 'minute')
+  if (hours < 24) return relative.format(-hours, 'hour')
+  return relative.format(-days, 'day')
 }

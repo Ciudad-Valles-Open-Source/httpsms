@@ -23,7 +23,8 @@ const { target: heartbeatsTable, stacked: heartbeatsStacked } = useTableFit()
 const authStore = useAuthStore()
 const phonesStore = usePhonesStore()
 const { formatPhoneNumber, formatTimestamp } = useFilters()
-const { t } = useI18n()
+const { locale, t } = useI18n()
+const durationLocale = computed(() => dateFnsLocale(locale.value))
 
 const loading = ref(true)
 const heartbeats = ref<EntitiesHeartbeat[]>([])
@@ -57,8 +58,9 @@ function formatInterval(duration: number): string {
   const start = new Date()
   start.setMilliseconds(start.getMilliseconds() + duration)
   return (
-    formatDurationFns(intervalToDuration({ start: new Date(), end: start })) ||
-    '0 seconds'
+    formatDurationFns(intervalToDuration({ start: new Date(), end: start }), {
+      locale: durationLocale.value,
+    }) || t('pages.heartbeats.zeroSeconds')
   )
 }
 
@@ -128,7 +130,9 @@ const chartOptions = computed<ChartOptions<'bar'>>(() => {
               start: new Date(dataset[context.dataIndex + 1]!.x),
               end: new Date(dataset[context.dataIndex]!.x),
             })
-            return formatDurationFns(duration)
+            return formatDurationFns(duration, {
+              locale: durationLocale.value,
+            })
           },
         },
       },
