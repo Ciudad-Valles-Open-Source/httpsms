@@ -21,7 +21,10 @@
     "termsAndConditions": "Términos y Condiciones",
     "privacyPolicy": "Política de Privacidad",
     "contactSupport": "Contactar Soporte",
-    "docs": "Documentación"
+    "docs": "Documentación",
+    "mainNavigation": "Navegación principal",
+    "openMenu": "Abrir menú",
+    "footerTagline": "Convierte tu teléfono Android en una pasarela de SMS autoalojada con una API HTTP sencilla."
   },
   "components": {
     "contactDialog": {
@@ -71,7 +74,13 @@
         "sent": "enviado",
         "failed": "fallido",
         "pending": "pendiente"
-      }
+      },
+      "loadMoreError": "No se pudieron cargar más conversaciones",
+      "loadMore": "Cargar más",
+      "noPhoneTitle": "Conecta tu primer teléfono",
+      "emptyTitle": "Aún no hay conversaciones",
+      "emptyArchiveTitle": "No hay conversaciones archivadas",
+      "noUnread": "No hay conversaciones sin leer"
     },
     "messageThreadHeader": {
       "logoutSuccess": "Has cerrado sesión correctamente",
@@ -94,7 +103,12 @@
       "filterAll": "Todos",
       "filterUnread": "No leídos",
       "filterError": "No se pudo actualizar el filtro de conversaciones",
-      "documentation": "Documentación"
+      "documentation": "Documentación",
+      "syncing": "Sincronizando",
+      "menu": "Abrir menú",
+      "archivedFilter": "Archivados",
+      "showInbox": "Volver a la bandeja de entrada",
+      "showArchived": "Ver conversaciones archivadas"
     },
     "redirectPromptPopover": {
       "skipNextTime": "¿Omitir esta página la próxima vez?",
@@ -156,6 +170,27 @@
     },
     "backButton": {
       "goBack": "Regresar"
+    },
+    "theme": {
+      "title": "Apariencia",
+      "mode": "Modo",
+      "dark": "Oscuro",
+      "light": "Claro",
+      "palette": "Paleta de colores",
+      "paletteBlue": "Azul",
+      "paletteViolet": "Morado",
+      "toLight": "Cambiar a tema claro",
+      "toDark": "Cambiar a tema oscuro"
+    },
+    "appLogo": {
+      "home": "Inicio de httpSMS"
+    },
+    "languageSwitcher": {
+      "label": "Cambiar idioma"
+    },
+    "panelNav": {
+      "threads": "Conversaciones",
+      "label": "Navegación del panel"
     }
   },
   "pages": {
@@ -252,7 +287,9 @@
       "btnDeleteApiKey": "Eliminar Clave API",
       "dialogRemoveTitle": "¿Estás seguro de que deseas eliminar este número de teléfono de la clave API?",
       "dialogRemoveSubtitle": "Esto eliminará el {phoneNumber} de la clave API de tu teléfono. Tendrás que cerrar sesión e iniciar sesión nuevamente en la aplicación Android httpSMS en el teléfono que actualmente usa esta clave API.",
-      "btnRemovePhoneFromKey": "Eliminar Teléfono de la clave"
+      "btnRemovePhoneFromKey": "Eliminar Teléfono de la clave",
+      "emptyTitle": "Aún no hay claves API de teléfono",
+      "emptyDesc": "Crea una por cada teléfono que quieras conectar sin compartir tu clave API principal."
     },
     "messages": {
       "title": "Nuevo Mensaje - httpSMS",
@@ -390,7 +427,8 @@
       "formNotesLabel": "Notas (opcional)",
       "formNotesPlaceholder": "ej. ¡Gracias por hacer negocios con nosotros!",
       "btnDownloadInvoice": "Descargar Factura",
-      "btnClose": "Cerrar"
+      "btnClose": "Cerrar",
+      "noHistory": "Todavía no hay historial de uso."
     },
     "index": {
       "proPlanTitle": "Pro",
@@ -468,13 +506,27 @@
       "freePlanDesc": "Prueba enviar y recibir SMS en tus sitios web de pasatiempo y experimentos.",
       "freePlanCost": "$0",
       "noCreditCard": "No requiere tarjeta de crédito",
-      "freePlanFeature1": "Envía o recibe hasta 200 SMS/mes"
+      "freePlanFeature1": "Envía o recibe hasta 200 SMS/mes",
+      "heroBadge": "Autoalojado · Gratis · Código abierto",
+      "heroTitleLead": "Convierte tu teléfono Android en una",
+      "heroTitleAccent": "pasarela de SMS.",
+      "selfHostedBadge": "Autoalojado",
+      "chipApi": "API HTTP",
+      "chipEncryption": "Cifrado de extremo a extremo",
+      "featuresKicker": "Funciones",
+      "featuresTitle": "Todo lo que necesitas para enviar SMS desde tu propio teléfono",
+      "viewOnGithubBtn": "Ver en GitHub",
+      "howItWorksKicker": "Cómo funciona",
+      "faqKicker": "Preguntas",
+      "ctaTitle": "¿Listo para enviar tu primer SMS?",
+      "ctaDesc": "Crea tu cuenta, conecta tu teléfono Android y envía un mensaje con una sola petición HTTP."
     },
     "login": {
       "welcome": "Bienvenido",
       "joinUsers": "⚡Gratis, de código abierto y autoalojado: tus mensajes se quedan en tu propio servidor.",
       "metaTitle": "Inicia sesión en tu cuenta - httpSMS",
-      "metaDescription": "Inicia sesión en httpSMS para enviar y recibir mensajes SMS a través de tu propio teléfono Android con una sencilla API HTTP."
+      "metaDescription": "Inicia sesión en httpSMS para enviar y recibir mensajes SMS a través de tu propio teléfono Android con una sencilla API HTTP.",
+      "badge": "Pasarela de SMS autoalojada"
     }
   },
   "settings": {
@@ -626,10 +678,12 @@
     "save_schedule": "Guardar Horario",
     "delete_schedule": "Eliminar horario",
     "delete_schedule_confirm": "¿Estás seguro de que quieres eliminar {name}? Los teléfonos adjuntos a este horario ya no tendrán restricciones basadas en el horario.",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "no_send_schedules": "Aún no hay horarios de envío.",
+    "appearance_desc": "Elige el modo claro u oscuro y la paleta de colores del panel. La elección se guarda en este navegador."
   },
   "threads": {
-    "select_message": "Selecciona un Mensaje",
+    "select_message": "Selecciona una conversación",
     "discord_help_desc": "No dudes en abrir un issue en GitHub si tienes alguna pregunta",
     "id": {
       "message_length_error": "El mensaje debe tener menos de 2048 caracteres",
@@ -644,8 +698,14 @@
       "delete_message": "Eliminar Mensaje",
       "missed_phone_call": "Llamada perdida",
       "type_message_here": "Escribe tu mensaje aquí",
-      "cannot_send_messages": "No puedes enviar mensajes a {contact}"
-    }
+      "cannot_send_messages": "No puedes enviar mensajes a {contact}",
+      "back": "Volver a las conversaciones",
+      "via_phone": "Desde {phone}",
+      "thread_actions": "Opciones de la conversación",
+      "message_actions": "Opciones del mensaje",
+      "send": "Enviar mensaje"
+    },
+    "select_message_desc": "Elige una conversación de la lista para leer y responder sus mensajes."
   },
   "legal": {
     "lastUpdated": "Última actualización: 23 de noviembre de 2026",

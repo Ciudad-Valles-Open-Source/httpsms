@@ -21,7 +21,10 @@
     "termsAndConditions": "Terms & Conditions",
     "privacyPolicy": "Privacy Policy",
     "contactSupport": "Contact Support",
-    "docs": "Docs"
+    "docs": "Docs",
+    "mainNavigation": "Main navigation",
+    "openMenu": "Open menu",
+    "footerTagline": "Turn your Android phone into a self-hosted SMS gateway with a simple HTTP API."
   },
   "components": {
     "contactDialog": {
@@ -71,7 +74,13 @@
         "sent": "sent",
         "failed": "failed",
         "pending": "pending"
-      }
+      },
+      "loadMoreError": "More conversations could not be loaded",
+      "loadMore": "Load more",
+      "noPhoneTitle": "Connect your first phone",
+      "emptyTitle": "No conversations yet",
+      "emptyArchiveTitle": "No archived conversations",
+      "noUnread": "No unread conversations"
     },
     "messageThreadHeader": {
       "logoutSuccess": "You have successfully logged out",
@@ -94,7 +103,12 @@
       "filterAll": "All",
       "filterUnread": "Unread",
       "filterError": "The message thread filter could not be updated",
-      "documentation": "Documentation"
+      "documentation": "Documentation",
+      "syncing": "Syncing",
+      "menu": "Open menu",
+      "archivedFilter": "Archived",
+      "showInbox": "Back to the inbox",
+      "showArchived": "Show archived conversations"
     },
     "redirectPromptPopover": {
       "skipNextTime": "Skip this page next time?",
@@ -156,6 +170,27 @@
     },
     "backButton": {
       "goBack": "Go Back"
+    },
+    "theme": {
+      "title": "Appearance",
+      "mode": "Mode",
+      "dark": "Dark",
+      "light": "Light",
+      "palette": "Color palette",
+      "paletteBlue": "Blue",
+      "paletteViolet": "Violet",
+      "toLight": "Switch to light theme",
+      "toDark": "Switch to dark theme"
+    },
+    "appLogo": {
+      "home": "httpSMS home"
+    },
+    "languageSwitcher": {
+      "label": "Change language"
+    },
+    "panelNav": {
+      "threads": "Conversations",
+      "label": "Dashboard navigation"
     }
   },
   "pages": {
@@ -252,7 +287,9 @@
       "btnDeleteApiKey": "Delete API Key",
       "dialogRemoveTitle": "Are you sure you want to remove this phone number from the Phone API Key?",
       "dialogRemoveSubtitle": "This will remove the {phoneNumber} from your phone API key. You will have to logout and login again on the httpSMS Android app on the phone which is currently using this API key.",
-      "btnRemovePhoneFromKey": "Remove Phone from key"
+      "btnRemovePhoneFromKey": "Remove Phone from key",
+      "emptyTitle": "No phone API keys yet",
+      "emptyDesc": "Create one for each phone you want to connect without sharing your main API key."
     },
     "messages": {
       "title": "New Message - httpSMS",
@@ -390,7 +427,8 @@
       "formNotesLabel": "Notes (optional)",
       "formNotesPlaceholder": "e.g Thanks for doing business with us!",
       "btnDownloadInvoice": "Download Invoice",
-      "btnClose": "Close"
+      "btnClose": "Close",
+      "noHistory": "There is no usage history yet."
     },
     "index": {
       "proPlanTitle": "Pro",
@@ -468,13 +506,27 @@
       "freePlanDesc": "Try sending and receiving SMS on your hobby websites and experiments.",
       "freePlanCost": "$0",
       "noCreditCard": "No credit card required",
-      "freePlanFeature1": "Send or receive up to 200 SMS/month"
+      "freePlanFeature1": "Send or receive up to 200 SMS/month",
+      "heroBadge": "Self-hosted · Free · Open source",
+      "heroTitleLead": "Turn your Android phone into an",
+      "heroTitleAccent": "SMS gateway.",
+      "selfHostedBadge": "Self-hosted",
+      "chipApi": "HTTP API",
+      "chipEncryption": "End-to-end encryption",
+      "featuresKicker": "Features",
+      "featuresTitle": "Everything you need to send SMS from your own phone",
+      "viewOnGithubBtn": "View on GitHub",
+      "howItWorksKicker": "How it works",
+      "faqKicker": "FAQ",
+      "ctaTitle": "Ready to send your first SMS?",
+      "ctaDesc": "Create your account, connect your Android phone and send a message with a single HTTP request."
     },
     "login": {
       "welcome": "Welcome",
       "joinUsers": "⚡Free, open source and self-hosted: your messages stay on your own server.",
       "metaTitle": "Log in to your account - httpSMS",
-      "metaDescription": "Log in to httpSMS to send and receive SMS messages through your own Android phone with a simple HTTP API."
+      "metaDescription": "Log in to httpSMS to send and receive SMS messages through your own Android phone with a simple HTTP API.",
+      "badge": "Self-hosted SMS gateway"
     }
   },
   "settings": {
@@ -626,10 +678,12 @@
     "save_schedule": "Save Schedule",
     "delete_schedule": "Delete schedule",
     "delete_schedule_confirm": "Are you sure you want to delete {name}? Phones attached to this schedule will no longer have schedule-based restrictions.",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "no_send_schedules": "No send schedules yet.",
+    "appearance_desc": "Pick light or dark mode and the color palette of the dashboard. The choice is saved in this browser."
   },
   "threads": {
-    "select_message": "Select a Message",
+    "select_message": "Select a conversation",
     "discord_help_desc": "Don't hesitate to open an issue on GitHub if you have any questions",
     "id": {
       "message_length_error": "Message must be less than 2048 characters",
@@ -644,8 +698,14 @@
       "delete_message": "Delete Message",
       "missed_phone_call": "Missed phone call",
       "type_message_here": "Type your message here",
-      "cannot_send_messages": "You cannot send messages to {contact}"
-    }
+      "cannot_send_messages": "You cannot send messages to {contact}",
+      "back": "Back to conversations",
+      "via_phone": "Via {phone}",
+      "thread_actions": "Conversation options",
+      "message_actions": "Message options",
+      "send": "Send message"
+    },
+    "select_message_desc": "Pick a conversation from the list to read and reply to its messages."
   },
   "legal": {
     "lastUpdated": "Last updated: November 23, 2026",

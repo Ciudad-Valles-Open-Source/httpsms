@@ -199,7 +199,7 @@ onMounted(async () => {
               indeterminate
               class="mb-4"
             />
-            <VTable v-else density="comfortable">
+            <VTable v-else class="stack-table" density="comfortable">
               <thead>
                 <tr class="text-uppercase text-medium-emphasis">
                   <th class="text-left">
@@ -240,17 +240,60 @@ onMounted(async () => {
                     router.push(`/search-messages?query=${order.request_id}`)
                   "
                 >
-                  <td class="text-left">{{ cleanName(order.request_id) }}</td>
-                  <td class="text-center">
+                  <td
+                    :data-label="$t('pages.bulkMessages.thName')"
+                    class="text-left"
+                  >
+                    {{ cleanName(order.request_id) }}
+                  </td>
+                  <td
+                    :data-label="$t('pages.bulkMessages.thCreatedAt')"
+                    class="text-center"
+                  >
                     {{ formatTimestamp(order.created_at) }}
                   </td>
-                  <td class="text-center">{{ order.total }}</td>
-                  <td class="text-center">{{ order.pending_count }}</td>
-                  <td class="text-center">{{ order.scheduled_count }}</td>
-                  <td class="text-center">{{ order.sent_count }}</td>
-                  <td class="text-center">{{ order.delivered_count }}</td>
-                  <td class="text-center">{{ order.failed_count }}</td>
-                  <td class="text-center">{{ order.expired_count }}</td>
+                  <td
+                    :data-label="$t('pages.bulkMessages.thTotal')"
+                    class="text-center"
+                  >
+                    {{ order.total }}
+                  </td>
+                  <td
+                    :data-label="$t('pages.bulkMessages.thPending')"
+                    class="text-center"
+                  >
+                    {{ order.pending_count }}
+                  </td>
+                  <td
+                    :data-label="$t('pages.bulkMessages.thScheduled')"
+                    class="text-center"
+                  >
+                    {{ order.scheduled_count }}
+                  </td>
+                  <td
+                    :data-label="$t('pages.bulkMessages.thSent')"
+                    class="text-center"
+                  >
+                    {{ order.sent_count }}
+                  </td>
+                  <td
+                    :data-label="$t('pages.bulkMessages.thDelivered')"
+                    class="text-center"
+                  >
+                    {{ order.delivered_count }}
+                  </td>
+                  <td
+                    :data-label="$t('pages.bulkMessages.thFailed')"
+                    class="text-center"
+                  >
+                    {{ order.failed_count }}
+                  </td>
+                  <td
+                    :data-label="$t('pages.bulkMessages.thExpired')"
+                    class="text-center"
+                  >
+                    {{ order.expired_count }}
+                  </td>
                 </tr>
               </tbody>
             </VTable>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { mdiMessageTextOutline } from '@mdi/js'
+
 definePageMeta({
   middleware: ['auth'],
 })
@@ -20,37 +22,42 @@ onMounted(async () => {
 </script>
 
 <template>
-  <VContainer class="pa-0" fluid :class="{ 'fill-height': lgAndUp }">
-    <VRow
-      v-if="lgAndUp"
-      align="center"
-      :class="{ 'fill-height': lgAndUp }"
-      justify="center"
-    >
-      <div :class="{ 'mt-n16': lgAndUp }">
-        <VImg
-          class="mx-auto mb-4"
-          :class="{ 'mt-n16': lgAndUp }"
-          max-height="400"
-          max-width="90%"
-          :src="'/img/person-texting.svg'"
-        />
-        <div class="text-center">
-          <h3 class="text-headline-medium mt-4 mb-0">
-            {{ $t('threads.select_message') }}
-          </h3>
-          <p
-            class="text-medium-emphasis mt-0"
-            v-html="$t('threads.discord_help_desc')"
-          ></p>
-        </div>
-      </div>
-    </VRow>
-    <VRow v-else justify="end">
-      <VCol class="px-0 py-0">
-        <MessageThreadHeader />
-        <MessageThread />
-      </VCol>
-    </VRow>
-  </VContainer>
+  <div v-if="lgAndUp" class="threads-placeholder">
+    <div class="empty-state">
+      <span class="icon-tile icon-tile-lg icon-tile-gradient">
+        <v-icon size="34" :icon="mdiMessageTextOutline" />
+      </span>
+      <h2 class="empty-state-title text-headline-small">
+        {{ $t('threads.select_message') }}
+      </h2>
+      <p class="empty-state-text">
+        {{ $t('threads.select_message_desc') }}
+      </p>
+    </div>
+  </div>
+  <div v-else class="threads-mobile">
+    <MessageThreadHeader />
+    <MessageThread />
+  </div>
 </template>
+
+<style scoped>
+.threads-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  background:
+    radial-gradient(
+      circle at 50% 40%,
+      rgb(var(--v-theme-primary), 0.1),
+      transparent 45%
+    ),
+    rgb(var(--v-theme-background));
+}
+
+.threads-mobile {
+  min-height: 100dvh;
+  background: rgb(var(--v-theme-surface));
+}
+</style>

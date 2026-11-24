@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useDisplay } from 'vuetify'
 
+useThemeScope('public')
+
 const route = useRoute()
 const { lgAndUp, mdAndUp } = useDisplay()
 const authStore = useAuthStore()
@@ -24,58 +26,39 @@ watch(
 
 <template>
   <v-app>
-    <v-app-bar color="#121212" elevation="0" border="b">
+    <v-app-bar class="app-glass" height="64">
       <v-app-bar-nav-icon
         v-if="!lgAndUp"
         :aria-label="$t('docs.toggleNavigation')"
         @click="drawer = !drawer"
       />
-      <NuxtLink
-        to="/"
-        class="text-decoration-none d-flex align-center"
-        :class="{ 'ml-4': lgAndUp }"
-      >
-        <v-avatar
-          color="#121212"
-          class="pa-1"
-          rounded="0"
-          :image="'/img/logo.svg'"
-          :size="34"
-        />
-        <span v-if="mdAndUp" class="text-headline-small ml-1 text-white">
-          httpSMS
-        </span>
-      </NuxtLink>
+      <AppLogo :show-name="mdAndUp" :size="34" :class="{ 'ml-4': lgAndUp }" />
       <NuxtLink :to="docsHome" class="text-decoration-none ml-3">
-        <v-chip color="primary" variant="tonal" size="small" label>
+        <v-chip
+          color="primary"
+          variant="tonal"
+          size="small"
+          class="font-weight-bold"
+        >
           {{ $t('docs.title') }}
         </v-chip>
       </NuxtLink>
       <v-spacer />
+      <ThemeToggle />
       <LanguageSwitcher />
-      <v-btn
-        v-if="mdAndUp"
-        variant="text"
-        color="primary"
-        class="mr-1"
-        :to="{ name: 'blog' }"
-      >
+      <v-btn v-if="mdAndUp" variant="text" class="mr-1" :to="{ name: 'blog' }">
         {{ $t('website.blog') }}
       </v-btn>
       <v-btn
         v-show="authStore.authStateChanged && authStore.authUser === null"
-        color="primary"
-        variant="flat"
-        class="mr-4"
+        class="btn-gradient mr-4"
         :to="{ name: 'login' }"
       >
         {{ $t('website.login') }}
       </v-btn>
       <v-btn
         v-show="authStore.authStateChanged && authStore.authUser !== null"
-        color="primary"
-        variant="flat"
-        class="mr-4"
+        class="btn-gradient mr-4"
         :to="{ name: 'threads' }"
       >
         {{ $t('website.dashboard') }}
@@ -83,7 +66,7 @@ watch(
     </v-app-bar>
     <v-navigation-drawer
       v-model="drawer"
-      color="#121212"
+      color="background"
       mobile-breakpoint="lg"
       :width="280"
     >

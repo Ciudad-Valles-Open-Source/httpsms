@@ -41,7 +41,7 @@ useHead({
 
 const route = useRoute()
 const router = useRouter()
-const { lgAndUp, mdAndDown, mdAndUp } = useVDisplay()
+const { mdAndDown } = useVDisplay()
 const { formatPhoneNumber, startsWithLetter } = useFilters()
 const notificationsStore = useNotificationsStore()
 const authStore = useAuthStore()
@@ -354,346 +354,314 @@ onBeforeUnmount(() => unbindRealtime())
 </script>
 
 <template>
-  <VContainer class="px-0" :class="{ 'fill-height': lgAndUp }">
-    <div class="h-100">
-      <VAppBar>
-        <VBtn v-if="mdAndDown" icon to="/threads">
-          <VIcon :icon="mdiArrowLeft" />
-        </VBtn>
-        <VToolbarTitle v-if="currentThread">
-          <VTooltip
-            v-if="currentThread.contact_details?.name?.trim()"
-            :text="formatPhoneNumber(currentThread.contact)"
-            location="bottom"
-          >
-            <template #activator="{ props }">
-              <span v-bind="props">{{ currentThreadContactTitle() }}</span>
+  <div class="thread-view">
+    <header class="thread-view-header">
+      <VBtn
+        v-if="mdAndDown"
+        icon
+        variant="text"
+        to="/threads"
+        :aria-label="$t('threads.id.back')"
+      >
+        <VIcon :icon="mdiArrowLeft" />
+      </VBtn>
+      <template v-if="currentThread">
+        <VAvatar :color="currentThread.color" size="40" class="flex-shrink-0">
+          <VIcon
+            v-if="!startsWithLetter(currentThreadContactTitle())"
+            color="white"
+            :icon="mdiAccount"
+          />
+          <span v-else class="text-white text-title-large">{{
+            currentThreadContactTitle().substring(0, 1)
+          }}</span>
+        </VAvatar>
+        <div class="thread-view-title">
+          <div class="text-title-medium font-weight-bold text-truncate">
+            {{ currentThreadContactTitle() }}
+          </div>
+          <div class="text-body-small text-medium-emphasis text-truncate">
+            <template v-if="currentThread.contact_details?.name?.trim()">
+              {{ formatPhoneNumber(currentThread.contact) }}
             </template>
-          </VTooltip>
-          <template v-else>{{ currentThreadContactTitle() }}</template>
-        </VToolbarTitle>
-        <VMenu>
-          <template #activator="{ props }">
-            <VBtn icon variant="text" class="mt-2" v-bind="props">
-              <VIcon :icon="mdiDotsVertical" />
-            </VBtn>
-          </template>
-          <VList
-            class="pa-0"
-            prepend-gap="24"
-            :density="mdAndDown ? 'compact' : 'default'"
+            <template v-else>
+              {{
+                $t('threads.id.via_phone', {
+                  phone: formatPhoneNumber(currentThread.owner),
+                })
+              }}
+            </template>
+          </div>
+        </div>
+      </template>
+      <VSpacer />
+      <VMenu>
+        <template #activator="{ props }">
+          <VBtn
+            icon
+            variant="text"
+            v-bind="props"
+            :aria-label="$t('threads.id.thread_actions')"
           >
-            <VListItem
-              v-if="currentThread?.contact_details"
-              @click="contactDialog = true"
-            >
-              <template #prepend>
-                <VIcon :icon="mdiSquareEditOutline" />
-              </template>
-              <VListItemTitle>{{
-                $t('threads.id.edit_contact')
-              }}</VListItemTitle>
-            </VListItem>
-            <VListItem
-              v-else-if="contactIsPhoneNumber"
-              @click="contactDialog = true"
-            >
-              <template #prepend>
-                <VIcon :icon="mdiAccountPlus" />
-              </template>
-              <VListItemTitle>{{
-                $t('threads.id.add_contact')
-              }}</VListItemTitle>
-            </VListItem>
-            <VListItem
-              v-if="currentThread && !currentThread.is_archived"
-              @click.prevent="archiveThread"
-            >
-              <template #prepend>
-                <VIcon :icon="mdiPackageDown" />
-              </template>
-              <VListItemTitle>{{ $t('threads.id.archive') }}</VListItemTitle>
-            </VListItem>
-            <VListItem
-              v-if="currentThread && currentThread.is_archived"
-              @click.prevent="unArchiveThread"
-            >
-              <template #prepend>
-                <VIcon :icon="mdiPackageUp" />
-              </template>
-              <VListItemTitle>{{ $t('threads.id.unarchive') }}</VListItemTitle>
-            </VListItem>
-            <VListItem
-              v-if="currentThread"
-              @click.prevent="deleteThread(currentThread.id)"
-            >
-              <template #prepend>
-                <VIcon :icon="mdiDelete" color="error" />
-              </template>
-              <VListItemTitle>{{
-                $t('threads.id.delete_thread')
-              }}</VListItemTitle>
-            </VListItem>
-          </VList>
-        </VMenu>
-      </VAppBar>
-      <VProgressLinear
-        v-if="loadingMessages"
-        class="mt-n5 py-1"
-        color="primary"
-        indeterminate
-      />
-      <VContainer v-if="currentThread" class="pa-0">
+            <VIcon :icon="mdiDotsVertical" />
+          </VBtn>
+        </template>
+        <VList prepend-gap="16" density="compact" min-width="220">
+          <VListItem
+            v-if="currentThread?.contact_details"
+            @click="contactDialog = true"
+          >
+            <template #prepend>
+              <VIcon :icon="mdiSquareEditOutline" />
+            </template>
+            <VListItemTitle>{{ $t('threads.id.edit_contact') }}</VListItemTitle>
+          </VListItem>
+          <VListItem
+            v-else-if="contactIsPhoneNumber"
+            @click="contactDialog = true"
+          >
+            <template #prepend>
+              <VIcon :icon="mdiAccountPlus" />
+            </template>
+            <VListItemTitle>{{ $t('threads.id.add_contact') }}</VListItemTitle>
+          </VListItem>
+          <VListItem
+            v-if="currentThread && !currentThread.is_archived"
+            @click.prevent="archiveThread"
+          >
+            <template #prepend>
+              <VIcon :icon="mdiPackageDown" />
+            </template>
+            <VListItemTitle>{{ $t('threads.id.archive') }}</VListItemTitle>
+          </VListItem>
+          <VListItem
+            v-if="currentThread && currentThread.is_archived"
+            @click.prevent="unArchiveThread"
+          >
+            <template #prepend>
+              <VIcon :icon="mdiPackageUp" />
+            </template>
+            <VListItemTitle>{{ $t('threads.id.unarchive') }}</VListItemTitle>
+          </VListItem>
+          <VListItem
+            v-if="currentThread"
+            base-color="error"
+            @click.prevent="deleteThread(currentThread.id)"
+          >
+            <template #prepend>
+              <VIcon :icon="mdiDelete" />
+            </template>
+            <VListItemTitle>{{
+              $t('threads.id.delete_thread')
+            }}</VListItemTitle>
+          </VListItem>
+        </VList>
+      </VMenu>
+    </header>
+    <VProgressLinear
+      :active="loadingMessages"
+      color="primary"
+      height="2"
+      indeterminate
+    />
+
+    <div ref="messageBody" class="thread-view-body">
+      <div v-if="currentThread" class="thread-view-messages">
         <div
-          ref="messageBody"
-          class="messages-body no-scrollbar w-100 pl-2"
-          :class="{ 'pr-7': lgAndUp }"
+          v-for="message in messages"
+          :key="message.id"
+          class="msg-row"
+          :class="isMT(message) ? 'msg-row-out' : 'msg-row-in'"
+          :style="{ visibility: messageVisibility }"
         >
-          <VRow
-            v-for="message in messages"
-            :key="message.id"
-            :style="{ visibility: messageVisibility }"
+          <VAvatar
+            v-if="isMo(message)"
+            :color="currentThread.color"
+            size="32"
+            class="msg-row-avatar"
           >
-            <VCol
-              class="d-flex"
+            <VIcon
+              v-if="!startsWithLetter(message.contact)"
+              size="18"
+              color="white"
+              :icon="mdiAccount"
+            />
+            <span v-else class="text-white text-body-medium font-weight-bold">{{
+              message.contact.substring(0, 1)
+            }}</span>
+          </VAvatar>
+          <VAvatar
+            v-if="isMissedCall(message)"
+            size="32"
+            color="error"
+            variant="tonal"
+            class="msg-row-avatar"
+          >
+            <VIcon size="18" :icon="mdiCallMissed" />
+          </VAvatar>
+
+          <div class="msg-stack">
+            <div
+              v-if="message.content"
+              class="msg-bubble text-break"
               :class="{
-                'pr-10': mdAndDown && !isMT(message),
-                'pl-12 pr-4': mdAndDown && isMT(message),
-                'pl-16 ml-16': lgAndUp && isMT(message),
-                'pr-16 mr-16': lgAndUp && !isMT(message),
+                'msg-bubble-out': isMT(message),
+                'msg-bubble-failed':
+                  isMT(message) &&
+                  (message.status === 'failed' || message.status === 'expired'),
               }"
             >
-              <VSpacer v-if="isMT(message)" />
-              <v-avatar
-                v-if="isMo(message)"
-                :class="{
-                  'ml-2': !mdAndUp,
-                  'ml-4': mdAndUp,
-                }"
-                :color="currentThread.color"
-                size="40"
-              >
-                <v-icon
-                  v-if="!startsWithLetter(message.contact)"
-                  color="white"
-                  >{{ mdiAccount }}</v-icon
-                >
-                <span v-else class="text-white text-headline-small">{{
-                  message.contact.substring(0, 1)
-                }}</span>
-              </v-avatar>
-              <VAvatar v-if="isMissedCall(message)" color="#1e1e1e">
-                <VIcon size="large" color="red" :icon="mdiCallMissed" />
-              </VAvatar>
-              <!-- MT message menu -->
-              <VMenu v-if="isMT(message)">
-                <template #activator="{ props }">
-                  <VBtn icon variant="text" class="mt-2" v-bind="props">
-                    <VIcon :icon="mdiDotsVertical" />
-                  </VBtn>
-                </template>
-                <VList class="pa-0" prepend-gap="24" density="compact">
-                  <VListItem
-                    v-if="canResend(message)"
-                    @click.prevent="resendMessage(message)"
-                  >
-                    <template #prepend
-                      ><VIcon size="small" :icon="mdiRefresh"
-                    /></template>
-                    <VListItemTitle class="text-body-medium">{{
-                      $t('threads.id.resend_message')
-                    }}</VListItemTitle>
-                  </VListItem>
-                  <VListItem @click.prevent="copyMessageId(message)">
-                    <template #prepend
-                      ><VIcon size="small" :icon="mdiContentCopy"
-                    /></template>
-                    <VListItemTitle class="text-body-medium">{{
-                      $t('threads.id.copy_message_id')
-                    }}</VListItemTitle>
-                  </VListItem>
-                  <VListItem @click.prevent="deleteMessage(message)">
-                    <template #prepend
-                      ><VIcon size="small" :icon="mdiDelete" color="error"
-                    /></template>
-                    <VListItemTitle class="text-body-medium">{{
-                      $t('threads.id.delete_message')
-                    }}</VListItemTitle>
-                  </VListItem>
-                </VList>
-              </VMenu>
-              <div :style="{ maxWidth: mdAndUp ? '50%' : '100%' }">
-                <VCard
-                  rounded="shaped"
-                  :variant="isMT(message) ? 'flat' : 'tonal'"
-                  :color="isMT(message) ? 'primary' : undefined"
-                  :class="{ 'ml-2': !isMT(message) }"
-                >
-                  <VCardText
-                    v-if="message.content"
-                    class="text-break"
-                    style="white-space: pre-line"
-                  >
-                    <span
-                      v-if="
-                        !isMissedCall(message) && isWhatsappFormatted(message)
-                      "
-                      v-html="formatWhatsappText(message.content)"
-                    />
-                    <span v-else-if="!isMissedCall(message)">{{
-                      message.content
-                    }}</span>
-                    <span v-else class="text-medium-emphasis">{{
-                      $t('threads.id.missed_phone_call')
-                    }}</span>
-                  </VCardText>
-                </VCard>
-                <VCard
-                  v-if="message.attachments?.length"
-                  :class="{ 'ml-2': !isMT(message) }"
-                >
-                  <VCardText class="pb-2">
-                    <a
-                      v-for="(attachment, index) in message.attachments"
-                      :key="index"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      :href="attachment"
-                      class="text-decoration-none hover:text-decoration-underline text-body-medium mb-2 d-flex w-100"
-                    >
-                      <VIcon
-                        size="x-small"
-                        class="text-medium-emphasis mt-1"
-                        :icon="mdiPaperclip"
-                      />
-                      {{ formatAttachmentName(attachment) }}
-                    </a>
-                  </VCardText>
-                </VCard>
-                <div class="d-flex mt-n2">
-                  <p class="ml-2 text-medium-emphasis text-body-small mr-2">
-                    {{ new Date(message.order_timestamp).toLocaleString() }}
-                  </p>
-                  <VSpacer />
-                  <VTooltip location="bottom">
-                    <template #activator="{ props }">
-                      <div v-bind="props">
-                        <VIcon
-                          v-if="message.status === 'expired'"
-                          color="warning"
-                          class="mt-2"
-                          :icon="mdiAlert"
-                        />
-                        <VProgressCircular
-                          v-else-if="isPending(message)"
-                          indeterminate
-                          :size="14"
-                          :width="1"
-                          class="mt-2"
-                          :color="statusColor(message)"
-                        />
-                        <VIcon
-                          v-else-if="message.status === 'delivered'"
-                          color="primary"
-                          class="mt-2"
-                          :icon="mdiCheckAll"
-                        />
-                        <VIcon
-                          v-else-if="message.status === 'sent'"
-                          class="mt-2"
-                          :icon="mdiCheck"
-                        />
-                        <VIcon
-                          v-else-if="message.status === 'failed'"
-                          color="error"
-                          class="mt-2"
-                          :icon="mdiAlert"
-                        />
-                      </div>
-                    </template>
-                    <span>{{ message.failure_reason || message.status }}</span>
-                  </VTooltip>
-                </div>
-              </div>
-              <!-- MO message menu -->
-              <VMenu v-if="!isMT(message)">
-                <template #activator="{ props }">
-                  <VBtn icon variant="text" class="mt-2" v-bind="props">
-                    <VIcon :icon="mdiDotsVertical" />
-                  </VBtn>
-                </template>
-                <VList class="pa-0" prepend-gap="16" density="compact">
-                  <VListItem
-                    v-if="canResend(message)"
-                    @click.prevent="resendMessage(message)"
-                  >
-                    <template #prepend
-                      ><VIcon size="small" :icon="mdiRefresh"
-                    /></template>
-                    <VListItemTitle class="text-body-medium">{{
-                      $t('threads.id.resend_message')
-                    }}</VListItemTitle>
-                  </VListItem>
-                  <VListItem @click.prevent="copyMessageId(message)">
-                    <template #prepend
-                      ><VIcon size="small" :icon="mdiContentCopy"
-                    /></template>
-                    <VListItemTitle class="text-body-medium">{{
-                      $t('threads.id.copy_message_id')
-                    }}</VListItemTitle>
-                  </VListItem>
-                  <VListItem @click.prevent="deleteMessage(message)">
-                    <template #prepend
-                      ><VIcon size="small" :icon="mdiDelete" color="error"
-                    /></template>
-                    <VListItemTitle class="text-body-medium">{{
-                      $t('threads.id.delete_message')
-                    }}</VListItemTitle>
-                  </VListItem>
-                </VList>
-              </VMenu>
-            </VCol>
-          </VRow>
-        </div>
-        <VFooter app class="py-0" color="#121212">
-          <VContainer class="pb-0 pt-0">
-            <VForm ref="form" class="d-flex">
-              <VTextField
-                v-model="formMessage"
-                :disabled="submitting || !contactIsPhoneNumber"
-                variant="solo"
-                :rules="formMessageRules"
-                :placeholder="
-                  contactIsPhoneNumber
-                    ? $t('threads.id.type_message_here')
-                    : $t('threads.id.cannot_send_messages', { contact })
-                "
-                rounded
-                @keydown.enter="sendMessage"
+              <span
+                v-if="!isMissedCall(message) && isWhatsappFormatted(message)"
+                v-html="formatWhatsappText(message.content)"
               />
-              <VBtn
-                :disabled="submitting || !contactIsPhoneNumber"
-                type="submit"
-                color="primary"
-                class="ml-2"
-                icon
-                size="large"
-                @click="sendMessage"
+              <span v-else-if="!isMissedCall(message)">{{
+                message.content
+              }}</span>
+              <span v-else class="text-medium-emphasis">{{
+                $t('threads.id.missed_phone_call')
+              }}</span>
+            </div>
+            <div v-if="message.attachments?.length" class="msg-attachments">
+              <a
+                v-for="(attachment, index) in message.attachments"
+                :key="index"
+                target="_blank"
+                rel="noopener noreferrer"
+                :href="attachment"
+                class="text-decoration-none hover:text-decoration-underline text-body-medium d-flex align-center"
               >
-                <VProgressCircular
-                  v-if="submitting"
-                  indeterminate
-                  :size="20"
-                  :width="3"
-                  color="pink"
-                />
-                <VIcon :icon="mdiSend" />
+                <VIcon size="x-small" class="mr-1" :icon="mdiPaperclip" />
+                {{ formatAttachmentName(attachment) }}
+              </a>
+            </div>
+            <div class="msg-meta">
+              <span>{{
+                new Date(message.order_timestamp).toLocaleString()
+              }}</span>
+              <VTooltip location="bottom">
+                <template #activator="{ props }">
+                  <span v-bind="props" class="d-inline-flex">
+                    <VIcon
+                      v-if="message.status === 'expired'"
+                      color="warning"
+                      size="16"
+                      :icon="mdiAlert"
+                    />
+                    <VProgressCircular
+                      v-else-if="isPending(message)"
+                      indeterminate
+                      :size="12"
+                      :width="1.5"
+                      :color="statusColor(message)"
+                    />
+                    <VIcon
+                      v-else-if="message.status === 'delivered'"
+                      color="primary"
+                      size="16"
+                      :icon="mdiCheckAll"
+                    />
+                    <VIcon
+                      v-else-if="message.status === 'sent'"
+                      size="16"
+                      :icon="mdiCheck"
+                    />
+                    <VIcon
+                      v-else-if="message.status === 'failed'"
+                      color="error"
+                      size="16"
+                      :icon="mdiAlert"
+                    />
+                  </span>
+                </template>
+                <span>{{ message.failure_reason || message.status }}</span>
+              </VTooltip>
+            </div>
+          </div>
+
+          <VMenu>
+            <template #activator="{ props }">
+              <VBtn
+                icon
+                variant="text"
+                size="small"
+                class="msg-row-actions"
+                :aria-label="$t('threads.id.message_actions')"
+                v-bind="props"
+              >
+                <VIcon :icon="mdiDotsVertical" />
               </VBtn>
-            </VForm>
-          </VContainer>
-        </VFooter>
-      </VContainer>
+            </template>
+            <VList prepend-gap="16" density="compact">
+              <VListItem
+                v-if="canResend(message)"
+                @click.prevent="resendMessage(message)"
+              >
+                <template #prepend
+                  ><VIcon size="small" :icon="mdiRefresh"
+                /></template>
+                <VListItemTitle class="text-body-medium">{{
+                  $t('threads.id.resend_message')
+                }}</VListItemTitle>
+              </VListItem>
+              <VListItem @click.prevent="copyMessageId(message)">
+                <template #prepend
+                  ><VIcon size="small" :icon="mdiContentCopy"
+                /></template>
+                <VListItemTitle class="text-body-medium">{{
+                  $t('threads.id.copy_message_id')
+                }}</VListItemTitle>
+              </VListItem>
+              <VListItem
+                base-color="error"
+                @click.prevent="deleteMessage(message)"
+              >
+                <template #prepend
+                  ><VIcon size="small" :icon="mdiDelete"
+                /></template>
+                <VListItemTitle class="text-body-medium">{{
+                  $t('threads.id.delete_message')
+                }}</VListItemTitle>
+              </VListItem>
+            </VList>
+          </VMenu>
+        </div>
+      </div>
     </div>
+
+    <footer v-if="currentThread" class="thread-view-composer">
+      <VForm ref="form" class="thread-view-form" @submit.prevent>
+        <VTextField
+          v-model="formMessage"
+          :disabled="submitting || !contactIsPhoneNumber"
+          variant="solo-filled"
+          flat
+          rounded="pill"
+          hide-details="auto"
+          :rules="formMessageRules"
+          :placeholder="
+            contactIsPhoneNumber
+              ? $t('threads.id.type_message_here')
+              : $t('threads.id.cannot_send_messages', { contact })
+          "
+          :aria-label="$t('threads.id.type_message_here')"
+          @keydown.enter="sendMessage"
+        />
+        <VBtn
+          :disabled="submitting || !contactIsPhoneNumber"
+          type="submit"
+          class="btn-gradient ml-2 flex-shrink-0"
+          icon
+          size="large"
+          rounded="circle"
+          :loading="submitting"
+          :aria-label="$t('threads.id.send')"
+          @click="sendMessage"
+        >
+          <VIcon :icon="mdiSend" />
+        </VBtn>
+      </VForm>
+    </footer>
     <ContactDialog
       v-model="contactDialog"
       :contact="currentThread?.contact_details"
@@ -701,47 +669,156 @@ onBeforeUnmount(() => unbindRealtime())
       :refresh-contacts="false"
       @saved="refreshThreadContact"
     />
-  </VContainer>
+  </div>
 </template>
 
 <style lang="scss">
-.messages-body {
-  padding-top: 50px;
-  max-height: calc(100vh - 170px);
-  position: absolute;
-  width: calc(100vw - 8px);
-  bottom: 94px;
+.thread-view {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background:
+    radial-gradient(
+      circle at 85% 0%,
+      rgb(var(--v-theme-primary), 0.07),
+      transparent 40%
+    ),
+    rgb(var(--v-theme-background));
 }
 
-@media (min-width: 960px) {
-  .messages-body {
-    max-width: 900px;
-  }
-}
-@media (min-width: 1280px) {
-  .messages-body {
-    max-width: 1185px;
-  }
-}
-
-@media (min-width: 1545px) {
-  .messages-body {
-    max-width: 1280px;
-  }
+.thread-view-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 68px;
+  padding: 0.5rem 0.75rem 0.5rem 1rem;
+  border-bottom: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+  background: rgb(var(--v-theme-surface));
 }
 
-@media (min-width: 2138px) {
-  .messages-body {
-    max-width: 2000px;
-  }
+.thread-view-title {
+  min-width: 0;
+  line-height: 1.3;
 }
 
-.no-scrollbar {
+.thread-view-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   overflow-x: hidden;
-  -ms-overflow-style: none;
-  overflow-y: scroll;
-  &::-webkit-scrollbar {
-    display: none;
+}
+
+.thread-view-messages {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.9rem;
+  max-width: 920px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.msg-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.msg-row-out {
+  flex-direction: row-reverse;
+}
+
+.msg-row-avatar {
+  margin-top: 0.15rem;
+}
+
+.msg-row-actions {
+  opacity: 0.55;
+  transition: opacity 0.15s;
+}
+
+.msg-row:hover .msg-row-actions,
+.msg-row-actions[aria-expanded='true'] {
+  opacity: 1;
+}
+
+.msg-stack {
+  display: flex;
+  flex-direction: column;
+  max-width: min(72%, 560px);
+}
+
+.msg-row-out .msg-stack {
+  align-items: flex-end;
+}
+
+.msg-bubble {
+  padding: 0.65rem 0.95rem;
+  border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 1.1rem 1.1rem 1.1rem 0.35rem;
+  background: rgb(var(--v-theme-surface));
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.msg-bubble-out {
+  border: 0;
+  border-radius: 1.1rem 1.1rem 0.35rem;
+  background: var(--brand-grad);
+  color: rgb(var(--v-theme-on-primary));
+}
+
+.msg-bubble-out a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.msg-bubble-failed {
+  outline: 2px solid rgb(var(--v-theme-error), 0.55);
+  outline-offset: 2px;
+}
+
+.msg-attachments {
+  margin-top: 0.35rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 0.8rem;
+  background: rgb(var(--v-theme-surface));
+}
+
+.msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.3rem;
+  padding-inline: 0.25rem;
+  color: rgb(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+  font-size: 0.75rem;
+}
+
+.thread-view-composer {
+  flex-shrink: 0;
+  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+  border-top: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+  background: rgb(var(--v-theme-surface));
+}
+
+.thread-view-form {
+  display: flex;
+  align-items: flex-start;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+@media (width <= 600px) {
+  .thread-view-messages {
+    padding: 1rem 0.5rem;
+  }
+
+  .msg-stack {
+    max-width: 82%;
   }
 }
 </style>

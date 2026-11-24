@@ -1,0 +1,492 @@
+/* stylelint-disable selector-class-pattern -- Vuetify classes use BEM names */
+
+/*
+ * Global look & feel for httpSMS.
+ *
+ * Shares its visual language with the author's other products: Plus Jakarta
+ * Sans, a violet → blue brand gradient, soft bordered cards, pill badges and a
+ * dark-first palette. Colors come from the Vuetify themes in nuxt.config.ts so
+ * every rule here works in both the dark and the light theme.
+ */
+
+:root {
+  --v-font-body:
+    'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', roboto,
+    'Helvetica Neue', arial, sans-serif;
+  --v-font-heading: var(--v-font-body);
+  --brand-grad: linear-gradient(
+    135deg,
+    rgb(var(--v-theme-primary)),
+    rgb(var(--v-theme-secondary))
+  );
+  --card-radius: 1.1rem;
+  --card-shadow: 0 10px 30px rgb(40 20 80 / 8%);
+  --panel-rail-width: 76px;
+}
+
+.v-theme--dark,
+.v-theme--violetDark {
+  --card-shadow: 0 10px 30px rgb(0 0 0 / 35%);
+
+  color-scheme: dark;
+}
+
+.v-theme--light,
+.v-theme--violetLight {
+  color-scheme: light;
+}
+
+/* Deep shades for large gradient panels that carry white text. */
+.v-theme--dark,
+.v-theme--light {
+  --brand-deep-grad: linear-gradient(135deg, #003688, #0050c8);
+}
+
+.v-theme--violetDark,
+.v-theme--violetLight {
+  --brand-deep-grad: linear-gradient(135deg, #7a1fc2, #2f6bf0);
+}
+
+html {
+  scroll-padding-top: 5rem;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Typography ─────────────────────────────────────────────────────────── */
+
+.v-application .text-display-large,
+.v-application .text-display-medium,
+.v-application .text-display-small,
+.v-application .text-headline-large,
+.v-application .text-headline-medium {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.v-application .text-headline-small,
+.v-application .text-title-large {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.v-application h1,
+.v-application h2,
+.v-application h3 {
+  letter-spacing: -0.02em;
+}
+
+/* Plain links only: Vuetify components rendered as <a> keep their colors. */
+.v-application a:not([class*='v-']) {
+  color: rgb(var(--v-theme-primary));
+}
+
+::selection {
+  background: rgb(var(--v-theme-primary), 0.3);
+}
+
+:focus-visible {
+  outline: 3px solid rgb(var(--v-theme-primary), 0.6);
+  outline-offset: 2px;
+}
+
+/* ── Brand helpers ──────────────────────────────────────────────────────── */
+
+.text-gradient {
+  background: var(--brand-grad);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: rgb(var(--v-theme-primary));
+}
+
+.kicker {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(var(--v-theme-primary));
+}
+
+.v-btn.btn-gradient {
+  background-image: var(--brand-grad);
+  background-color: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary)) !important;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s,
+    filter 0.15s;
+}
+
+.v-btn.btn-gradient:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgb(var(--v-theme-primary), 0.35);
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid rgb(var(--v-theme-primary), 0.25);
+  border-radius: 999px;
+  background: rgb(var(--v-theme-primary), 0.12);
+  color: rgb(var(--v-theme-primary));
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.hero-badge .dot,
+.status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: rgb(var(--v-theme-success));
+  box-shadow: 0 0 0 0 rgb(var(--v-theme-success), 0.6);
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0% {
+    box-shadow: 0 0 0 0 rgb(var(--v-theme-success), 0.6);
+  }
+
+  70% {
+    box-shadow: 0 0 0 8px rgb(var(--v-theme-success), 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgb(var(--v-theme-success), 0);
+  }
+}
+
+.icon-tile {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.9rem;
+  background: rgb(var(--v-theme-primary), 0.12);
+  color: rgb(var(--v-theme-primary));
+}
+
+.icon-tile-lg {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 1.25rem;
+}
+
+.icon-tile-gradient {
+  background: var(--brand-grad);
+  color: rgb(var(--v-theme-on-primary));
+}
+
+.card-soft {
+  border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+  border-radius: var(--card-radius);
+  background: rgb(var(--v-theme-surface));
+  box-shadow: var(--card-shadow);
+}
+
+.card-hover {
+  transition:
+    transform 0.2s,
+    border-color 0.2s;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgb(var(--v-theme-primary), 0.5);
+}
+
+/* Translucent header used by the public site and the docs. */
+.app-glass.v-app-bar {
+  background: rgb(var(--v-theme-background), 0.82) !important;
+  backdrop-filter: saturate(180%) blur(12px);
+}
+
+/* ── Panel (dashboard) building blocks ──────────────────────────────────── */
+
+.panel-content {
+  width: 100%;
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+.panel-section {
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+  border-radius: var(--card-radius);
+  background: rgb(var(--v-theme-surface));
+}
+
+.panel-section-title {
+  margin: 0 0 0.5rem !important;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.panel-section > h5:first-child,
+.panel-section > h2:first-child {
+  margin-top: 0 !important;
+}
+
+.panel-section-danger {
+  border-color: rgb(var(--v-theme-error), 0.4);
+}
+
+@media (width <= 600px) {
+  .panel-section {
+    padding: 1.1rem;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 360px;
+  margin: 2.5rem auto;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+.empty-state-title {
+  margin: 1rem 0 0.25rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.empty-state-text {
+  margin: 0 0 1.25rem;
+  color: rgb(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+  font-size: 0.925rem;
+}
+
+/* ── Vuetify component polish ───────────────────────────────────────────── */
+
+.v-application .v-card {
+  background: rgb(var(--v-theme-surface));
+}
+
+.v-application .v-table {
+  border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+  border-radius: var(--card-radius);
+  overflow: hidden;
+}
+
+.v-application .v-card .v-table,
+.v-application .panel-section .v-table {
+  border-radius: 0.8rem;
+}
+
+.v-application .v-table > .v-table__wrapper > table > thead > tr > th {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+}
+
+.v-application .v-expansion-panels .v-expansion-panel {
+  margin-bottom: 0.75rem;
+  border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+  border-radius: var(--card-radius) !important;
+  background: rgb(var(--v-theme-surface));
+}
+
+.v-application .v-expansion-panels .v-expansion-panel::after {
+  display: none;
+}
+
+.v-application .v-expansion-panel-title {
+  font-weight: 700;
+}
+
+.v-application .v-list-subheader {
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.v-application .v-menu > .v-overlay__content > .v-list,
+.v-application .v-menu > .v-overlay__content > .v-card {
+  border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 0.9rem;
+  box-shadow: var(--card-shadow);
+}
+
+.v-application .v-menu > .v-overlay__content > .v-list {
+  padding: 0.35rem !important;
+}
+
+.v-application .v-menu > .v-overlay__content > .v-list .v-list-item {
+  border-radius: 0.6rem;
+}
+
+.v-application .v-tooltip > .v-overlay__content {
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+
+.v-application .v-dialog > .v-overlay__content > .v-card {
+  box-shadow: var(--card-shadow);
+}
+
+.v-application .v-alert {
+  border: 1px solid currentcolor;
+  border-color: rgb(var(--v-border-color), var(--v-border-opacity));
+}
+
+.v-application .v-alert.v-alert--variant-tonal {
+  border-color: transparent;
+}
+
+/* ── Scrollbars ─────────────────────────────────────────────────────────── */
+
+* {
+  scrollbar-color: rgb(var(--v-theme-on-surface), 0.2) transparent;
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background: rgb(var(--v-theme-on-surface), 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-badge .dot,
+  .status-dot {
+    animation: none;
+  }
+
+  .card-hover,
+  .v-btn.btn-gradient {
+    transition: none;
+  }
+
+  .card-hover:hover,
+  .v-btn.btn-gradient:hover {
+    transform: none;
+  }
+}
+
+@media (width <= 600px) {
+  .v-application .v-data-table:has(.v-data-table__tr--mobile) {
+    border: 0;
+    background: transparent;
+  }
+
+  .v-application .v-data-table .v-data-table__tr--mobile {
+    display: block;
+    margin-bottom: 0.75rem;
+    padding: 0.35rem 1rem;
+    border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+    border-radius: 0.9rem;
+    background: rgb(var(--v-theme-surface));
+  }
+
+  .v-application .v-data-table .v-data-table__tr--mobile > td {
+    border: 0 !important;
+  }
+
+  .v-application .v-data-table .v-data-table__tr--mobile > td + td {
+    border-top: 1px dashed rgb(var(--v-border-color), var(--v-border-opacity)) !important;
+  }
+}
+
+/* ── Tables become lists of cards on phones ─────────────────────────────────
+ * Add `stack-table` to a VTable and a `data-label` to each cell: below 600px
+ * every row turns into a card with "label: value" lines. VDataTable uses
+ * Vuetify's own mobile mode (see the defaults in nuxt.config.ts). */
+
+@media (width <= 600px) {
+  .v-application .v-table.stack-table {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .v-application .v-table.stack-table > .v-table__wrapper {
+    overflow: visible;
+  }
+
+  .v-application .v-table.stack-table thead {
+    display: none;
+  }
+
+  .v-application .v-table.stack-table table,
+  .v-application .v-table.stack-table tbody,
+  .v-application .v-table.stack-table tr,
+  .v-application .v-table.stack-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .v-application .v-table.stack-table tbody > tr {
+    margin-bottom: 0.75rem;
+    padding: 0.35rem 1rem;
+    border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+    border-radius: 0.9rem;
+    background: rgb(var(--v-theme-surface));
+  }
+
+  .v-application .v-table.stack-table tbody > tr > td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: auto !important;
+    min-height: 2.5rem;
+    padding: 0.5rem 0 !important;
+    border: 0 !important;
+    text-align: right !important;
+    vertical-align: middle !important;
+  }
+
+  .v-application .v-table.stack-table tbody > tr > td + td {
+    border-top: 1px dashed rgb(var(--v-border-color), var(--v-border-opacity)) !important;
+  }
+
+  .v-application .v-table.stack-table tbody > tr > td[data-label]::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    max-width: 45%;
+    color: rgb(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .v-application .v-table.stack-table tbody > tr > td[colspan] {
+    justify-content: center;
+    text-align: center !important;
+  }
+
+  .v-application .v-table.stack-table tbody > tr > td ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}

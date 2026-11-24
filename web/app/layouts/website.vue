@@ -3,234 +3,286 @@ import { useDisplay } from 'vuetify'
 import {
   mdiGithub,
   mdiHeart,
-  mdiLightbulbOn50,
-  mdiEyeOffOutline,
-  mdiPost,
-  mdiScaleBalance,
-  mdiEmailOutline,
+  mdiMenu,
+  mdiArrowRight,
   mdiBookOpenVariant,
+  mdiPost,
+  mdiLogin,
+  mdiViewDashboardOutline,
 } from '@mdi/js'
 
-const { lgAndUp, mdAndUp } = useDisplay()
+useThemeScope('public')
+
+const { mdAndUp } = useDisplay()
 const authStore = useAuthStore()
 const appStore = useAppStore()
+const route = useRoute()
 const { githubIssuesUrl } = usePublicUrls()
+
+const mobileMenu = ref(false)
+
+const isGuest = computed(
+  () => authStore.authStateChanged && authStore.authUser === null,
+)
+const isSignedIn = computed(
+  () => authStore.authStateChanged && authStore.authUser !== null,
+)
+
+watch(
+  () => route.fullPath,
+  () => {
+    mobileMenu.value = false
+  },
+)
 </script>
 
 <template>
   <v-app>
-    <v-app-bar color="#121212" elevation="0">
-      <v-container>
-        <v-row>
-          <v-col class="w-full d-flex">
-            <NuxtLink to="/" class="text-decoration-none d-flex align-baseline">
-              <v-avatar
-                color="#121212"
-                class="pa-1"
-                rounded="0"
-                :image="'/img/logo.svg'"
-                :size="38"
-              />
-              <h3
-                v-if="lgAndUp"
-                class="text-headline-large mb-0 ml-1 mt-6 text-white"
-              >
-                httpSMS
-              </h3>
-            </NuxtLink>
-            <v-spacer />
-            <LanguageSwitcher class="mt-6" />
-            <v-btn
-              v-show="lgAndUp"
-              size="large"
-              variant="text"
-              color="primary"
-              class="my-5 mr-2"
-              to="/docs"
-            >
-              {{ $t('website.docs') }}
+    <v-app-bar class="app-glass" height="68">
+      <div class="site-bar">
+        <AppLogo />
+        <v-spacer />
+        <nav
+          v-if="mdAndUp"
+          class="site-bar-links"
+          :aria-label="$t('website.mainNavigation')"
+        >
+          <v-btn variant="text" to="/docs">{{ $t('website.docs') }}</v-btn>
+          <v-btn variant="text" :to="{ name: 'blog' }">
+            {{ $t('website.blog') }}
+          </v-btn>
+        </nav>
+        <ThemeToggle />
+        <LanguageSwitcher />
+        <template v-if="mdAndUp">
+          <v-btn
+            v-show="isGuest"
+            variant="text"
+            class="ml-1"
+            :to="{ name: 'login' }"
+          >
+            {{ $t('website.login') }}
+          </v-btn>
+          <v-btn
+            v-show="isGuest"
+            class="btn-gradient ml-2"
+            :to="{ name: 'login' }"
+          >
+            {{ $t('website.getStarted') }}
+            <v-icon end :icon="mdiArrowRight" />
+          </v-btn>
+          <div
+            v-show="isSignedIn"
+            class="position-relative d-inline-block ml-2"
+          >
+            <v-btn class="btn-gradient" :to="{ name: 'threads' }">
+              {{ $t('website.dashboard') }}
+              <v-icon end :icon="mdiArrowRight" />
             </v-btn>
-            <v-btn
-              v-show="lgAndUp"
-              size="large"
-              variant="text"
-              color="primary"
-              class="my-5 mr-2"
-              :to="{ name: 'blog' }"
-            >
-              {{ $t('website.blog') }}
-            </v-btn>
-            <v-btn
-              v-show="
-                lgAndUp &&
-                authStore.authStateChanged &&
-                authStore.authUser === null
-              "
-              size="large"
-              variant="text"
-              color="primary"
-              class="my-5 mr-2"
-              :to="{ name: 'login' }"
-            >
-              {{ $t('website.login') }}
-            </v-btn>
-            <v-btn
-              v-show="authStore.authStateChanged && authStore.authUser === null"
-              color="primary"
-              variant="flat"
-              :class="{ 'mt-5': mdAndUp, 'mt-1': !mdAndUp }"
-              :size="lgAndUp ? 'large' : 'default'"
-              :to="{ name: 'login' }"
-            >
-              {{ $t('website.getStarted') }}
-              <span v-show="lgAndUp">&nbsp;{{ $t('website.forFree') }}</span>
-            </v-btn>
-            <div
-              v-show="authStore.authStateChanged && authStore.authUser !== null"
-              class="position-relative d-inline-block"
-            >
-              <v-btn
-                color="primary"
-                variant="flat"
-                :class="{ 'mt-5': mdAndUp, 'mt-1': !mdAndUp }"
-                :size="lgAndUp ? 'large' : 'default'"
-                :to="{ name: 'threads' }"
-              >
-                {{ $t('website.dashboard') }}
-              </v-btn>
-              <RedirectPromptPopover />
-            </div>
-          </v-col>
-        </v-row>
-      </v-container>
+            <RedirectPromptPopover />
+          </div>
+        </template>
+        <v-btn
+          v-else
+          icon
+          variant="text"
+          :aria-label="$t('website.openMenu')"
+          :aria-expanded="mobileMenu"
+          @click="mobileMenu = !mobileMenu"
+        >
+          <v-icon :icon="mdiMenu" />
+        </v-btn>
+      </div>
     </v-app-bar>
+
+    <v-navigation-drawer
+      v-if="!mdAndUp"
+      v-model="mobileMenu"
+      location="top"
+      temporary
+      color="background"
+      class="site-mobile-menu"
+    >
+      <v-list nav class="pa-3">
+        <v-list-item
+          to="/docs"
+          :prepend-icon="mdiBookOpenVariant"
+          :title="$t('website.docs')"
+        />
+        <v-list-item
+          :to="{ name: 'blog' }"
+          :prepend-icon="mdiPost"
+          :title="$t('website.blog')"
+        />
+        <v-list-item
+          :href="appStore.appData.githubUrl"
+          :prepend-icon="mdiGithub"
+          :title="$t('website.github')"
+        />
+      </v-list>
+      <div class="px-4 pb-4 d-flex flex-column ga-2">
+        <template v-if="isGuest">
+          <v-btn
+            block
+            size="large"
+            class="btn-gradient"
+            :to="{ name: 'login' }"
+          >
+            {{ $t('website.getStarted') }}
+            <v-icon end :icon="mdiArrowRight" />
+          </v-btn>
+          <v-btn
+            block
+            size="large"
+            variant="outlined"
+            :prepend-icon="mdiLogin"
+            :to="{ name: 'login' }"
+          >
+            {{ $t('website.login') }}
+          </v-btn>
+        </template>
+        <v-btn
+          v-if="isSignedIn"
+          block
+          size="large"
+          class="btn-gradient"
+          :prepend-icon="mdiViewDashboardOutline"
+          :to="{ name: 'threads' }"
+        >
+          {{ $t('website.dashboard') }}
+        </v-btn>
+      </div>
+    </v-navigation-drawer>
+
     <v-main>
       <AppToast />
       <slot />
     </v-main>
-    <v-footer>
-      <v-container>
+
+    <footer class="site-footer">
+      <v-container class="site-container">
         <v-row>
-          <v-col cols="12" md="3">
-            <NuxtLink to="/" class="text-decoration-none d-flex mt-n6">
-              <v-avatar
-                color="#212121"
-                class="mt-8 pa-1"
-                rounded="0"
-                :image="'/img/logo.svg'"
-                :size="38"
-              />
-              <h3 class="text-headline-large ml-1 mb-0 text-white">httpSMS</h3>
-            </NuxtLink>
-            <div class="text-title-medium mb-4 text-medium-emphasis">
+          <v-col cols="12" md="4">
+            <AppLogo />
+            <p class="text-body-medium text-medium-emphasis mt-4 mb-3 pr-md-8">
+              {{ $t('website.footerTagline') }}
+            </p>
+            <div class="text-body-small text-medium-emphasis">
               {{ $t('website.madeWith') }}
-              <v-icon color="#cf1112" :icon="mdiHeart" />
+              <v-icon size="14" color="error" :icon="mdiHeart" />
               {{ $t('website.inTallinn') }}
             </div>
-            <p class="mt-n3">
-              <v-btn
-                :href="appStore.appData.githubUrl"
-                color="#ffffff"
-                class="ml-n3"
-                variant="text"
-                :icon="mdiGithub"
-              />
-            </p>
           </v-col>
-          <v-col cols="12" md="3">
-            <h2 class="text-headline-small mb-2">
-              {{ $t('website.resources') }}
-            </h2>
-            <ul style="list-style: none" class="pa-0">
-              <li class="mb-2">
-                <NuxtLink
-                  class="text-white text-decoration-none footer-link"
-                  to="/blog"
-                >
-                  {{ $t('website.blog') }}
-                  <v-icon size="small" :icon="mdiPost" />
-                </NuxtLink>
+          <v-col cols="6" md="2" offset-md="2">
+            <h2 class="footer-heading">{{ $t('website.resources') }}</h2>
+            <ul class="footer-links">
+              <li>
+                <NuxtLink to="/blog">{{ $t('website.blog') }}</NuxtLink>
+              </li>
+              <li>
+                <NuxtLink to="/docs">{{
+                  $t('website.documentation')
+                }}</NuxtLink>
               </li>
             </ul>
           </v-col>
-          <v-col cols="12" md="3">
-            <h2 class="text-headline-small mb-2">
-              {{ $t('website.developers') }}
-            </h2>
-            <ul style="list-style: none" class="pa-0">
-              <li class="mb-2">
-                <NuxtLink
-                  to="/docs"
-                  class="text-white text-decoration-none footer-link"
-                >
-                  {{ $t('website.documentation') }}
-                  <v-icon size="small" :icon="mdiBookOpenVariant" />
-                </NuxtLink>
+          <v-col cols="6" md="2">
+            <h2 class="footer-heading">{{ $t('website.developers') }}</h2>
+            <ul class="footer-links">
+              <li>
+                <a :href="appStore.appData.githubUrl">{{
+                  $t('website.github')
+                }}</a>
               </li>
-              <li class="mb-2">
-                <a
-                  :href="appStore.appData.githubUrl"
-                  class="text-white text-decoration-none footer-link"
-                >
-                  {{ $t('website.github') }}
-                  <v-icon size="small" :icon="mdiGithub" />
-                </a>
-              </li>
-              <li class="mb-2">
-                <a
-                  :href="`${githubIssuesUrl}/new`"
-                  class="text-white text-decoration-none footer-link"
-                >
-                  {{ $t('website.requestFeature') }}
-                  <v-icon
-                    size="small"
-                    color="yellow"
-                    :icon="mdiLightbulbOn50"
-                  />
-                </a>
+              <li>
+                <a :href="`${githubIssuesUrl}/new`">{{
+                  $t('website.requestFeature')
+                }}</a>
               </li>
             </ul>
           </v-col>
-          <v-col cols="12" md="3">
-            <h2 class="text-headline-small mb-2">{{ $t('website.legal') }}</h2>
-            <ul style="list-style: none" class="pa-0">
-              <li class="mb-2">
-                <NuxtLink
-                  class="text-white text-decoration-none footer-link"
-                  to="/terms-and-conditions"
-                >
-                  {{ $t('website.termsAndConditions') }}
-                  <v-icon size="small" :icon="mdiScaleBalance" />
-                </NuxtLink>
+          <v-col cols="12" md="2">
+            <h2 class="footer-heading">{{ $t('website.legal') }}</h2>
+            <ul class="footer-links">
+              <li>
+                <NuxtLink to="/terms-and-conditions">{{
+                  $t('website.termsAndConditions')
+                }}</NuxtLink>
               </li>
-              <li class="mb-2">
-                <NuxtLink
-                  class="text-white text-decoration-none footer-link"
-                  to="/privacy-policy"
-                >
-                  {{ $t('website.privacyPolicy') }}
-                  <v-icon size="small" :icon="mdiEyeOffOutline" />
-                </NuxtLink>
+              <li>
+                <NuxtLink to="/privacy-policy">{{
+                  $t('website.privacyPolicy')
+                }}</NuxtLink>
               </li>
-              <li class="mt-2">
-                <a
-                  class="text-white text-decoration-none footer-link"
-                  :href="githubIssuesUrl"
-                >
-                  {{ $t('website.contactSupport') }}
-                  <v-icon size="small" :icon="mdiEmailOutline" />
-                </a>
+              <li>
+                <a :href="githubIssuesUrl">{{
+                  $t('website.contactSupport')
+                }}</a>
               </li>
             </ul>
           </v-col>
         </v-row>
       </v-container>
-    </v-footer>
+    </footer>
   </v-app>
 </template>
 
 <style scoped>
-.footer-link:hover {
-  text-decoration: underline !important;
+.site-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.site-bar-links {
+  display: flex;
+  gap: 0.25rem;
+  margin-right: 0.5rem;
+}
+
+.site-container {
+  max-width: 1200px;
+}
+
+.site-footer {
+  padding: 3rem 0 2rem;
+  border-top: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+  background: rgb(var(--v-theme-background));
+}
+
+.footer-heading {
+  margin-bottom: 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(var(--v-theme-on-background), var(--v-medium-emphasis-opacity));
+}
+
+.footer-links {
+  padding: 0;
+  list-style: none;
+}
+
+.footer-links li + li {
+  margin-top: 0.5rem;
+}
+
+.footer-links a {
+  color: rgb(var(--v-theme-on-background)) !important;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer-links a:hover {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.site-mobile-menu {
+  height: auto !important;
 }
 </style>

@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { escapeHtml } from '~/utils/escape-html'
-import { mdiArrowLeft, mdiPlus, mdiDelete, mdiEye } from '@mdi/js'
+import {
+  mdiArrowLeft,
+  mdiPlus,
+  mdiDelete,
+  mdiEye,
+  mdiCellphoneKey,
+} from '@mdi/js'
 import QRCode from 'qrcode'
 import { bindRealtimeEvents } from '~/composables/useRealtime'
 import { ErrorMessages } from '~/utils/errors'
@@ -295,7 +301,10 @@ onBeforeUnmount(() => unbindRealtime())
               class="text-medium-emphasis"
               v-html="$t('pages.phoneApiKeys.description')"
             ></p>
-            <VTable class="mb-4 api-key-table" density="comfortable">
+            <VTable
+              class="stack-table mb-4 api-key-table"
+              density="comfortable"
+            >
               <thead>
                 <tr class="text-uppercase text-medium-emphasis">
                   <th class="text-left">
@@ -313,10 +322,32 @@ onBeforeUnmount(() => unbindRealtime())
                 </tr>
               </thead>
               <tbody>
+                <tr v-if="!loading && phoneApiKeys.length === 0">
+                  <td colspan="4" class="py-8">
+                    <div class="empty-state my-0">
+                      <span class="icon-tile icon-tile-lg">
+                        <VIcon size="32" :icon="mdiCellphoneKey" />
+                      </span>
+                      <p class="empty-state-title">
+                        {{ $t('pages.phoneApiKeys.emptyTitle') }}
+                      </p>
+                      <p class="empty-state-text mb-0">
+                        {{ $t('pages.phoneApiKeys.emptyDesc') }}
+                      </p>
+                    </div>
+                  </td>
+                </tr>
                 <tr v-for="phoneApiKey in phoneApiKeys" :key="phoneApiKey.id">
-                  <td class="text-left">{{ phoneApiKey.name }}</td>
-                  <td>{{ formatTimestamp(phoneApiKey.created_at) }}</td>
-                  <td>
+                  <td
+                    :data-label="$t('pages.phoneApiKeys.thName')"
+                    class="text-left"
+                  >
+                    {{ phoneApiKey.name }}
+                  </td>
+                  <td :data-label="$t('pages.phoneApiKeys.thCreatedAt')">
+                    {{ formatTimestamp(phoneApiKey.created_at) }}
+                  </td>
+                  <td :data-label="$t('pages.phoneApiKeys.thPhoneNumbers')">
                     <ul v-if="phoneApiKey.phone_numbers.length" class="ml-n3">
                       <li
                         v-for="phoneNumber in phoneApiKey.phone_numbers"
@@ -341,7 +372,7 @@ onBeforeUnmount(() => unbindRealtime())
                     </ul>
                     <span v-else class="text-medium-emphasis">-</span>
                   </td>
-                  <td>
+                  <td :data-label="$t('pages.phoneApiKeys.thActions')">
                     <VBtn
                       size="small"
                       color="primary"

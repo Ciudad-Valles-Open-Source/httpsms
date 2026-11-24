@@ -4,6 +4,8 @@ import { setAuthHeader } from '~/composables/useApi'
 import { bindRealtimeEvents } from '~/composables/useRealtime'
 import { getAuth } from 'firebase/auth'
 
+useThemeScope('dashboard')
+
 const route = useRoute()
 const { lgAndUp } = useDisplay()
 const authStore = useAuthStore()
@@ -75,10 +77,24 @@ onBeforeUnmount(() => {
 
 <template>
   <v-app>
-    <v-navigation-drawer v-if="lgAndUp && hasDrawer" :width="400" permanent>
+    <v-navigation-drawer
+      v-if="lgAndUp && authStore.authUser"
+      :width="76"
+      permanent
+      color="background"
+      class="panel-rail-drawer"
+    >
+      <PanelRail />
+    </v-navigation-drawer>
+    <v-navigation-drawer
+      v-if="lgAndUp && hasDrawer"
+      :width="380"
+      permanent
+      color="surface"
+    >
       <template #default>
         <div class="message-thread-sidebar d-flex flex-column">
-          <div v-if="appStore.isLocal" class="py-2 bg-warning" />
+          <div v-if="appStore.isLocal" class="local-env-bar bg-warning" />
           <MessageThreadHeader />
           <div class="overflow-y-auto v-navigation-drawer__message-thread">
             <MessageThread />
@@ -99,36 +115,36 @@ onBeforeUnmount(() => {
   .w-full {
     width: 100%;
   }
+
   .h-full {
     height: 100%;
   }
+
   .has-drawer {
     .v-snackbar {
-      padding-left: 400px;
+      padding-left: 456px;
     }
   }
+
   .message-thread-sidebar {
     height: 100%;
   }
+
+  .local-env-bar {
+    height: 4px;
+  }
+
   .v-navigation-drawer__message-thread {
     flex: 1;
     min-height: 0;
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-    &::-webkit-scrollbar-track {
-      background: #363636;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: #666666;
-      border-radius: 8px;
-    }
   }
+
   .hover\:text-decoration-underline {
     &:hover {
       text-decoration: underline;
     }
   }
+
   code.hljs {
     font-size: 16px;
   }

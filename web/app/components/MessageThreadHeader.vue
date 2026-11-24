@@ -1,21 +1,13 @@
 <script setup lang="ts">
 import { useDisplay } from 'vuetify'
-import { getAuth, signOut } from 'firebase/auth'
 import {
-  mdiPlus,
-  mdiAccountCog,
   mdiLogout,
-  mdiCellphoneKey,
   mdiDownload,
-  mdiChartBar,
   mdiBatteryChargingHigh,
   mdiPackageUp,
   mdiPackageDown,
   mdiDotsVertical,
-  mdiMagnify,
-  mdiCommentTextMultipleOutline,
-  mdiAccountMultiple,
-  mdiCircle,
+  mdiCellphone,
   mdiBookOpenVariant,
 } from '@mdi/js'
 import type { EntitiesPhone } from '~~/shared/types/api'
@@ -24,14 +16,15 @@ const { t } = useI18n()
 
 const router = useRouter()
 const route = useRoute()
-const { mdAndDown, lgAndUp } = useDisplay()
+const { lgAndUp } = useDisplay()
 const authStore = useAuthStore()
 const phonesStore = usePhonesStore()
 const threadsStore = useThreadsStore()
 const appStore = useAppStore()
 const notificationsStore = useNotificationsStore()
-const redirectPreferenceStore = useRedirectPreferenceStore()
 const { formatPhoneNumber, phoneCountry, humanizeTime } = useFilters()
+const { items: navItems, isActive } = usePanelNav()
+const logout = useLogout()
 
 const selectedMenuItem = ref(-1)
 
@@ -70,20 +63,6 @@ async function toggleArchive() {
   await threadsStore.loadThreads()
 }
 
-async function logout() {
-  const auth = getAuth()
-  await signOut(auth)
-  authStore.resetState()
-  phonesStore.resetState()
-  threadsStore.resetState()
-  redirectPreferenceStore.resetState()
-  notificationsStore.addNotification({
-    type: 'info',
-    message: t('components.messageThreadHeader.logoutSuccess'),
-  })
-  router.push({ name: 'index' })
-}
-
 async function filterThreads(unreadOnly: boolean) {
   if (threadsStore.unreadOnly === unreadOnly) return
 
@@ -104,209 +83,197 @@ async function filterThreads(unreadOnly: boolean) {
 </script>
 
 <template>
-  <v-sheet
-    class="pa-4 flex-shrink-0"
-    :elevation="lgAndUp ? 0 : 2"
-    color="black"
-  >
-    <div class="d-flex">
-      <div :class="{ 'px-2': mdAndDown }">
-        <v-toolbar-title>
-          <div class="d-flex pt-2" style="width: 260px">
-            <v-select
-              variant="outlined"
-              density="compact"
+  <div class="thread-header flex-shrink-0">
+    <div class="d-flex align-center ga-1">
+      <h1 class="thread-header-title text-truncate">
+        {{ $t('components.panelNav.threads') }}
+      </h1>
+      <v-progress-circular
+        v-if="appStore.polling"
+        indeterminate
+        :size="16"
+        :width="2"
+        class="ml-2"
+        color="primary"
+        :aria-label="$t('components.messageThreadHeader.syncing')"
+      />
+      <v-spacer />
+      <template v-if="!lgAndUp">
+        <ThemeToggle with-palette />
+        <LanguageSwitcher />
+        <v-menu>
+          <template #activator="{ props: menuProps }">
+            <v-btn
+              v-bind="menuProps"
+              icon
+              variant="text"
+              size="small"
+              :aria-label="$t('components.messageThreadHeader.menu')"
+            >
+              <v-icon :icon="mdiDotsVertical" />
+            </v-btn>
+          </template>
+          <v-list density="compact" prepend-gap="16" min-width="240">
+            <v-list-item
+              v-for="item in navItems"
+              :key="item.name"
+              :to="{ name: item.name }"
+              :active="isActive(item)"
               color="primary"
-              :disabled="owners.length === 0"
-              :placeholder="$t('components.messageThreadHeader.phoneNumbers')"
-              :class="{ 'mb-n5': !phonesStore.owner }"
-              :items="owners"
-              :model-value="phonesStore.owner"
-              @update:model-value="onOwnerChanged"
+            >
+              <template #prepend><v-icon :icon="item.icon" /></template>
+              <v-list-item-title>{{ $t(item.label) }}</v-list-item-title>
+            </v-list-item>
+            <v-divider class="my-1" />
+            <v-list-item
+              v-if="phonesStore.owner"
+              :href="appStore.appData.appDownloadUrl"
+            >
+              <template #prepend><v-icon :icon="mdiDownload" /></template>
+              <v-list-item-title>{{
+                $t('components.messageThreadHeader.downloadApp')
+              }}</v-list-item-title>
+            </v-list-item>
+            <v-list-item to="/docs">
+              <template #prepend
+                ><v-icon :icon="mdiBookOpenVariant"
+              /></template>
+              <v-list-item-title>{{
+                $t('components.messageThreadHeader.documentation')
+              }}</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click.prevent="logout">
+              <template #prepend><v-icon :icon="mdiLogout" /></template>
+              <v-list-item-title>{{
+                $t('components.messageThreadHeader.logout')
+              }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </template>
+    </div>
+
+    <v-select
+      variant="outlined"
+      density="compact"
+      class="mt-4"
+      hide-details
+      :prepend-inner-icon="mdiCellphone"
+      :disabled="owners.length === 0"
+      :placeholder="$t('components.messageThreadHeader.phoneNumbers')"
+      :aria-label="$t('components.messageThreadHeader.phoneNumbers')"
+      :items="owners"
+      :model-value="phonesStore.owner"
+      @update:model-value="onOwnerChanged"
+    />
+    <div
+      v-if="phonesStore.owner"
+      class="d-flex align-center flex-wrap ga-2 mt-2 text-body-small"
+    >
+      <span class="text-medium-emphasis">
+        {{ phoneCountry(phonesStore.owner) }}
+      </span>
+      <v-tooltip v-if="phonesStore.heartbeat" location="bottom">
+        <template #activator="{ props: tooltipProps }">
+          <v-chip
+            v-bind="tooltipProps"
+            size="x-small"
+            color="success"
+            variant="tonal"
+            class="font-weight-bold"
+            :to="{
+              name: 'heartbeats-id',
+              params: { id: phonesStore.owner },
+            }"
+          >
+            <v-icon
+              v-if="phonesStore.heartbeat.charging"
+              start
+              :icon="mdiBatteryChargingHigh"
             />
-            <div style="width: 50px">
-              <v-progress-circular
-                v-if="appStore.polling"
-                indeterminate
-                :size="20"
-                :width="1"
-                class="mt-3 ml-2"
-                color="success"
-              />
-            </div>
-          </div>
-        </v-toolbar-title>
-        <div v-if="phonesStore.owner" class="d-flex mt-n2">
-          <p class="text-medium-emphasis mb-n1 mt-0">
-            {{ phoneCountry(phonesStore.owner) }}
-          </p>
-          <v-tooltip v-if="phonesStore.heartbeat" location="end">
-            <template #activator="{ props: tooltipProps }">
-              <v-btn
-                v-bind="tooltipProps"
-                size="small"
-                density="compact"
-                :to="{
-                  name: 'heartbeats-id',
-                  params: { id: phonesStore.owner },
-                }"
-                color="success"
-                class="ml-2 mb-0 mt-1"
-                icon
-                variant="text"
-              >
-                <v-icon
-                  v-if="phonesStore.heartbeat.charging"
-                  size="small"
-                  class="mt-n1"
-                  :icon="mdiBatteryChargingHigh"
-                />
-                <v-icon
-                  v-else
-                  size="x-small"
-                  color="success"
-                  :icon="mdiCircle"
-                />
-              </v-btn>
-            </template>
-            <h4 class="font-weight-bold mt-0 mb-0">
-              {{ $t('components.messageThreadHeader.lastHeartbeat') }}
-            </h4>
+            <span v-else class="status-dot mr-2" />
             {{
               $t('components.messageThreadHeader.timeAgo', {
                 time: humanizeTime(phonesStore.heartbeat.timestamp),
               })
             }}
-          </v-tooltip>
-        </div>
+          </v-chip>
+        </template>
+        {{ $t('components.messageThreadHeader.lastHeartbeat') }}
+      </v-tooltip>
+    </div>
+
+    <div class="d-flex align-center ga-2 pt-4">
+      <div
+        role="group"
+        :aria-label="$t('components.messageThreadHeader.filtersLabel')"
+        class="d-flex ga-2"
+      >
+        <v-btn
+          size="small"
+          rounded="pill"
+          :color="!threadsStore.unreadOnly ? 'primary' : undefined"
+          :variant="!threadsStore.unreadOnly ? 'flat' : 'outlined'"
+          :class="{ 'text-medium-emphasis': threadsStore.unreadOnly }"
+          :aria-pressed="!threadsStore.unreadOnly"
+          :disabled="!phonesStore.owner || threadsStore.loadingThreads"
+          @click="filterThreads(false)"
+        >
+          {{ $t('components.messageThreadHeader.filterAll') }}
+        </v-btn>
+        <v-btn
+          size="small"
+          rounded="pill"
+          :color="threadsStore.unreadOnly ? 'primary' : undefined"
+          :variant="threadsStore.unreadOnly ? 'flat' : 'outlined'"
+          :class="{ 'text-medium-emphasis': !threadsStore.unreadOnly }"
+          :aria-pressed="threadsStore.unreadOnly"
+          :disabled="!phonesStore.owner || threadsStore.loadingThreads"
+          @click="filterThreads(true)"
+        >
+          {{ $t('components.messageThreadHeader.filterUnread') }}
+        </v-btn>
       </div>
       <v-spacer />
-      <LanguageSwitcher class="mt-4 mr-1" />
-      <v-menu>
-        <template #activator="{ props: menuProps }">
-          <v-btn v-bind="menuProps" icon variant="text" class="mt-2 mr-n3">
-            <v-icon :icon="mdiDotsVertical" />
+      <v-tooltip location="bottom">
+        <template #activator="{ props: tooltipProps }">
+          <v-btn
+            v-bind="tooltipProps"
+            size="small"
+            rounded="pill"
+            :color="threadsStore.archivedThreads ? 'warning' : undefined"
+            :variant="threadsStore.archivedThreads ? 'tonal' : 'text'"
+            :class="{ 'text-medium-emphasis': !threadsStore.archivedThreads }"
+            :aria-pressed="threadsStore.archivedThreads"
+            :prepend-icon="
+              threadsStore.archivedThreads ? mdiPackageUp : mdiPackageDown
+            "
+            @click.prevent="toggleArchive"
+          >
+            {{ $t('components.messageThreadHeader.archivedFilter') }}
           </v-btn>
         </template>
-        <v-list
-          class="pa-0"
-          :density="mdAndDown ? 'compact' : 'default'"
-          prepend-gap="20"
-        >
-          <v-list-item @click.prevent="toggleArchive">
-            <template #prepend>
-              <v-icon
-                v-if="!threadsStore.archivedThreads"
-                :icon="mdiPackageDown"
-              />
-              <v-icon v-else :icon="mdiPackageUp" />
-            </template>
-            <v-list-item-title>
-              {{
-                threadsStore.archivedThreads
-                  ? $t('components.messageThreadHeader.unarchived')
-                  : $t('components.messageThreadHeader.archived')
-              }}
-            </v-list-item-title>
-          </v-list-item>
-          <v-list-item v-if="phonesStore.owner" :to="{ name: 'messages' }">
-            <template #prepend><v-icon :icon="mdiPlus" /></template>
-            <v-list-item-title>{{
-              $t('components.messageThreadHeader.newMessage')
-            }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item v-if="phonesStore.owner" :to="{ name: 'bulk-messages' }">
-            <template #prepend
-              ><v-icon :icon="mdiCommentTextMultipleOutline"
-            /></template>
-            <v-list-item-title>{{
-              $t('components.messageThreadHeader.bulkMessages')
-            }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item
-            v-if="phonesStore.owner"
-            :to="{ name: 'search-messages' }"
-          >
-            <template #prepend><v-icon :icon="mdiMagnify" /></template>
-            <v-list-item-title>{{
-              $t('components.messageThreadHeader.searchMessages')
-            }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item :to="{ name: 'contacts' }">
-            <template #prepend><v-icon :icon="mdiAccountMultiple" /></template>
-            <v-list-item-title>{{
-              $t('components.messageThreadHeader.contacts')
-            }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item :to="{ name: 'settings' }">
-            <template #prepend><v-icon :icon="mdiAccountCog" /></template>
-            <v-list-item-title>{{
-              $t('components.messageThreadHeader.settings')
-            }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item :to="{ name: 'phone-api-keys' }">
-            <template #prepend><v-icon :icon="mdiCellphoneKey" /></template>
-            <v-list-item-title :class="{ 'pr-16': lgAndUp }">{{
-              $t('components.messageThreadHeader.phoneApiKeys')
-            }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item
-            v-if="phonesStore.owner"
-            :href="appStore.appData.appDownloadUrl"
-          >
-            <template #prepend><v-icon :icon="mdiDownload" /></template>
-            <v-list-item-title>{{
-              $t('components.messageThreadHeader.downloadApp')
-            }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item to="/docs">
-            <template #prepend><v-icon :icon="mdiBookOpenVariant" /></template>
-            <v-list-item-title>{{
-              $t('components.messageThreadHeader.documentation')
-            }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item :to="{ name: 'statistics' }">
-            <template #prepend><v-icon :icon="mdiChartBar" /></template>
-            <v-list-item-title>{{
-              $t('components.messageThreadHeader.statistics')
-            }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item @click.prevent="logout">
-            <template #prepend><v-icon :icon="mdiLogout" /></template>
-            <v-list-item-title>{{
-              $t('components.messageThreadHeader.logout')
-            }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
+        {{
+          threadsStore.archivedThreads
+            ? $t('components.messageThreadHeader.showInbox')
+            : $t('components.messageThreadHeader.showArchived')
+        }}
+      </v-tooltip>
     </div>
-    <div
-      role="group"
-      :aria-label="$t('components.messageThreadHeader.filtersLabel')"
-      class="d-flex ga-2 pt-3"
-    >
-      <v-btn
-        class="text-medium-emphasis"
-        density="comfortable"
-        :color="!threadsStore.unreadOnly ? 'primary' : undefined"
-        variant="tonal"
-        :aria-pressed="!threadsStore.unreadOnly"
-        :disabled="!phonesStore.owner || threadsStore.loadingThreads"
-        @click="filterThreads(false)"
-      >
-        {{ $t('components.messageThreadHeader.filterAll') }}
-      </v-btn>
-      <v-btn
-        class="text-medium-emphasis"
-        density="comfortable"
-        :color="threadsStore.unreadOnly ? 'primary' : undefined"
-        variant="tonal"
-        :aria-pressed="threadsStore.unreadOnly"
-        :disabled="!phonesStore.owner || threadsStore.loadingThreads"
-        @click="filterThreads(true)"
-      >
-        {{ $t('components.messageThreadHeader.filterUnread') }}
-      </v-btn>
-    </div>
-  </v-sheet>
+  </div>
 </template>
+
+<style scoped>
+.thread-header {
+  padding: 1.1rem 1rem 0.9rem;
+  border-bottom: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
+  background: rgb(var(--v-theme-surface));
+}
+
+.thread-header-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+</style>

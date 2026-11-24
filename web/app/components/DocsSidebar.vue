@@ -13,7 +13,13 @@ const groups = DOCS_GROUPS.map((group) => ({
 </script>
 
 <template>
-  <VList nav density="compact" class="docs-sidebar py-4" color="primary">
+  <VList
+    nav
+    density="compact"
+    class="docs-sidebar py-4 px-3"
+    color="primary"
+    bg-color="transparent"
+  >
     <template v-for="group in groups" :key="group.titleKey">
       <VListSubheader class="text-uppercase font-weight-bold">
         {{ $t(group.titleKey) }}
@@ -47,7 +53,11 @@ const groups = DOCS_GROUPS.map((group) => ({
 .docs-sidebar :deep(.v-list-subheader) {
   min-height: 36px;
   margin-top: 8px;
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+}
+
+.docs-sidebar :deep(.v-list-item-title) {
+  font-weight: 600;
 }
 </style>

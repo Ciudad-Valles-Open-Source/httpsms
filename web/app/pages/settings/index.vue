@@ -826,23 +826,36 @@ onMounted(async () => {
         </VBtn>
         <VToolbarTitle>{{ $t('settings.title') }}</VToolbarTitle>
       </VAppBar>
-      <VContainer class="pa-0">
+      <VContainer class="pt-6 px-0 px-sm-4">
         <VRow>
-          <VCol cols="12" md="9" offset-md="1" xl="8" offset-xl="2">
+          <VCol cols="12" md="10" offset-md="1" xl="8" offset-xl="2">
             <!-- Profile -->
-            <div v-if="firebaseUser" class="text-center">
-              <VAvatar v-if="avatarUrl" size="100" :image="avatarUrl" />
-              <v-avatar v-else size="100">
-                <VIcon size="80" :icon="mdiAccountCircle" />
+            <div v-if="firebaseUser" class="panel-section profile-card">
+              <VAvatar
+                v-if="avatarUrl"
+                size="72"
+                :image="avatarUrl"
+                class="profile-card-avatar"
+              />
+              <v-avatar
+                v-else
+                size="72"
+                color="primary"
+                variant="tonal"
+                class="profile-card-avatar"
+              >
+                <VIcon size="48" :icon="mdiAccountCircle" />
               </v-avatar>
 
               <h3
                 v-if="firebaseUser.displayName"
-                class="text-title-large mt-2 mb-0"
+                class="text-title-large mb-0 profile-card-name"
               >
                 {{ firebaseUser.displayName }}
               </h3>
-              <h4 class="text-medium-emphasis mb-2 mt-0">
+              <h4
+                class="text-body-medium text-medium-emphasis my-0 profile-card-email"
+              >
                 {{ firebaseUser.email }}
                 <VIcon
                   v-if="firebaseUser.emailVerified"
@@ -866,513 +879,604 @@ onMounted(async () => {
                 v-if="authStore.user"
                 density="compact"
                 variant="outlined"
+                hide-details
                 :model-value="authStore.user.timezone"
-                class="mx-auto mt-2"
-                style="max-width: 250px"
+                class="profile-card-timezone"
                 :label="$t('settings.timezone')"
                 :items="timezones"
                 @update:model-value="updateTimezone"
               />
             </div>
 
+            <!-- Appearance -->
+            <section class="panel-section">
+              <h5 class="panel-section-title">
+                {{ $t('components.theme.title') }}
+              </h5>
+              <p class="text-medium-emphasis">
+                {{ $t('settings.appearance_desc') }}
+              </p>
+              <AppearancePicker class="appearance-settings" />
+            </section>
+
             <!-- API Key -->
-            <h5 class="text-headline-large mb-3 mt-0">
-              {{ $t('settings.api_key') }}
-            </h5>
-            <p
-              class="text-medium-emphasis"
-              v-html="$t('settings.api_key_desc')"
-            ></p>
-            <div v-if="apiKey === ''" class="mb-n9 pl-3 pt-5">
-              <VProgressCircular
-                :size="20"
-                :width="2"
-                color="primary"
-                indeterminate
+            <section class="panel-section">
+              <h5 class="panel-section-title">
+                {{ $t('settings.api_key') }}
+              </h5>
+              <p
+                class="text-medium-emphasis"
+                v-html="$t('settings.api_key_desc')"
+              ></p>
+              <div v-if="apiKey === ''" class="mb-n9 pl-3 pt-5">
+                <VProgressCircular
+                  :size="20"
+                  :width="2"
+                  color="primary"
+                  indeterminate
+                />
+              </div>
+              <VTextField
+                v-else
+                :append-inner-icon="apiKeyShow ? mdiEye : mdiEyeOff"
+                :type="apiKeyShow ? 'text' : 'password'"
+                :model-value="apiKey"
+                readonly
+                name="api-key"
+                variant="outlined"
+                class="mb-n2"
+                @click:append-inner="apiKeyShow = !apiKeyShow"
               />
-            </div>
-            <VTextField
-              v-else
-              :append-inner-icon="apiKeyShow ? mdiEye : mdiEyeOff"
-              :type="apiKeyShow ? 'text' : 'password'"
-              :model-value="apiKey"
-              readonly
-              name="api-key"
-              variant="outlined"
-              class="mb-n2"
-              @click:append-inner="apiKeyShow = !apiKeyShow"
-            />
-            <div class="d-flex flex-wrap">
-              <CopyButton
-                :value="apiKey"
-                color="primary"
-                :copy-text="$t('settings.copy_api_key')"
-                :notification-text="$t('settings.api_key_copied')"
-              />
-              <VBtn
-                v-if="mdAndUp"
-                color="primary"
-                class="ml-4"
-                @click="generateQrCode"
-              >
-                <VIcon start :icon="mdiQrcode" />
-                {{ $t('settings.show_qr_code') }}
-              </VBtn>
-              <VDialog
-                v-model="showQrCodeDialog"
-                max-width="400px"
-                opacity="0.9"
-              >
-                <VCard>
-                  <VCardTitle class="text-center">{{
-                    $t('settings.qr_code_title')
-                  }}</VCardTitle>
-                  <VCardText class="text-center">
-                    <p
-                      class="text-body-large mt-0"
-                      v-html="
-                        $t('settings.qr_code_desc', {
-                          url: config.public.appDownloadUrl,
-                        })
-                      "
-                    ></p>
-                    <canvas ref="qrCodeCanvas" />
-                  </VCardText>
-                  <VCardActions>
+              <div class="d-flex flex-wrap">
+                <CopyButton
+                  :value="apiKey"
+                  color="primary"
+                  :copy-text="$t('settings.copy_api_key')"
+                  :notification-text="$t('settings.api_key_copied')"
+                />
+                <VBtn
+                  v-if="mdAndUp"
+                  color="primary"
+                  class="ml-4"
+                  @click="generateQrCode"
+                >
+                  <VIcon start :icon="mdiQrcode" />
+                  {{ $t('settings.show_qr_code') }}
+                </VBtn>
+                <VDialog
+                  v-model="showQrCodeDialog"
+                  max-width="400px"
+                  opacity="0.9"
+                >
+                  <VCard>
+                    <VCardTitle class="text-center">{{
+                      $t('settings.qr_code_title')
+                    }}</VCardTitle>
+                    <VCardText class="text-center">
+                      <p
+                        class="text-body-large mt-0"
+                        v-html="
+                          $t('settings.qr_code_desc', {
+                            url: config.public.appDownloadUrl,
+                          })
+                        "
+                      ></p>
+                      <canvas ref="qrCodeCanvas" />
+                    </VCardText>
+                    <VCardActions>
+                      <VBtn
+                        color="primary"
+                        block
+                        variant="flat"
+                        class="mt-n4"
+                        @click="showQrCodeDialog = false"
+                        >{{ $t('settings.close') }}</VBtn
+                      >
+                    </VCardActions>
+                  </VCard>
+                </VDialog>
+                <VBtn v-if="lgAndUp" class="ml-4" to="/docs">{{
+                  $t('settings.documentation')
+                }}</VBtn>
+                <VSpacer />
+                <VDialog v-model="showRotateApiKey" max-width="550">
+                  <template #activator="{ props }">
                     <VBtn
-                      color="primary"
-                      block
-                      variant="flat"
-                      class="mt-n4"
-                      @click="showQrCodeDialog = false"
-                      >{{ $t('settings.close') }}</VBtn
-                    >
-                  </VCardActions>
-                </VCard>
-              </VDialog>
-              <VBtn v-if="lgAndUp" class="ml-4" to="/docs">{{
-                $t('settings.documentation')
-              }}</VBtn>
-              <VSpacer />
-              <VDialog v-model="showRotateApiKey" max-width="550">
-                <template #activator="{ props }">
-                  <VBtn
-                    :size="mdAndDown ? 'small' : 'default'"
-                    :variant="lgAndUp ? 'text' : 'elevated'"
-                    color="warning"
-                    v-bind="props"
-                  >
-                    <VIcon start :icon="mdiRefresh" />
-                    {{ $t('settings.rotate_api_key') }}
-                  </VBtn>
-                </template>
-                <VCard>
-                  <VCardTitle class="text-headline-small">{{
-                    $t('settings.rotate_api_key_confirm')
-                  }}</VCardTitle>
-                  <VCardText class="text-medium-emphasis"
-                    ><span v-html="$t('settings.rotate_api_key_desc')"
-                  /></VCardText>
-                  <VCardActions class="pb-4">
-                    <VBtn
-                      color="primary"
-                      variant="flat"
-                      :loading="rotatingApiKey"
-                      @click="rotateApiKey"
+                      :size="mdAndDown ? 'small' : 'default'"
+                      :variant="lgAndUp ? 'text' : 'elevated'"
+                      color="warning"
+                      v-bind="props"
                     >
                       <VIcon start :icon="mdiRefresh" />
-                      {{ $t('settings.yes_rotate') }}
+                      {{ $t('settings.rotate_api_key') }}
+                    </VBtn>
+                  </template>
+                  <VCard>
+                    <VCardTitle class="text-headline-small">{{
+                      $t('settings.rotate_api_key_confirm')
+                    }}</VCardTitle>
+                    <VCardText class="text-medium-emphasis"
+                      ><span v-html="$t('settings.rotate_api_key_desc')"
+                    /></VCardText>
+                    <VCardActions class="pb-4">
+                      <VBtn
+                        color="primary"
+                        variant="flat"
+                        :loading="rotatingApiKey"
+                        @click="rotateApiKey"
+                      >
+                        <VIcon start :icon="mdiRefresh" />
+                        {{ $t('settings.yes_rotate') }}
+                      </VBtn>
+                      <VSpacer />
+                      <VBtn
+                        variant="text"
+                        color="warning"
+                        @click="showRotateApiKey = false"
+                        >{{ $t('settings.close') }}</VBtn
+                      >
+                    </VCardActions>
+                  </VCard>
+                </VDialog>
+              </div>
+            </section>
+
+            <!-- Webhooks -->
+            <section class="panel-section">
+              <h5 id="webhook-settings" class="panel-section-title">
+                Webhooks
+              </h5>
+              <p
+                class="text-medium-emphasis"
+                v-html="$t('settings.webhooks_desc')"
+              ></p>
+              <div v-if="loadingWebhooks">
+                <VProgressCircular
+                  :size="60"
+                  :width="2"
+                  color="primary"
+                  class="mb-4"
+                  indeterminate
+                />
+              </div>
+              <VTable v-else-if="webhooks.length" class="stack-table mb-4">
+                <thead>
+                  <tr class="text-uppercase text-title-medium">
+                    <th v-if="xlAndUp" class="text-left">
+                      {{ $t('settings.id') }}
+                    </th>
+                    <th class="text-left text-break">
+                      {{ $t('settings.callback_url') }}
+                    </th>
+                    <th v-if="lgAndUp" class="text-center">
+                      {{ $t('settings.events') }}
+                    </th>
+                    <th class="text-center">{{ $t('settings.action') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="webhook in webhooks" :key="webhook.id">
+                    <td
+                      v-if="xlAndUp"
+                      :data-label="$t('settings.id')"
+                      class="text-left"
+                    >
+                      {{ webhook.id }}
+                    </td>
+                    <td
+                      :data-label="$t('settings.callback_url')"
+                      class="text-break"
+                    >
+                      {{ webhook.url }}
+                    </td>
+                    <td
+                      v-if="lgAndUp"
+                      :data-label="$t('settings.events')"
+                      class="text-center"
+                    >
+                      <VChip
+                        v-for="event in webhook.events"
+                        :key="event"
+                        class="ma-1"
+                        size="small"
+                        >{{ event }}</VChip
+                      >
+                    </td>
+                    <td :data-label="$t('settings.action')" class="text-center">
+                      <VBtn
+                        :icon="mdAndDown"
+                        size="small"
+                        color="info"
+                        :disabled="updatingWebhook"
+                        @click.prevent="onWebhookEdit(webhook.id)"
+                      >
+                        <VIcon size="small" :icon="mdiSquareEditOutline" />
+                        <span v-if="!mdAndDown" class="ml-1">{{
+                          $t('settings.edit')
+                        }}</span>
+                      </VBtn>
+                    </td>
+                  </tr>
+                </tbody>
+              </VTable>
+              <div class="d-flex">
+                <VBtn color="primary" @click="onWebhookCreate">
+                  <VIcon start :icon="mdiLinkVariant" />
+                  {{ $t('settings.add_webhook') }}
+                </VBtn>
+                <VBtn
+                  v-if="lgAndUp"
+                  class="ml-4"
+                  to="/docs/webhooks-introduction"
+                  >{{ $t('settings.documentation') }}</VBtn
+                >
+              </div>
+            </section>
+
+            <!-- Discord Integration -->
+            <section class="panel-section">
+              <h5 id="discord-settings" class="panel-section-title">
+                {{ $t('settings.discord_integration') }}
+              </h5>
+              <p
+                class="text-medium-emphasis"
+                v-html="$t('settings.discord_integration_desc')"
+              ></p>
+              <div v-if="loadingDiscordIntegrations">
+                <VProgressCircular
+                  :size="60"
+                  :width="2"
+                  color="primary"
+                  class="mb-4"
+                  indeterminate
+                />
+              </div>
+              <VTable v-else-if="discords.length" class="stack-table mb-4">
+                <thead>
+                  <tr class="text-uppercase text-title-medium">
+                    <th class="text-left">{{ $t('settings.name') }}</th>
+                    <th class="text-left">{{ $t('settings.server_id') }}</th>
+                    <th class="text-left">{{ $t('settings.channel_id') }}</th>
+                    <th class="text-center">{{ $t('settings.action') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="discord in discords" :key="discord.id">
+                    <td :data-label="$t('settings.name')" class="text-left">
+                      {{ discord.name }}
+                    </td>
+                    <td
+                      :data-label="$t('settings.server_id')"
+                      class="text-left"
+                    >
+                      {{ discord.server_id }}
+                    </td>
+                    <td
+                      :data-label="$t('settings.channel_id')"
+                      class="text-left"
+                    >
+                      {{ discord.incoming_channel_id }}
+                    </td>
+                    <td :data-label="$t('settings.action')" class="text-center">
+                      <VBtn
+                        :icon="mdAndDown"
+                        size="small"
+                        color="info"
+                        :disabled="updatingDiscord"
+                        @click.prevent="onDiscordEdit(discord.id)"
+                      >
+                        <VIcon size="small" :icon="mdiSquareEditOutline" />
+                        <span v-if="!mdAndDown" class="ml-1">{{
+                          $t('settings.edit')
+                        }}</span>
+                      </VBtn>
+                    </td>
+                  </tr>
+                </tbody>
+              </VTable>
+              <VBtn color="primary" @click="onDiscordCreate">
+                <VIcon start :icon="mdiConnection" />
+                {{ $t('settings.add_discord') }}
+              </VBtn>
+            </section>
+
+            <!-- Phones -->
+            <section class="panel-section">
+              <h5 id="phones" class="panel-section-title">
+                {{ $t('settings.phones') }}
+              </h5>
+              <p
+                class="text-medium-emphasis"
+                v-html="$t('settings.phones_desc')"
+              ></p>
+              <VTable class="stack-table mb-4" density="comfortable">
+                <thead>
+                  <tr class="text-uppercase text-medium-emphasis">
+                    <th v-if="xlAndUp" class="text-left">
+                      {{ $t('settings.id') }}
+                    </th>
+                    <th class="text-left">{{ $t('settings.phone_number') }}</th>
+                    <th v-if="lgAndUp" class="text-center">
+                      {{ $t('settings.retries') }}
+                    </th>
+                    <th class="text-center">{{ $t('settings.rate') }}</th>
+                    <th class="text-center">{{ $t('settings.updated_at') }}</th>
+                    <th class="text-center">{{ $t('settings.action') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="phone in phonesStore.phones" :key="phone.id">
+                    <td
+                      v-if="xlAndUp"
+                      :data-label="$t('settings.id')"
+                      class="text-left"
+                    >
+                      {{ phone.id }}
+                    </td>
+                    <td :data-label="$t('settings.phone_number')">
+                      {{ useFilters().formatPhoneNumber(phone.phone_number) }}
+                    </td>
+                    <td
+                      v-if="lgAndUp"
+                      :data-label="$t('settings.retries')"
+                      class="text-center"
+                    >
+                      {{
+                        phone.max_send_attempts ? phone.max_send_attempts : 1
+                      }}
+                    </td>
+                    <td :data-label="$t('settings.rate')" class="text-center">
+                      <span v-if="phone.messages_per_minute"
+                        >{{ phone.messages_per_minute }}/min</span
+                      >
+                      <span v-else>{{ $t('settings.unlimited') }}</span>
+                    </td>
+                    <td
+                      :data-label="$t('settings.updated_at')"
+                      class="text-center"
+                    >
+                      {{ useFilters().formatTimestamp(phone.updated_at) }}
+                    </td>
+                    <td :data-label="$t('settings.action')" class="text-center">
+                      <VBtn
+                        :icon="mdAndDown"
+                        size="small"
+                        color="info"
+                        :disabled="updatingPhone"
+                        @click.prevent="showEditPhone(phone.id)"
+                      >
+                        <VIcon size="small" :icon="mdiSquareEditOutline" />
+                        <span v-if="!mdAndDown" class="ml-1">{{
+                          $t('settings.edit')
+                        }}</span>
+                      </VBtn>
+                    </td>
+                  </tr>
+                </tbody>
+              </VTable>
+            </section>
+
+            <!-- Send Schedules -->
+            <section class="panel-section">
+              <h5 id="send-schedules" class="panel-section-title">
+                {{ $t('settings.send_schedules') }}
+              </h5>
+              <p
+                class="text-medium-emphasis"
+                v-html="$t('settings.send_schedules_desc')"
+              ></p>
+              <div v-if="loadingSendSchedules">
+                <VProgressCircular
+                  :size="60"
+                  :width="2"
+                  color="primary"
+                  class="mb-4"
+                  indeterminate
+                />
+              </div>
+              <VTable class="stack-table mb-4" density="comfortable">
+                <thead>
+                  <tr class="text-uppercase text-medium-emphasis">
+                    <th class="text-left">{{ $t('settings.name') }}</th>
+                    <th class="text-left">{{ $t('settings.timezone') }}</th>
+                    <th class="text-left">{{ $t('settings.schedule') }}</th>
+                    <th class="text-center">{{ $t('settings.action') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-if="!loadingSendSchedules && sendSchedules.length === 0"
+                  >
+                    <td
+                      colspan="4"
+                      class="text-center text-medium-emphasis py-6"
+                    >
+                      {{ $t('settings.no_send_schedules') }}
+                    </td>
+                  </tr>
+                  <tr v-for="schedule in sendSchedules" :key="schedule.id">
+                    <td
+                      :data-label="$t('settings.name')"
+                      class="text-left pt-2"
+                      style="vertical-align: top"
+                    >
+                      {{ schedule.name }}
+                    </td>
+                    <td
+                      :data-label="$t('settings.timezone')"
+                      class="pt-2"
+                      style="vertical-align: top"
+                    >
+                      {{ schedule.timezone }}
+                    </td>
+                    <td :data-label="$t('settings.schedule')" class="py-2">
+                      <div
+                        v-for="line in scheduleSummary(schedule)"
+                        :key="`${schedule.id}-${line[0]}`"
+                        class="mb-1"
+                      >
+                        {{ line[0] }}:
+                        <span class="text-medium-emphasis">{{ line[1] }}</span>
+                      </div>
+                    </td>
+                    <td
+                      :data-label="$t('settings.action')"
+                      class="text-center pt-2"
+                      style="vertical-align: top"
+                    >
+                      <VBtn
+                        :icon="mdAndDown"
+                        size="small"
+                        color="info"
+                        :disabled="loadingSendSchedules"
+                        @click.prevent="openEditSchedule(schedule)"
+                      >
+                        <VIcon size="small" :icon="mdiSquareEditOutline" />
+                        <span v-if="!mdAndDown" class="ml-1">{{
+                          $t('settings.edit')
+                        }}</span>
+                      </VBtn>
+                    </td>
+                  </tr>
+                </tbody>
+              </VTable>
+              <div class="d-flex mt-4">
+                <VBtn color="primary" @click="openCreateSchedule">
+                  <VIcon start :icon="mdiCalendarClock" />
+                  {{ $t('settings.create_send_schedule') }}
+                </VBtn>
+                <VBtn
+                  v-if="lgAndUp"
+                  class="ml-4"
+                  to="/docs/outgoing-message-queue"
+                  >{{ $t('settings.documentation') }}</VBtn
+                >
+              </div>
+            </section>
+
+            <!-- Email Notifications -->
+            <section class="panel-section">
+              <h5 id="email-notifications" class="panel-section-title">
+                {{ $t('settings.email_notifications') }}
+              </h5>
+              <p
+                class="text-medium-emphasis"
+                v-html="$t('settings.email_notifications_desc')"
+              ></p>
+              <VSwitch
+                v-model="notificationSettings.heartbeat_enabled"
+                color="primary"
+                :label="$t('settings.heartbeat_emails')"
+                :disabled="updatingEmailNotifications"
+                :hint="$t('settings.heartbeat_emails_hint')"
+                persistent-hint
+              />
+              <VSwitch
+                v-model="notificationSettings.webhook_enabled"
+                color="primary"
+                :label="$t('settings.webhook_emails')"
+                :disabled="updatingEmailNotifications"
+                :hint="$t('settings.webhook_emails_hint')"
+                persistent-hint
+              />
+              <VSwitch
+                v-model="notificationSettings.message_status_enabled"
+                color="primary"
+                :label="$t('settings.message_status_emails')"
+                :disabled="updatingEmailNotifications"
+                :hint="$t('settings.message_status_emails_hint')"
+                persistent-hint
+              />
+              <VSwitch
+                v-model="notificationSettings.newsletter_enabled"
+                color="primary"
+                :label="$t('settings.newsletter_emails')"
+                :disabled="updatingEmailNotifications"
+                :hint="$t('settings.newsletter_emails_hint')"
+                persistent-hint
+              />
+              <VBtn
+                color="primary"
+                :loading="updatingEmailNotifications"
+                class="mt-4"
+                @click="saveEmailNotifications"
+              >
+                <VIcon start :icon="mdiContentSave" />
+                {{ $t('settings.save_notification_settings') }}
+              </VBtn>
+            </section>
+
+            <!-- Message Data Retention -->
+            <section class="panel-section">
+              <h5 class="panel-section-title">
+                {{ $t('settings.message_data_retention') }}
+              </h5>
+              <p
+                class="text-medium-emphasis"
+                v-html="$t('settings.message_data_retention_desc')"
+              ></p>
+              <VSelect
+                :items="['1 Year']"
+                model-value="1 Year"
+                :label="$t('settings.retention_period')"
+                variant="outlined"
+                density="compact"
+                class="mt-4"
+                style="max-width: 300px"
+              />
+            </section>
+
+            <!-- Delete Account -->
+            <section class="panel-section panel-section-danger">
+              <h5 class="panel-section-title text-error">
+                {{ $t('settings.delete_account') }}
+              </h5>
+              <p
+                class="text-medium-emphasis"
+                v-html="$t('settings.delete_account_desc')"
+              ></p>
+              <VBtn
+                color="error"
+                :loading="deletingAccount"
+                class="mt-2"
+                @click="showDeleteAccountDialog = true"
+              >
+                <VIcon start :icon="mdiDelete" />
+                {{ $t('settings.delete_your_account') }}
+              </VBtn>
+              <VDialog v-model="showDeleteAccountDialog" max-width="600px">
+                <VCard>
+                  <VCardTitle class="text-center">{{
+                    $t('settings.delete_account_title')
+                  }}</VCardTitle>
+                  <VCardText class="mt-2 text-center text-medium-emphasis"
+                    ><span v-html="$t('settings.delete_account_confirm')"
+                  /></VCardText>
+                  <VCardActions>
+                    <VBtn
+                      color="error"
+                      variant="text"
+                      :loading="deletingAccount"
+                      @click="deleteUserAccount"
+                    >
+                      <VIcon v-if="lgAndUp" start :icon="mdiDelete" />
+                      {{ $t('settings.delete_my_account') }}
                     </VBtn>
                     <VSpacer />
                     <VBtn
-                      variant="text"
-                      color="warning"
-                      @click="showRotateApiKey = false"
-                      >{{ $t('settings.close') }}</VBtn
+                      color="primary"
+                      variant="flat"
+                      @click="showDeleteAccountDialog = false"
                     >
+                      <span v-if="lgAndUp">{{
+                        $t('settings.keep_my_account')
+                      }}</span>
+                      <span v-else>{{ $t('settings.close') }}</span>
+                    </VBtn>
                   </VCardActions>
                 </VCard>
               </VDialog>
-            </div>
-
-            <!-- Webhooks -->
-            <h5 id="webhook-settings" class="text-headline-large mb-3 mt-12">
-              Webhooks
-            </h5>
-            <p
-              class="text-medium-emphasis"
-              v-html="$t('settings.webhooks_desc')"
-            ></p>
-            <div v-if="loadingWebhooks">
-              <VProgressCircular
-                :size="60"
-                :width="2"
-                color="primary"
-                class="mb-4"
-                indeterminate
-              />
-            </div>
-            <VTable v-else-if="webhooks.length" class="mb-4">
-              <thead>
-                <tr class="text-uppercase text-title-medium">
-                  <th v-if="xlAndUp" class="text-left">
-                    {{ $t('settings.id') }}
-                  </th>
-                  <th class="text-left text-break">
-                    {{ $t('settings.callback_url') }}
-                  </th>
-                  <th v-if="lgAndUp" class="text-center">
-                    {{ $t('settings.events') }}
-                  </th>
-                  <th class="text-center">{{ $t('settings.action') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="webhook in webhooks" :key="webhook.id">
-                  <td v-if="xlAndUp" class="text-left">{{ webhook.id }}</td>
-                  <td class="text-break">{{ webhook.url }}</td>
-                  <td v-if="lgAndUp" class="text-center">
-                    <VChip
-                      v-for="event in webhook.events"
-                      :key="event"
-                      class="ma-1"
-                      size="small"
-                      >{{ event }}</VChip
-                    >
-                  </td>
-                  <td class="text-center">
-                    <VBtn
-                      :icon="mdAndDown"
-                      size="small"
-                      color="info"
-                      :disabled="updatingWebhook"
-                      @click.prevent="onWebhookEdit(webhook.id)"
-                    >
-                      <VIcon size="small" :icon="mdiSquareEditOutline" />
-                      <span v-if="!mdAndDown" class="ml-1">{{
-                        $t('settings.edit')
-                      }}</span>
-                    </VBtn>
-                  </td>
-                </tr>
-              </tbody>
-            </VTable>
-            <div class="d-flex">
-              <VBtn color="primary" @click="onWebhookCreate">
-                <VIcon start :icon="mdiLinkVariant" />
-                {{ $t('settings.add_webhook') }}
-              </VBtn>
-              <VBtn
-                v-if="lgAndUp"
-                class="ml-4"
-                to="/docs/webhooks-introduction"
-                >{{ $t('settings.documentation') }}</VBtn
-              >
-            </div>
-
-            <!-- Discord Integration -->
-            <h5 id="discord-settings" class="text-headline-large mb-3 mt-12">
-              Discord Integration
-            </h5>
-            <p
-              class="text-medium-emphasis"
-              v-html="$t('settings.discord_integration_desc')"
-            ></p>
-            <div v-if="loadingDiscordIntegrations">
-              <VProgressCircular
-                :size="60"
-                :width="2"
-                color="primary"
-                class="mb-4"
-                indeterminate
-              />
-            </div>
-            <VTable v-else-if="discords.length" class="mb-4">
-              <thead>
-                <tr class="text-uppercase text-title-medium">
-                  <th class="text-left">{{ $t('settings.name') }}</th>
-                  <th class="text-left">{{ $t('settings.server_id') }}</th>
-                  <th class="text-left">{{ $t('settings.channel_id') }}</th>
-                  <th class="text-center">{{ $t('settings.action') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="discord in discords" :key="discord.id">
-                  <td class="text-left">{{ discord.name }}</td>
-                  <td class="text-left">{{ discord.server_id }}</td>
-                  <td class="text-left">{{ discord.incoming_channel_id }}</td>
-                  <td class="text-center">
-                    <VBtn
-                      :icon="mdAndDown"
-                      size="small"
-                      color="info"
-                      :disabled="updatingDiscord"
-                      @click.prevent="onDiscordEdit(discord.id)"
-                    >
-                      <VIcon size="small" :icon="mdiSquareEditOutline" />
-                      <span v-if="!mdAndDown" class="ml-1">{{
-                        $t('settings.edit')
-                      }}</span>
-                    </VBtn>
-                  </td>
-                </tr>
-              </tbody>
-            </VTable>
-            <VBtn color="primary" @click="onDiscordCreate">
-              <VIcon start :icon="mdiConnection" />
-              {{ $t('settings.add_discord') }}
-            </VBtn>
-
-            <!-- Phones -->
-            <h5 id="phones" class="text-headline-large mb-3 mt-12">
-              {{ $t('settings.phones') }}
-            </h5>
-            <p
-              class="text-medium-emphasis"
-              v-html="$t('settings.phones_desc')"
-            ></p>
-            <VTable class="mb-4" density="comfortable">
-              <thead>
-                <tr class="text-uppercase text-medium-emphasis">
-                  <th v-if="xlAndUp" class="text-left">
-                    {{ $t('settings.id') }}
-                  </th>
-                  <th class="text-left">{{ $t('settings.phone_number') }}</th>
-                  <th v-if="lgAndUp" class="text-center">
-                    {{ $t('settings.retries') }}
-                  </th>
-                  <th class="text-center">{{ $t('settings.rate') }}</th>
-                  <th class="text-center">{{ $t('settings.updated_at') }}</th>
-                  <th class="text-center">{{ $t('settings.action') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="phone in phonesStore.phones" :key="phone.id">
-                  <td v-if="xlAndUp" class="text-left">{{ phone.id }}</td>
-                  <td>
-                    {{ useFilters().formatPhoneNumber(phone.phone_number) }}
-                  </td>
-                  <td v-if="lgAndUp" class="text-center">
-                    {{ phone.max_send_attempts ? phone.max_send_attempts : 1 }}
-                  </td>
-                  <td class="text-center">
-                    <span v-if="phone.messages_per_minute"
-                      >{{ phone.messages_per_minute }}/min</span
-                    >
-                    <span v-else>{{ $t('settings.unlimited') }}</span>
-                  </td>
-                  <td class="text-center">
-                    {{ useFilters().formatTimestamp(phone.updated_at) }}
-                  </td>
-                  <td class="text-center">
-                    <VBtn
-                      :icon="mdAndDown"
-                      size="small"
-                      color="info"
-                      :disabled="updatingPhone"
-                      @click.prevent="showEditPhone(phone.id)"
-                    >
-                      <VIcon size="small" :icon="mdiSquareEditOutline" />
-                      <span v-if="!mdAndDown" class="ml-1">{{
-                        $t('settings.edit')
-                      }}</span>
-                    </VBtn>
-                  </td>
-                </tr>
-              </tbody>
-            </VTable>
-
-            <!-- Send Schedules -->
-            <h5 id="send-schedules" class="text-headline-large mb-3 mt-12">
-              {{ $t('settings.send_schedules') }}
-            </h5>
-            <p
-              class="text-medium-emphasis"
-              v-html="$t('settings.send_schedules_desc')"
-            ></p>
-            <div v-if="loadingSendSchedules">
-              <VProgressCircular
-                :size="60"
-                :width="2"
-                color="primary"
-                class="mb-4"
-                indeterminate
-              />
-            </div>
-            <VTable class="mb-4" density="comfortable">
-              <thead>
-                <tr class="text-uppercase text-medium-emphasis">
-                  <th class="text-left">{{ $t('settings.name') }}</th>
-                  <th class="text-left">{{ $t('settings.timezone') }}</th>
-                  <th class="text-left">{{ $t('settings.schedule') }}</th>
-                  <th class="text-center">{{ $t('settings.action') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="schedule in sendSchedules" :key="schedule.id">
-                  <td class="text-left pt-2" style="vertical-align: top">
-                    {{ schedule.name }}
-                  </td>
-                  <td class="pt-2" style="vertical-align: top">
-                    {{ schedule.timezone }}
-                  </td>
-                  <td class="py-2">
-                    <div
-                      v-for="line in scheduleSummary(schedule)"
-                      :key="`${schedule.id}-${line[0]}`"
-                      class="mb-1"
-                    >
-                      {{ line[0] }}:
-                      <span class="text-medium-emphasis">{{ line[1] }}</span>
-                    </div>
-                  </td>
-                  <td class="text-center pt-2" style="vertical-align: top">
-                    <VBtn
-                      :icon="mdAndDown"
-                      size="small"
-                      color="info"
-                      :disabled="loadingSendSchedules"
-                      @click.prevent="openEditSchedule(schedule)"
-                    >
-                      <VIcon size="small" :icon="mdiSquareEditOutline" />
-                      <span v-if="!mdAndDown" class="ml-1">{{
-                        $t('settings.edit')
-                      }}</span>
-                    </VBtn>
-                  </td>
-                </tr>
-              </tbody>
-            </VTable>
-            <div class="d-flex mt-4">
-              <VBtn color="primary" @click="openCreateSchedule">
-                <VIcon start :icon="mdiCalendarClock" />
-                {{ $t('settings.create_send_schedule') }}
-              </VBtn>
-              <VBtn
-                v-if="lgAndUp"
-                class="ml-4"
-                to="/docs/outgoing-message-queue"
-                >{{ $t('settings.documentation') }}</VBtn
-              >
-            </div>
-
-            <!-- Email Notifications -->
-            <h5 id="email-notifications" class="text-headline-large mb-3 mt-12">
-              Email Notifications
-            </h5>
-            <p
-              class="text-medium-emphasis"
-              v-html="$t('settings.email_notifications_desc')"
-            ></p>
-            <VSwitch
-              v-model="notificationSettings.heartbeat_enabled"
-              color="primary"
-              :label="$t('settings.heartbeat_emails')"
-              :disabled="updatingEmailNotifications"
-              :hint="$t('settings.heartbeat_emails_hint')"
-              persistent-hint
-            />
-            <VSwitch
-              v-model="notificationSettings.webhook_enabled"
-              color="primary"
-              :label="$t('settings.webhook_emails')"
-              :disabled="updatingEmailNotifications"
-              :hint="$t('settings.webhook_emails_hint')"
-              persistent-hint
-            />
-            <VSwitch
-              v-model="notificationSettings.message_status_enabled"
-              color="primary"
-              :label="$t('settings.message_status_emails')"
-              :disabled="updatingEmailNotifications"
-              :hint="$t('settings.message_status_emails_hint')"
-              persistent-hint
-            />
-            <VSwitch
-              v-model="notificationSettings.newsletter_enabled"
-              color="primary"
-              :label="$t('settings.newsletter_emails')"
-              :disabled="updatingEmailNotifications"
-              :hint="$t('settings.newsletter_emails_hint')"
-              persistent-hint
-            />
-            <VBtn
-              color="primary"
-              :loading="updatingEmailNotifications"
-              class="mt-4"
-              @click="saveEmailNotifications"
-            >
-              <VIcon start :icon="mdiContentSave" />
-              {{ $t('settings.save_notification_settings') }}
-            </VBtn>
-
-            <!-- Message Data Retention -->
-            <h5 class="text-headline-large mb-3 mt-12">
-              Message Data Retention
-            </h5>
-            <p
-              class="text-medium-emphasis"
-              v-html="$t('settings.message_data_retention_desc')"
-            ></p>
-            <VSelect
-              :items="['1 Year']"
-              model-value="1 Year"
-              :label="$t('settings.retention_period')"
-              variant="outlined"
-              density="compact"
-              class="mt-4"
-              style="max-width: 300px"
-            />
-
-            <!-- Delete Account -->
-            <h5 class="text-headline-large text-error mb-3 mt-10">
-              Delete Account
-            </h5>
-            <p
-              class="text-medium-emphasis"
-              v-html="$t('settings.delete_account_desc')"
-            ></p>
-            <VBtn
-              color="error"
-              :loading="deletingAccount"
-              class="mt-2"
-              @click="showDeleteAccountDialog = true"
-            >
-              <VIcon start :icon="mdiDelete" />
-              {{ $t('settings.delete_your_account') }}
-            </VBtn>
-            <VDialog v-model="showDeleteAccountDialog" max-width="600px">
-              <VCard>
-                <VCardTitle class="text-center">{{
-                  $t('settings.delete_account_title')
-                }}</VCardTitle>
-                <VCardText class="mt-2 text-center text-medium-emphasis"
-                  ><span v-html="$t('settings.delete_account_confirm')"
-                /></VCardText>
-                <VCardActions>
-                  <VBtn
-                    color="error"
-                    variant="text"
-                    :loading="deletingAccount"
-                    @click="deleteUserAccount"
-                  >
-                    <VIcon v-if="lgAndUp" start :icon="mdiDelete" />
-                    {{ $t('settings.delete_my_account') }}
-                  </VBtn>
-                  <VSpacer />
-                  <VBtn
-                    color="primary"
-                    variant="flat"
-                    @click="showDeleteAccountDialog = false"
-                  >
-                    <span v-if="lgAndUp">{{
-                      $t('settings.keep_my_account')
-                    }}</span>
-                    <span v-else>{{ $t('settings.close') }}</span>
-                  </VBtn>
-                </VCardActions>
-              </VCard>
-            </VDialog>
+            </section>
           </VCol>
         </VRow>
       </VContainer>
@@ -1980,3 +2084,47 @@ onMounted(async () => {
     </VDialog>
   </VContainer>
 </template>
+
+<style scoped>
+.appearance-settings {
+  max-width: 420px;
+}
+
+.profile-card {
+  display: grid;
+  grid-template-columns: auto 1fr minmax(200px, 260px);
+  align-items: center;
+  gap: 0.15rem 1.25rem;
+}
+
+.profile-card-avatar {
+  grid-row: 1 / span 2;
+}
+
+.profile-card-name {
+  grid-column: 2;
+  align-self: end;
+}
+
+.profile-card-email {
+  grid-column: 2;
+  align-self: start;
+}
+
+.profile-card-timezone {
+  grid-row: 1 / span 2;
+  grid-column: 3;
+}
+
+@media (width <= 700px) {
+  .profile-card {
+    grid-template-columns: auto 1fr;
+  }
+
+  .profile-card-timezone {
+    grid-row: auto;
+    grid-column: 1 / -1;
+    margin-top: 1rem;
+  }
+}
+</style>

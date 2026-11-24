@@ -242,7 +242,7 @@ onBeforeUnmount(() => {
       <VRow>
         <VCol cols="12">
           <div class="d-flex align-center">
-            <h1 class="text-display-large mb-1">
+            <h1 class="text-headline-large mb-1">
               {{ $t('pages.contacts.titleContacts') }}
             </h1>
             <VSpacer />

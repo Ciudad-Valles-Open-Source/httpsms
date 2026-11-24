@@ -101,14 +101,13 @@ onMounted(() => {
           <VCard
             v-if="adjacent.previous"
             :to="adjacent.previous.to"
-            variant="outlined"
-            class="pa-4 h-100"
+            class="pa-5 h-100"
           >
             <div class="text-body-small text-medium-emphasis">
               <VIcon size="small" :icon="mdiArrowLeft" />
               {{ $t('docs.previous') }}
             </div>
-            <div class="text-title-medium text-primary mt-1">
+            <div class="text-title-medium font-weight-bold text-primary mt-1">
               {{ $t(adjacent.previous.titleKey) }}
             </div>
           </VCard>
@@ -117,14 +116,13 @@ onMounted(() => {
           <VCard
             v-if="adjacent.next"
             :to="adjacent.next.to"
-            variant="outlined"
-            class="pa-4 h-100 text-right"
+            class="pa-5 h-100 text-right"
           >
             <div class="text-body-small text-medium-emphasis">
               {{ $t('docs.next') }}
               <VIcon size="small" :icon="mdiArrowRight" />
             </div>
-            <div class="text-title-medium text-primary mt-1">
+            <div class="text-title-medium font-weight-bold text-primary mt-1">
               {{ $t(adjacent.next.titleKey) }}
             </div>
           </VCard>
@@ -147,6 +145,14 @@ onMounted(() => {
   max-width: 920px;
 }
 
+.docs-page :deep(.v-card) {
+  transition: border-color 0.15s;
+}
+
+.docs-page :deep(.v-card:hover) {
+  border-color: rgb(var(--v-theme-primary), 0.5);
+}
+
 .docs-article {
   font-size: 1rem;
   line-height: 1.7;
@@ -158,13 +164,15 @@ onMounted(() => {
 .docs-article :deep(h3),
 .docs-article :deep(h4) {
   line-height: 1.25;
-  font-weight: 500;
+  font-weight: 700;
+  letter-spacing: -0.015em;
   scroll-margin-top: 80px;
 }
 
 .docs-article :deep(h1) {
-  font-size: 2.5rem;
-  font-weight: 400;
+  font-size: 2.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   margin-bottom: 1rem;
 }
 
@@ -257,9 +265,10 @@ onMounted(() => {
   position: relative;
   overflow-x: auto;
   padding: 1rem 1.25rem;
-  border-radius: 6px;
+  border-radius: 0.9rem;
   font-size: 0.875rem;
   line-height: 1.6;
+  color: #e6edf3;
   background: #0d1117;
   border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
 }
@@ -284,7 +293,7 @@ onMounted(() => {
 .docs-article :deep(.docs-table) {
   overflow-x: auto;
   border: 1px solid rgb(var(--v-border-color), var(--v-border-opacity));
-  border-radius: 6px;
+  border-radius: 0.9rem;
 }
 
 .docs-article :deep(table) {
@@ -313,7 +322,7 @@ onMounted(() => {
 .docs-article :deep(blockquote.docs-callout) {
   padding: 0.75rem 1rem;
   border-left: 4px solid rgb(var(--callout-color));
-  border-radius: 0 6px 6px 0;
+  border-radius: 0 0.75rem 0.75rem 0;
   background: rgb(var(--callout-color), 0.08);
 
   --callout-color: var(--v-theme-on-surface);

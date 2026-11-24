@@ -320,9 +320,9 @@ function getGeneralErrorMessage(
   <div>
     <v-btn
       block
-      color="white"
+      variant="outlined"
       size="large"
-      class="mb-3 position-relative overflow-visible"
+      class="mb-3 position-relative overflow-visible auth-provider-btn"
       :loading="loading"
       :disabled="loading"
       @click="signInWithGoogle"
@@ -337,16 +337,15 @@ function getGeneralErrorMessage(
       >
         {{ $t('components.firebaseAuth.lastUsed') }}
       </v-chip>
-      <v-icon color="red" :icon="mdiGoogle" class="mr-2" />
+      <v-icon color="#ea4335" :icon="mdiGoogle" class="mr-2" />
       {{ $t('components.firebaseAuth.continueGoogle') }}
     </v-btn>
 
     <v-btn
       block
       size="large"
-      variant="flat"
-      color="black"
-      class="mb-3 position-relative overflow-visible"
+      variant="outlined"
+      class="mb-3 position-relative overflow-visible auth-provider-btn"
       :loading="loading"
       :disabled="loading"
       @click="signInWithGithub"
@@ -369,9 +368,7 @@ function getGeneralErrorMessage(
       v-if="!showEmailForm"
       block
       size="large"
-      variant="flat"
-      color="red"
-      class="mb-3 position-relative overflow-visible"
+      class="mb-3 position-relative overflow-visible btn-gradient"
       :disabled="loading"
       @click="showEmailForm = true"
     >
@@ -421,7 +418,7 @@ function getGeneralErrorMessage(
         <v-btn
           block
           size="large"
-          color="primary"
+          class="btn-gradient"
           type="submit"
           :loading="loading"
         >
@@ -437,8 +434,7 @@ function getGeneralErrorMessage(
         block
         variant="text"
         size="small"
-        color="warning"
-        class="mt-2"
+        class="mt-2 text-medium-emphasis"
         @click="backToSignIn"
       >
         {{ $t('components.firebaseAuth.backToSignIn') }}
@@ -507,7 +503,7 @@ function getGeneralErrorMessage(
       <v-btn
         block
         size="large"
-        color="primary"
+        class="btn-gradient"
         type="submit"
         :loading="loading"
       >
@@ -533,7 +529,7 @@ function getGeneralErrorMessage(
       </v-btn>
     </v-form>
 
-    <p class="text-body-small text-medium-emphasis mt-4">
+    <p class="text-body-small text-medium-emphasis mt-5 mb-0">
       {{ $t('components.firebaseAuth.byContinuing') }}
       <a
         :href="appStore.appData.url + '/terms-and-conditions'"
@@ -553,6 +549,15 @@ function getGeneralErrorMessage(
 </template>
 
 <style scoped>
+.auth-provider-btn {
+  border-color: rgb(var(--v-border-color), 0.22);
+  background: rgb(var(--v-theme-surface));
+}
+
+.auth-provider-btn:hover {
+  border-color: rgb(var(--v-theme-primary), 0.6);
+}
+
 .last-used-chip {
   top: -8px;
   left: -8px;
