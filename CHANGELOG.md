@@ -1,10 +1,38 @@
 # CHANGELOG
 
-*🌎 [Leer en Español](CHANGELOG_ES.md)*
+_🌎 [Leer en Español](CHANGELOG_ES.md)_
 
 This repository is a 100% free, self-hosted fork of
 [NdoleStudio/httpsms](https://github.com/NdoleStudio/httpsms). Versioning
 continues after the last release of the original project (`v1.2.1`).
+
+## [2.2.0] - 2026-11-24
+
+### Added
+
+- Documentation code examples use the same code window as the landing page,
+  with one tab per language when several examples go together.
+- Dart examples: send an SMS with Dio and receive webhooks with Shelf.
+
+### Changed
+
+- All dashboard pages share the same content width (the Contacts page width).
+- Tables turn into a list of cards whenever their columns don't fit the
+  available width, at any screen size (before, only on phones), and back into
+  a table when there is room. Long values such as emails now wrap.
+
+### Fixed
+
+- Table footers showed `$vuetify.dataFooter…` keys instead of translated text.
+- Toasts showed English text in Spanish ("Contact created successfully",
+  API messages such as "phone updated successfully" or "validation errors
+  while …"); they are now translated.
+- Relative dates ("2 minutes ago"), durations and timestamps now follow the
+  dashboard language instead of always being English.
+- The encryption card link on the landing page overflowed its card.
+- Swagger UI no longer shows an "INVALID" badge: the online validator
+  (validator.swagger.io) is disabled because it cannot reach self-hosted
+  servers.
 
 ## [2.1.0] - 2026-11-24
 
@@ -95,6 +123,7 @@ security patches and dependency updates.
   numbers.
 - Flaky tests for contacts and conversation archiving.
 
-[Unreleased]: https://github.com/Ciudad-Valles-Open-Source/httpsms/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/Ciudad-Valles-Open-Source/httpsms/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/Ciudad-Valles-Open-Source/httpsms/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/Ciudad-Valles-Open-Source/httpsms/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/Ciudad-Valles-Open-Source/httpsms/releases/tag/v2.0.0

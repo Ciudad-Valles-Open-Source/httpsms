@@ -1,10 +1,43 @@
 # CHANGELOG
 
-*🌎 [Read in English](CHANGELOG.md)*
+_🌎 [Read in English](CHANGELOG.md)_
 
 Este repositorio es un fork autoalojado y 100 % gratuito de
 [NdoleStudio/httpsms](https://github.com/NdoleStudio/httpsms). La numeración
 continúa después de la última versión del proyecto original (`v1.2.1`).
+
+## [2.2.0] - 2026-11-24
+
+### Agregado
+
+- Los ejemplos de código de la documentación usan la misma ventana de código
+  que la página de inicio, con una pestaña por lenguaje cuando hay varios
+  ejemplos juntos.
+- Ejemplos en Dart: enviar un SMS con Dio y recibir webhooks con Shelf.
+
+### Cambiado
+
+- Todas las vistas del panel tienen el mismo ancho de contenido (el de
+  Contactos).
+- Las tablas se convierten en una lista de tarjetas cuando sus columnas no
+  caben en el ancho disponible, en cualquier tamaño de pantalla (antes solo en
+  teléfonos), y vuelven a ser tabla cuando hay espacio. Los valores largos,
+  como correos, ahora se ajustan.
+
+### Corregido
+
+- El pie de las tablas mostraba claves `$vuetify.dataFooter…` en lugar del
+  texto traducido.
+- Los avisos (toasts) salían en inglés en la vista en español ("Contact
+  created successfully", mensajes de la API como "phone updated successfully"
+  o "validation errors while …"); ahora se traducen.
+- Las fechas relativas ("hace 2 minutos"), duraciones y fechas ahora siguen el
+  idioma del panel en lugar de mostrarse siempre en inglés.
+- El enlace de la tarjeta de cifrado en la página de inicio se salía de la
+  tarjeta.
+- Swagger UI ya no muestra la insignia "INVALID": se desactivó el validador en
+  línea (validator.swagger.io), que no puede acceder a servidores
+  autoalojados.
 
 ## [2.1.0] - 2026-11-24
 
@@ -95,6 +128,7 @@ parches de seguridad y actualizaciones de dependencias.
 - Vulnerabilidades XSS en textos con nombres de contactos, horarios y números.
 - Pruebas intermitentes de contactos y de archivado de conversaciones.
 
-[Sin publicar]: https://github.com/Ciudad-Valles-Open-Source/httpsms/compare/v2.1.0...HEAD
+[Sin publicar]: https://github.com/Ciudad-Valles-Open-Source/httpsms/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/Ciudad-Valles-Open-Source/httpsms/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/Ciudad-Valles-Open-Source/httpsms/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/Ciudad-Valles-Open-Source/httpsms/releases/tag/v2.0.0
